@@ -2,813 +2,244 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="Admin Console // Cloudflare R2 Uploads // CHRISKHROS.MY">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
-    <!-- Header -->
-    <div class="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-black/10">
-      <div>
-        <div class="flex items-center gap-2 text-xs font-mono font-semibold text-purple-700 uppercase tracking-wider mb-1.5">
-          <svg class="w-4 h-4 text-brand-vibrant-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          Restricted Operator Portal
-        </div>
-        <h1 class="font-primary text-3xl sm:text-4xl font-extrabold text-text-dark tracking-tight">
-          Cloudflare R2 Direct Upload & Catalog
-        </h1>
-        <p class="text-sm font-secondary text-text-dark/60 mt-1">
-          Direct browser-to-R2 streaming via S3 presigned URLs. Bypasses 100MB Cloudflare Worker body limitations.
-        </p>
-      </div>
+<Layout title="Admin // chriskhros.my">
+  <div class="max-w-2xl mx-auto px-4 py-10 font-mono text-xs text-neutral-300">
 
-      <a
-        href="/"
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-black/10 hover:border-black/25 text-xs font-secondary font-semibold text-text-dark transition-all hover:scale-105 shadow-sm self-start"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back to Hub
-      </a>
+    <!-- Auth -->
+    <div class="mb-6 pb-4 border-b border-neutral-700">
+      <div class="flex items-center gap-2 mb-2">
+        <label for="tk" class="text-neutral-500">Admin Key</label>
+        <input type="password" id="tk" class="flex-1 px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500" />
+        <button type="button" id="test-btn" class="px-2 py-1 bg-neutral-700 border border-neutral-600 rounded hover:bg-neutral-600 text-neutral-300">Test</button>
+        <button type="button" id="save-btn" class="px-2 py-1 bg-neutral-700 border border-neutral-600 rounded hover:bg-neutral-600 text-neutral-300">Save</button>
+      </div>
+      <div id="auth-status" class="text-neutral-500">—</div>
     </div>
 
-    <!-- Step 1: Authentication Card -->
-    <div class="mb-8 p-8 rounded-[36px] bg-white/90 border border-black/10 shadow-lg backdrop-blur-md space-y-4">
-      <div class="flex items-center justify-between">
-        <label for="admin-token-input" class="font-primary text-lg font-bold text-text-dark flex items-center gap-2">
-          <span>1. Admin Secret Key</span>
-          <span class="text-xs font-mono text-text-dark/50 font-normal">(Required for R2 Presigning & API Access)</span>
-        </label>
-        <span id="auth-status-badge" class="text-xs font-mono px-3 py-1 rounded-full bg-black/5 text-text-dark/70 border border-black/10">
-          Not Verified
-        </span>
+    <!-- Upload -->
+    <form id="upload-form" class="mb-6 pb-4 border-b border-neutral-700 space-y-2">
+      <div class="text-neutral-500 mb-1">Upload Binary</div>
+      <input type="file" id="file-input" class="block w-full text-neutral-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border file:border-neutral-600 file:bg-neutral-800 file:text-neutral-300 file:text-xs" />
+      <div class="grid grid-cols-2 gap-2">
+        <input type="text" id="m-title" placeholder="Title" class="px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500" />
+        <input type="text" id="m-version" placeholder="Version" class="px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500" />
+        <select id="m-platform" class="px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none">
+          <option>Windows</option><option>macOS</option><option>Linux</option><option>Web</option><option>Cross-Platform</option>
+        </select>
+        <select id="m-category" class="px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none">
+          <option>Binaries</option><option>Web Apps</option>
+        </select>
       </div>
-
-      <div class="flex flex-col sm:flex-row gap-2.5">
-        <div class="relative flex-1">
-          <input
-            type="password"
-            id="admin-token-input"
-            placeholder="Enter ADMIN_SECRET_KEY..."
-            class="w-full px-5 py-3 rounded-full bg-neutral-background/70 border border-black/10 text-text-dark font-mono text-sm focus:outline-none focus:border-brand-vibrant-purple focus:ring-2 focus:ring-brand-vibrant-purple/20 transition-all"
-            autocomplete="current-password"
-          />
-          <button
-            type="button"
-            id="toggle-token-visibility"
-            class="absolute inset-y-0 right-0 pr-4 flex items-center text-text-dark/40 hover:text-text-dark text-xs font-mono font-medium"
-          >
-            Show
-          </button>
+      <textarea id="m-desc" placeholder="Description" rows="2" class="w-full px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500 resize-none"></textarea>
+      <input type="text" id="m-tags" placeholder="Tags (comma separated)" class="w-full px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500" />
+      <!-- Progress -->
+      <div id="progress-wrap" class="hidden">
+        <div class="w-full h-1.5 bg-neutral-800 rounded overflow-hidden">
+          <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-100" style="width:0%"></div>
         </div>
-        <button
-          type="button"
-          id="test-token-btn"
-          class="px-6 py-3 rounded-full bg-brand-vibrant-teal/15 hover:bg-brand-vibrant-teal/25 border border-brand-vibrant-teal/40 text-xs font-secondary font-bold text-teal-800 transition-all hover:scale-105"
-        >
-          Test Key
-        </button>
-        <button
-          type="button"
-          id="save-token-btn"
-          class="px-6 py-3 rounded-full bg-text-dark hover:bg-brand-vibrant-purple text-white text-xs font-secondary font-bold transition-all hover:scale-105 shadow-md shadow-black/10"
-        >
-          Remember Key
-        </button>
+        <div id="progress-text" class="text-neutral-500 mt-0.5">0%</div>
       </div>
-      <p class="text-xs text-text-dark/50 font-secondary">
-        Token is stored securely in your browser's session and transmitted as <code class="text-text-dark font-mono font-medium">x-admin-token</code> to your Cloudflare Pages Functions.
-      </p>
-    </div>
-
-    <!-- Step 2: Upload & Registration Form -->
-    <form id="upload-form" class="space-y-8">
-      <!-- Drag and Drop Zone -->
-      <div class="p-8 rounded-[36px] bg-white/90 border border-black/10 shadow-lg backdrop-blur-md space-y-5">
-        <label class="block font-primary text-lg font-bold text-text-dark">
-          2. Binary File Upload (100MB – 250MB+)
-        </label>
-
-        <div
-          id="drop-zone"
-          class="relative border-2 border-dashed border-black/15 hover:border-brand-vibrant-purple rounded-[30px] p-10 text-center cursor-pointer transition-all bg-neutral-background/50 hover:bg-neutral-background group"
-        >
-          <input
-            type="file"
-            id="file-input"
-            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          />
-          <div class="space-y-3 pointer-events-none">
-            <div class="w-14 h-14 mx-auto rounded-full bg-white shadow-md flex items-center justify-center text-text-dark group-hover:scale-110 group-hover:text-brand-vibrant-purple transition-all">
-              <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-            </div>
-            <div class="font-primary text-base font-bold text-text-dark">
-              Drop binary here, or <span class="text-brand-vibrant-purple underline">browse local files</span>
-            </div>
-            <div class="text-xs font-mono text-text-dark/50">
-              Supports .exe, .dmg, .zip, .tar.gz, .pkg, .bin, .iso (Up to 5 GB via S3 presigned direct PUT)
-            </div>
-          </div>
-        </div>
-
-        <!-- Selected File Preview Card -->
-        <div id="file-preview-card" class="hidden p-5 rounded-[24px] bg-white border border-black/10 shadow-sm flex items-center justify-between gap-4">
-          <div class="flex items-center gap-3.5 overflow-hidden">
-            <div class="w-12 h-12 rounded-2xl bg-brand-vibrant-teal/15 border border-brand-vibrant-teal/30 flex items-center justify-center text-teal-800 flex-shrink-0 font-mono text-xs font-bold uppercase">
-              <span id="file-ext-badge">BIN</span>
-            </div>
-            <div class="overflow-hidden">
-              <div id="file-name-display" class="font-mono text-sm text-text-dark truncate font-semibold">file.zip</div>
-              <div class="flex items-center gap-2 text-xs font-mono text-text-dark/60 mt-0.5">
-                <span id="file-size-display">0 MB</span>
-                <span>•</span>
-                <span id="file-type-display">application/octet-stream</span>
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            id="remove-file-btn"
-            class="text-rose-600 hover:text-rose-700 px-3 py-1.5 rounded-full hover:bg-rose-50 text-xs font-secondary font-semibold transition-colors"
-          >
-            Remove
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 3: Metadata Details -->
-      <div class="p-8 rounded-[36px] bg-white/90 border border-black/10 shadow-lg backdrop-blur-md space-y-5">
-        <h3 class="font-primary text-lg font-bold text-text-dark">
-          3. Tool Details & Release Metadata
-        </h3>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label for="meta-title" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">Tool Title *</label>
-            <input
-              type="text"
-              id="meta-title"
-              required
-              placeholder="e.g., PacketForge Pro"
-              class="w-full px-4 py-3 rounded-full bg-neutral-background/70 border border-black/10 text-text-dark text-sm focus:outline-none focus:border-brand-vibrant-purple transition-all"
-            />
-          </div>
-
-          <div>
-            <label for="meta-version" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">Version *</label>
-            <input
-              type="text"
-              id="meta-version"
-              required
-              placeholder="e.g., v1.4.2"
-              class="w-full px-4 py-3 rounded-full bg-neutral-background/70 border border-black/10 text-text-dark text-sm font-mono focus:outline-none focus:border-brand-vibrant-purple transition-all"
-            />
-          </div>
-
-          <div>
-            <label for="meta-platform" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">Platform *</label>
-            <select
-              id="meta-platform"
-              required
-              class="w-full px-4 py-3 rounded-full bg-neutral-background/70 border border-black/10 text-text-dark text-sm font-mono focus:outline-none focus:border-brand-vibrant-purple transition-all cursor-pointer"
-            >
-              <option value="Windows">Windows</option>
-              <option value="macOS">macOS</option>
-              <option value="Linux">Linux</option>
-              <option value="Cross-Platform">Cross-Platform (Universal)</option>
-              <option value="Web">Web (Browser App)</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="meta-category" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">Category *</label>
-            <select
-              id="meta-category"
-              required
-              class="w-full px-4 py-3 rounded-full bg-neutral-background/70 border border-black/10 text-text-dark text-sm font-mono focus:outline-none focus:border-brand-vibrant-purple transition-all cursor-pointer"
-            >
-              <option value="Binaries">Binaries</option>
-              <option value="Web Apps">Web Apps</option>
-              <option value="Dev Tools">Dev Tools</option>
-              <option value="Utilities">Utilities</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label for="meta-description" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">Description *</label>
-          <textarea
-            id="meta-description"
-            rows="3"
-            required
-            placeholder="Brief explanation of the utility, feature set, or release notes..."
-            class="w-full px-4 py-3 rounded-2xl bg-neutral-background/70 border border-black/10 text-text-dark text-sm focus:outline-none focus:border-brand-vibrant-purple transition-all font-secondary"
-          ></textarea>
-        </div>
-
-        <!-- SHA-256 Checksum Calculation -->
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <label for="meta-sha256" class="text-xs font-mono text-text-dark/60 uppercase tracking-wider">SHA-256 Checksum (Optional)</label>
-            <button
-              type="button"
-              id="compute-sha-btn"
-              class="text-xs font-mono text-brand-vibrant-purple hover:underline flex items-center gap-1 font-semibold"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              Auto-Compute SHA-256 (Client-Side)
-            </button>
-          </div>
-          <input
-            type="text"
-            id="meta-sha256"
-            placeholder="Will auto-populate or enter manually..."
-            class="w-full px-4 py-3 rounded-full bg-neutral-background/70 border border-black/10 text-text-dark text-xs font-mono focus:outline-none focus:border-brand-vibrant-purple transition-all"
-          />
-        </div>
-
-        <div>
-          <label for="meta-tags" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">Tags (Comma-separated)</label>
-          <input
-            type="text"
-            id="meta-tags"
-            placeholder="e.g., Security, PCAP, Direct R2, CLI"
-            class="w-full px-4 py-3 rounded-full bg-neutral-background/70 border border-black/10 text-text-dark text-xs font-mono focus:outline-none focus:border-brand-vibrant-purple transition-all"
-          />
-        </div>
-      </div>
-
-      <!-- Upload Progress Container (Hidden initially) -->
-      <div id="progress-container" class="hidden p-8 rounded-[36px] bg-white/90 border border-black/10 shadow-lg space-y-4">
-        <div class="flex items-center justify-between text-xs font-mono">
-          <span id="progress-status-text" class="text-text-dark font-medium">Streaming binary directly to Cloudflare R2...</span>
-          <span id="progress-percentage" class="text-brand-vibrant-purple font-bold">0%</span>
-        </div>
-
-        <!-- Visual Bar -->
-        <div class="w-full h-3 rounded-full bg-black/10 overflow-hidden">
-          <div
-            id="progress-bar-fill"
-            class="h-full bg-gradient-to-r from-brand-vibrant-teal via-brand-vibrant-blue to-brand-vibrant-purple transition-all duration-150 w-0"
-          ></div>
-        </div>
-
-        <div class="flex items-center justify-between text-xs font-mono text-text-dark/60">
-          <span id="progress-bytes">0 MB / 0 MB</span>
-          <span id="progress-speed">0.0 MB/s</span>
-        </div>
-      </div>
-
-      <!-- Status / Alerts Box -->
-      <div id="status-box" class="hidden p-5 rounded-[24px] border text-xs font-mono"></div>
-
-      <!-- Submit Button -->
-      <button
-        type="submit"
-        id="submit-upload-btn"
-        class="w-full py-4 rounded-full bg-text-dark hover:bg-brand-vibrant-purple text-white font-secondary font-bold text-base transition-all shadow-xl hover:scale-[1.01] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <svg class="w-5 h-5 text-brand-vibrant-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-        </svg>
-        <span id="submit-btn-text">Generate Presigned Signature & Upload to R2</span>
-      </button>
+      <div id="upload-status" class="text-neutral-500"></div>
+      <button type="submit" id="upload-btn" class="w-full py-1.5 bg-neutral-700 border border-neutral-600 rounded hover:bg-neutral-600 text-neutral-200 disabled:opacity-40">Upload</button>
     </form>
 
-    <!-- Catalog Management Section -->
-    <div class="mt-20 pt-10 border-t border-black/10 space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="font-primary text-2xl font-bold text-text-dark">Catalog Management</h2>
-          <p class="text-xs text-text-dark/60 font-mono">Live entries stored in Cloudflare R2 index</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            id="clear-all-demo-btn"
-            class="px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-xs font-secondary font-bold text-rose-600 transition-all hover:scale-105"
-          >
-            Clear All Demo Tools
-          </button>
-          <button
-            type="button"
-            id="refresh-catalog-btn"
-            class="px-4 py-2 rounded-full bg-white border border-black/10 hover:border-black/25 text-xs font-secondary font-semibold text-text-dark transition-all hover:scale-105 shadow-sm"
-          >
-            Refresh List
-          </button>
+    <!-- Catalog -->
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-neutral-500">Catalog</span>
+        <div class="flex gap-1">
+          <button type="button" id="refresh-btn" class="px-2 py-0.5 bg-neutral-700 border border-neutral-600 rounded hover:bg-neutral-600 text-neutral-300">Refresh</button>
+          <button type="button" id="clear-btn" class="px-2 py-0.5 bg-neutral-800 border border-red-900 rounded hover:bg-red-900/30 text-red-400">Clear All</button>
         </div>
       </div>
-
-      <div id="catalog-list" class="space-y-3">
-        <!-- Rendered dynamically -->
-        <div class="p-8 text-center text-xs font-mono text-text-dark/50 bg-white/60 rounded-[28px] border border-black/5">
-          Loading catalog entries...
-        </div>
+      <div id="catalog" class="space-y-1">
+        <div class="text-neutral-600 py-4 text-center">loading...</div>
       </div>
     </div>
+
   </div>
 </Layout>
 
 <script>
-  // Client-side Upload and Catalog Management Script
-  const tokenInput = document.getElementById("admin-token-input") as HTMLInputElement;
-  const toggleVisibilityBtn = document.getElementById("toggle-token-visibility");
-  const saveTokenBtn = document.getElementById("save-token-btn");
-  const authBadge = document.getElementById("auth-status-badge");
-  const dropZone = document.getElementById("drop-zone");
+  const tk = document.getElementById("tk") as HTMLInputElement;
+  const testBtn = document.getElementById("test-btn");
+  const saveBtn = document.getElementById("save-btn");
+  const authStatus = document.getElementById("auth-status");
   const fileInput = document.getElementById("file-input") as HTMLInputElement;
-  const filePreview = document.getElementById("file-preview-card");
-  const fileNameDisplay = document.getElementById("file-name-display");
-  const fileSizeDisplay = document.getElementById("file-size-display");
-  const fileTypeDisplay = document.getElementById("file-type-display");
-  const fileExtBadge = document.getElementById("file-ext-badge");
-  const removeFileBtn = document.getElementById("remove-file-btn");
-  const computeShaBtn = document.getElementById("compute-sha-btn");
+  const form = document.getElementById("upload-form") as HTMLFormElement;
+  const uploadBtn = document.getElementById("upload-btn") as HTMLButtonElement;
+  const progressWrap = document.getElementById("progress-wrap");
+  const progressBar = document.getElementById("progress-bar");
+  const progressText = document.getElementById("progress-text");
+  const uploadStatus = document.getElementById("upload-status");
+  const refreshBtn = document.getElementById("refresh-btn");
+  const clearBtn = document.getElementById("clear-btn");
+  const catalog = document.getElementById("catalog");
 
-  const metaTitle = document.getElementById("meta-title") as HTMLInputElement;
-  const metaVersion = document.getElementById("meta-version") as HTMLInputElement;
-  const metaPlatform = document.getElementById("meta-platform") as HTMLSelectElement;
-  const metaCategory = document.getElementById("meta-category") as HTMLSelectElement;
-  const metaDescription = document.getElementById("meta-description") as HTMLTextAreaElement;
-  const metaSha256 = document.getElementById("meta-sha256") as HTMLInputElement;
-  const metaTags = document.getElementById("meta-tags") as HTMLInputElement;
+  const mTitle = document.getElementById("m-title") as HTMLInputElement;
+  const mVersion = document.getElementById("m-version") as HTMLInputElement;
+  const mPlatform = document.getElementById("m-platform") as HTMLSelectElement;
+  const mCategory = document.getElementById("m-category") as HTMLSelectElement;
+  const mDesc = document.getElementById("m-desc") as HTMLTextAreaElement;
+  const mTags = document.getElementById("m-tags") as HTMLInputElement;
 
-  const uploadForm = document.getElementById("upload-form") as HTMLFormElement;
-  const submitBtn = document.getElementById("submit-upload-btn") as HTMLButtonElement;
-  const submitBtnText = document.getElementById("submit-btn-text");
-  const progressContainer = document.getElementById("progress-container");
-  const progressBarFill = document.getElementById("progress-bar-fill");
-  const progressPercentage = document.getElementById("progress-percentage");
-  const progressBytes = document.getElementById("progress-bytes");
-  const progressSpeed = document.getElementById("progress-speed");
-  const progressStatusText = document.getElementById("progress-status-text");
-  const statusBox = document.getElementById("status-box");
+  function getToken() { return tk.value.trim(); }
 
-  const refreshCatalogBtn = document.getElementById("refresh-catalog-btn");
-  const catalogList = document.getElementById("catalog-list");
+  // Restore
+  const saved = sessionStorage.getItem("ck_admin_key") || "";
+  if (saved) tk.value = saved;
 
-  const testTokenBtn = document.getElementById("test-token-btn");
-  let selectedFile: File | null = null;
+  saveBtn?.addEventListener("click", () => {
+    const v = getToken();
+    if (v) { sessionStorage.setItem("ck_admin_key", v); if (authStatus) authStatus.textContent = "saved"; }
+    else { sessionStorage.removeItem("ck_admin_key"); if (authStatus) authStatus.textContent = "cleared"; }
+  });
 
-  async function testToken(showNotification = true) {
-    const val = tokenInput.value.trim();
-    if (!val) {
-      if (authBadge) {
-        authBadge.textContent = "No Key Entered";
-        authBadge.className = "text-xs font-mono px-3 py-1 rounded-full bg-black/5 text-text-dark/70 border border-black/10";
-      }
-      if (showNotification) showStatus("Please enter an Admin Secret Key first.", "error");
-      return false;
+  testBtn?.addEventListener("click", async () => {
+    const v = getToken();
+    if (!v) { if (authStatus) authStatus.textContent = "enter a key first"; return; }
+    if (authStatus) authStatus.textContent = "testing...";
+    try {
+      const r = await fetch("/api/tools?verify=true", { headers: { "x-admin-token": v } });
+      const d = await r.json().catch(() => ({}));
+      if (authStatus) authStatus.textContent = r.ok ? "✓ verified" : `✗ ${d.error || "failed"}`;
+    } catch (e: any) {
+      if (authStatus) authStatus.textContent = `✗ ${e.message}`;
     }
+  });
 
-    if (authBadge) {
-      authBadge.textContent = "Verifying...";
-      authBadge.className = "text-xs font-mono px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 border border-amber-500/30";
-    }
+  // Upload
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const token = getToken();
+    if (!token) { if (uploadStatus) uploadStatus.textContent = "enter admin key first"; return; }
+    const file = fileInput.files?.[0];
+    if (!file && mCategory.value === "Binaries") { if (uploadStatus) uploadStatus.textContent = "select a file"; return; }
+
+    uploadBtn.disabled = true;
+    if (uploadStatus) uploadStatus.textContent = "signing...";
+    progressWrap?.classList.remove("hidden");
 
     try {
-      const res = await fetch("/api/tools?verify=true", {
-        headers: { "x-admin-token": val },
-      });
-      const data = await res.json().catch(() => ({}));
+      let downloadUrl = "", fileKey = "";
 
-      if (res.ok && data.success) {
-        if (authBadge) {
-          authBadge.textContent = "Verified Active";
-          authBadge.className = "text-xs font-mono px-3 py-1 rounded-full bg-teal-500/20 text-teal-800 border border-teal-500/40 font-bold";
-        }
-        if (showNotification) showStatus("Your Admin Secret Key is verified and matches Cloudflare Pages!", "success");
-        return true;
-      } else {
-        if (authBadge) {
-          authBadge.textContent = "Auth Failed";
-          authBadge.className = "text-xs font-mono px-3 py-1 rounded-full bg-rose-500/20 text-rose-700 border border-rose-500/40 font-bold";
-        }
-        if (showNotification) {
-          showStatus(`<strong>Authentication Failed:</strong> ${data.error || "Secret key does not match."}`, "error");
-        }
-        return false;
-      }
-    } catch (err: any) {
-      if (authBadge) {
-        authBadge.textContent = "Network Error";
-        authBadge.className = "text-xs font-mono px-3 py-1 rounded-full bg-rose-500/10 text-rose-600 border border-rose-500/30";
-      }
-      if (showNotification) showStatus(`Network error checking key: ${err.message}`, "error");
-      return false;
-    }
-  }
-
-  testTokenBtn?.addEventListener("click", () => testToken(true));
-
-  // Restore saved token
-  const savedToken = sessionStorage.getItem("chriskhros_admin_token") || localStorage.getItem("chriskhros_admin_token") || "";
-  if (savedToken) {
-    tokenInput.value = savedToken;
-    testToken(false);
-  }
-
-  saveTokenBtn?.addEventListener("click", async () => {
-    const val = tokenInput.value.trim();
-    if (val) {
-      sessionStorage.setItem("chriskhros_admin_token", val);
-      localStorage.setItem("chriskhros_admin_token", val);
-      await testToken(true);
-    } else {
-      sessionStorage.removeItem("chriskhros_admin_token");
-      localStorage.removeItem("chriskhros_admin_token");
-      if (authBadge) {
-        authBadge.textContent = "Not Verified";
-        authBadge.className = "text-xs font-mono px-3 py-1 rounded-full bg-black/5 text-text-dark/70 border border-black/10";
-      }
-      showStatus("Admin token cleared.", "info");
-    }
-  });
-
-  toggleVisibilityBtn?.addEventListener("click", () => {
-    if (tokenInput.type === "password") {
-      tokenInput.type = "text";
-      toggleVisibilityBtn.textContent = "Hide";
-    } else {
-      tokenInput.type = "password";
-      toggleVisibilityBtn.textContent = "Show";
-    }
-  });
-
-  // Drag and Drop
-  dropZone?.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropZone.classList.add("border-brand-vibrant-purple", "bg-brand-vibrant-purple/5");
-  });
-
-  dropZone?.addEventListener("dragleave", () => {
-    dropZone.classList.remove("border-brand-vibrant-purple", "bg-brand-vibrant-purple/5");
-  });
-
-  dropZone?.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropZone.classList.remove("border-brand-vibrant-purple", "bg-brand-vibrant-purple/5");
-    if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-      handleFileSelected(e.dataTransfer.files[0]);
-    }
-  });
-
-  fileInput?.addEventListener("change", (e) => {
-    const target = e.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) {
-      handleFileSelected(target.files[0]);
-    }
-  });
-
-  function handleFileSelected(file: File) {
-    selectedFile = file;
-    const mbSize = (file.size / (1024 * 1024)).toFixed(2);
-    const ext = file.name.split(".").pop()?.toUpperCase() || "BIN";
-
-    if (fileNameDisplay) fileNameDisplay.textContent = file.name;
-    if (fileSizeDisplay) fileSizeDisplay.textContent = `${mbSize} MB`;
-    if (fileTypeDisplay) fileTypeDisplay.textContent = file.type || "binary/octet-stream";
-    if (fileExtBadge) fileExtBadge.textContent = ext.substring(0, 4);
-
-    filePreview?.classList.remove("hidden");
-    dropZone?.classList.add("hidden");
-
-    // Auto-fill title and platform guess
-    if (!metaTitle.value) {
-      const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-      metaTitle.value = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
-    }
-
-    if (file.name.endsWith(".exe") || file.name.endsWith(".msi")) {
-      metaPlatform.value = "Windows";
-      metaCategory.value = "Binaries";
-    } else if (file.name.endsWith(".dmg") || file.name.endsWith(".pkg")) {
-      metaPlatform.value = "macOS";
-      metaCategory.value = "Binaries";
-    } else if (file.name.endsWith(".tar.gz") || file.name.endsWith(".AppImage") || file.name.endsWith(".deb")) {
-      metaPlatform.value = "Linux";
-      metaCategory.value = "Binaries";
-    }
-  }
-
-  removeFileBtn?.addEventListener("click", () => {
-    selectedFile = null;
-    fileInput.value = "";
-    filePreview?.classList.add("hidden");
-    dropZone?.classList.remove("hidden");
-    if (metaSha256) metaSha256.value = "";
-  });
-
-  // Client-Side Streaming SHA-256 calculation
-  computeShaBtn?.addEventListener("click", async () => {
-    if (!selectedFile) {
-      showStatus("Please select a file first to calculate SHA-256.", "error");
-      return;
-    }
-
-    computeShaBtn.innerHTML = `
-      <svg class="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Hashing in WebCrypto...
-    `;
-
-    try {
-      const buffer = await selectedFile.arrayBuffer();
-      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-
-      if (metaSha256) {
-        metaSha256.value = hashHex;
-      }
-      showStatus(`SHA-256 computed: ${hashHex.substring(0, 16)}...`, "success");
-    } catch (err: any) {
-      showStatus(`Failed to compute hash: ${err.message}`, "error");
-    } finally {
-      computeShaBtn.innerHTML = `
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-        Re-compute SHA-256
-      `;
-    }
-  });
-
-  function showStatus(message: string, type: "success" | "error" | "info") {
-    if (!statusBox) return;
-    statusBox.classList.remove("hidden", "bg-teal-50", "border-teal-500/40", "text-teal-900", "bg-rose-50", "border-rose-500/40", "text-rose-900", "bg-black/5", "border-black/10", "text-text-dark");
-
-    if (type === "success") {
-      statusBox.classList.add("bg-teal-50", "border-teal-500/40", "text-teal-900");
-    } else if (type === "error") {
-      statusBox.classList.add("bg-rose-50", "border-rose-500/40", "text-rose-900");
-    } else {
-      statusBox.classList.add("bg-black/5", "border-black/10", "text-text-dark");
-    }
-    statusBox.innerHTML = message;
-  }
-
-  // Handle Form Submission: Direct S3 Upload
-  uploadForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const token = tokenInput.value.trim();
-    if (!token) {
-      showStatus("Admin Secret Key is required. Please enter it in Step 1.", "error");
-      tokenInput.focus();
-      return;
-    }
-
-    if (!selectedFile && metaCategory.value === "Binaries") {
-      showStatus("Please select a binary file to upload.", "error");
-      return;
-    }
-
-    submitBtn.disabled = true;
-    if (submitBtnText) submitBtnText.textContent = "Negotiating R2 Presigned PUT URL...";
-    progressContainer?.classList.remove("hidden");
-    if (progressBarFill) progressBarFill.style.width = "0%";
-    if (progressPercentage) progressPercentage.textContent = "0%";
-
-    try {
-      let downloadUrl = "";
-      let fileKey = "";
-
-      if (selectedFile) {
-        if (progressStatusText) progressStatusText.textContent = "Requesting S3 Presigned URL from Cloudflare Functions...";
-
+      if (file) {
         const signRes = await fetch("/api/sign-upload", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-token": token,
-          },
+          headers: { "Content-Type": "application/json", "x-admin-token": token },
           body: JSON.stringify({
-            filename: selectedFile.name,
-            contentType: selectedFile.type || "application/octet-stream",
-            sizeBytes: selectedFile.size,
-            platform: metaPlatform.value,
-            category: metaCategory.value,
-            version: metaVersion.value,
+            filename: file.name,
+            contentType: file.type || "application/octet-stream",
+            sizeBytes: file.size,
+            platform: mPlatform.value,
+            version: mVersion.value,
           }),
         });
-
-        if (!signRes.ok) {
-          const errData = await signRes.json().catch(() => ({}));
-          throw new Error(errData.error || `Presign failed with status ${signRes.status}`);
-        }
-
+        if (!signRes.ok) { const e = await signRes.json().catch(() => ({})); throw new Error(e.error || `sign failed ${signRes.status}`); }
         const signData = await signRes.json();
-        const uploadUrl = signData.uploadUrl;
         downloadUrl = signData.downloadUrl;
         fileKey = signData.fileKey;
 
-        if (progressStatusText) progressStatusText.textContent = "Streaming binary directly to Cloudflare R2 bucket...";
-
+        if (uploadStatus) uploadStatus.textContent = "uploading to R2...";
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
-          const startTime = Date.now();
-
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const percent = Math.round((event.loaded / event.total) * 100);
-              const elapsedSec = (Date.now() - startTime) / 1000;
-              const speedMBs = elapsedSec > 0 ? (event.loaded / (1024 * 1024)) / elapsedSec : 0;
-              const loadedMB = (event.loaded / (1024 * 1024)).toFixed(1);
-              const totalMB = (event.total / (1024 * 1024)).toFixed(1);
-
-              if (progressBarFill) progressBarFill.style.width = `${percent}%`;
-              if (progressPercentage) progressPercentage.textContent = `${percent}%`;
-              if (progressBytes) progressBytes.textContent = `${loadedMB} MB / ${totalMB} MB`;
-              if (progressSpeed) progressSpeed.textContent = `${speedMBs.toFixed(2)} MB/s`;
+          xhr.upload.onprogress = (ev) => {
+            if (ev.lengthComputable) {
+              const pct = Math.round((ev.loaded / ev.total) * 100);
+              if (progressBar) progressBar.style.width = `${pct}%`;
+              if (progressText) progressText.textContent = `${pct}%`;
             }
           };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve();
-            } else {
-              reject(new Error(`R2 direct PUT returned status ${xhr.status}: ${xhr.statusText}`));
-            }
-          };
-
-          xhr.onerror = () => reject(new Error("Network error during direct R2 streaming. Check R2 CORS settings."));
-          xhr.ontimeout = () => reject(new Error("R2 upload timed out."));
-
-          xhr.open("PUT", uploadUrl, true);
-          xhr.setRequestHeader("Content-Type", selectedFile?.type || "application/octet-stream");
-          xhr.send(selectedFile);
+          xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error(`R2 PUT ${xhr.status}`));
+          xhr.onerror = () => reject(new Error("network error"));
+          xhr.open("PUT", signData.uploadUrl, true);
+          xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+          xhr.send(file);
         });
       }
 
-      if (progressStatusText) progressStatusText.textContent = "Registering release metadata into R2 catalog...";
-
-      const tagsArray = metaTags.value
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean);
-
-      const toolPayload = {
-        title: metaTitle.value.trim(),
-        version: metaVersion.value.trim(),
-        platform: metaPlatform.value,
-        category: metaCategory.value,
-        description: metaDescription.value.trim(),
-        sha256: metaSha256.value.trim() || undefined,
-        tags: tagsArray.length > 0 ? tagsArray : [metaPlatform.value, metaCategory.value],
-        type: metaCategory.value === "Web Apps" ? "web" : "binary",
-        downloadUrl: downloadUrl || undefined,
-        filename: selectedFile?.name,
-        fileKey: fileKey || undefined,
-        sizeBytes: selectedFile?.size,
-        size: selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB` : undefined,
-        releaseDate: new Date().toISOString().split("T")[0],
-      };
-
+      if (uploadStatus) uploadStatus.textContent = "registering...";
+      const tags = mTags.value.split(",").map(t => t.trim()).filter(Boolean);
       const metaRes = await fetch("/api/tools", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-token": token,
-        },
-        body: JSON.stringify(toolPayload),
+        headers: { "Content-Type": "application/json", "x-admin-token": token },
+        body: JSON.stringify({
+          title: mTitle.value.trim(),
+          version: mVersion.value.trim(),
+          platform: mPlatform.value,
+          category: mCategory.value,
+          description: mDesc.value.trim(),
+          tags: tags.length ? tags : [mPlatform.value],
+          type: mCategory.value === "Web Apps" ? "web" : "binary",
+          downloadUrl: downloadUrl || undefined,
+          filename: file?.name,
+          fileKey: fileKey || undefined,
+          sizeBytes: file?.size,
+          size: file ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` : undefined,
+          releaseDate: new Date().toISOString().split("T")[0],
+        }),
       });
+      if (!metaRes.ok) { const e = await metaRes.json().catch(() => ({})); throw new Error(e.error || "register failed"); }
 
-      if (!metaRes.ok) {
-        const errJson = await metaRes.json().catch(() => ({}));
-        throw new Error(errJson.error || "Failed to persist tool metadata.");
-      }
-
-      showStatus(`🎉 Successfully uploaded and registered "${toolPayload.title}"! <br><a href="/" class="underline font-bold">View in Directory &rarr;</a>`, "success");
-
-      // Reset form
-      selectedFile = null;
+      if (uploadStatus) uploadStatus.textContent = "✓ done";
+      mTitle.value = ""; mVersion.value = ""; mDesc.value = ""; mTags.value = "";
       fileInput.value = "";
-      filePreview?.classList.add("hidden");
-      dropZone?.classList.remove("hidden");
-      metaTitle.value = "";
-      metaVersion.value = "";
-      metaDescription.value = "";
-      metaSha256.value = "";
-      metaTags.value = "";
-
       loadCatalog();
-    } catch (err: any) {
-      showStatus(`Upload failed: ${err.message}`, "error");
+    } catch (e: any) {
+      if (uploadStatus) uploadStatus.textContent = `✗ ${e.message}`;
     } finally {
-      submitBtn.disabled = false;
-      if (submitBtnText) submitBtnText.textContent = "Generate Presigned Signature & Upload to R2";
+      uploadBtn.disabled = false;
     }
   });
 
-  // Load and Render Catalog
+  // Catalog
   async function loadCatalog() {
-    if (!catalogList) return;
+    if (!catalog) return;
     try {
-      const res = await fetch("/api/tools");
-      if (!res.ok) throw new Error("Failed to load catalog");
-      const tools = await res.json();
-
-      if (!Array.isArray(tools) || tools.length === 0) {
-        catalogList.innerHTML = `<div class="p-8 text-center text-xs font-mono text-text-dark/50 bg-white/60 rounded-[28px] border border-black/5">Catalog is currently empty.</div>`;
+      const r = await fetch("/api/tools");
+      if (!r.ok) throw new Error("fetch failed");
+      const items = await r.json();
+      if (!Array.isArray(items) || items.length === 0) {
+        catalog.innerHTML = `<div class="text-neutral-600 py-4 text-center">empty</div>`;
         return;
       }
+      catalog.innerHTML = items.map((t: any) =>
+        `<div class="flex items-center justify-between py-1 px-2 bg-neutral-800 rounded border border-neutral-700">
+          <div class="truncate"><span class="text-neutral-200">${t.title}</span> <span class="text-neutral-600">${t.version || ""} · ${t.platform}</span></div>
+          <button class="del-btn text-red-500 hover:text-red-400 px-1" data-id="${t.id}">×</button>
+        </div>`
+      ).join("");
 
-      catalogList.innerHTML = tools
-        .map(
-          (t: any) => `
-          <div class="p-5 rounded-[24px] bg-white border border-black/10 shadow-sm flex items-center justify-between gap-4">
-            <div class="overflow-hidden">
-              <div class="flex items-center gap-2">
-                <span class="font-primary font-bold text-text-dark text-base">${t.title}</span>
-                <span class="font-mono text-xs text-text-dark/50 font-medium">${t.version}</span>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-black/5 text-text-dark/70 border border-black/5">${t.platform}</span>
-              </div>
-              <div class="text-xs text-text-dark/70 truncate mt-1 font-secondary">${t.description}</div>
-              <div class="text-[11px] font-mono text-text-dark/50 mt-1.5 flex items-center gap-3">
-                <span>${t.size || "N/A"}</span>
-                <span>•</span>
-                <span>${t.releaseDate}</span>
-                ${t.downloadUrl ? `<span>•</span><a href="${t.downloadUrl}" target="_blank" class="text-purple-600 underline font-medium">Download Link</a>` : ""}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              class="delete-tool-btn text-xs font-secondary font-bold text-rose-600 hover:text-rose-700 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 transition-all flex-shrink-0"
-              data-id="${t.id}"
-            >
-              Delete
-            </button>
-          </div>
-        `
-        )
-        .join("");
-
-      document.querySelectorAll<HTMLButtonElement>(".delete-tool-btn").forEach((btn) => {
+      catalog.querySelectorAll<HTMLButtonElement>(".del-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-id");
-          const token = tokenInput.value.trim();
-          if (!token) {
-            alert("Please provide the Admin Secret Key in Step 1 first.");
-            return;
-          }
-          if (confirm(`Are you sure you want to remove tool "${id}" from catalog?`)) {
-            try {
-              const delRes = await fetch(`/api/tools?id=${encodeURIComponent(id || "")}`, {
-                method: "DELETE",
-                headers: { "x-admin-token": token },
-              });
-              if (!delRes.ok) {
-                const err = await delRes.json().catch(() => ({}));
-                throw new Error(err.error || "Delete failed");
-              }
-              loadCatalog();
-            } catch (err: any) {
-              alert(err.message);
-            }
-          }
+          const token = getToken();
+          if (!token) { alert("enter admin key"); return; }
+          if (!confirm(`Delete "${id}"?`)) return;
+          try {
+            const r = await fetch(`/api/tools?id=${encodeURIComponent(id || "")}`, { method: "DELETE", headers: { "x-admin-token": token } });
+            if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || "delete failed"); }
+            loadCatalog();
+          } catch (e: any) { alert(e.message); }
         });
       });
-    } catch (err) {
-      catalogList.innerHTML = `<div class="p-5 text-xs font-mono text-rose-600 bg-rose-50 rounded-[24px] border border-rose-200">Failed to fetch tools catalog.</div>`;
+    } catch {
+      catalog.innerHTML = `<div class="text-red-500 py-2 text-center">failed to load</div>`;
     }
   }
 
-  const clearAllDemoBtn = document.getElementById("clear-all-demo-btn");
-  clearAllDemoBtn?.addEventListener("click", async () => {
-    const token = tokenInput.value.trim();
-    if (!token) {
-      alert("Please provide the Admin Secret Key in Step 1 first.");
-      tokenInput.focus();
-      return;
-    }
-    if (confirm("Are you sure you want to delete ALL pre-made demo tools and start with an empty catalog?")) {
-      try {
-        const delRes = await fetch("/api/tools?all=true", {
-          method: "DELETE",
-          headers: { "x-admin-token": token },
-        });
-        if (!delRes.ok) {
-          const err = await delRes.json().catch(() => ({}));
-          throw new Error(err.error || `Delete failed with status ${delRes.status}`);
-        }
-        showStatus("All demo tools have been cleared from the catalog.", "success");
-        loadCatalog();
-      } catch (err: any) {
-        showStatus(`Failed to clear tools: ${err.message}`, "error");
-      }
-    }
+  refreshBtn?.addEventListener("click", loadCatalog);
+
+  clearBtn?.addEventListener("click", async () => {
+    const token = getToken();
+    if (!token) { alert("enter admin key"); return; }
+    if (!confirm("Delete ALL items?")) return;
+    try {
+      const r = await fetch("/api/tools?all=true", { method: "DELETE", headers: { "x-admin-token": token } });
+      if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || "clear failed"); }
+      loadCatalog();
+    } catch (e: any) { alert(e.message); }
   });
 
-  refreshCatalogBtn?.addEventListener("click", loadCatalog);
   loadCatalog();
 </script>

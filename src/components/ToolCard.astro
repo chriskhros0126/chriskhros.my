@@ -39,41 +39,41 @@ const {
 const platformConfig: Record<string, { label: string; bg: string; text: string; border: string }> = {
   Windows: {
     label: "Windows x64",
-    bg: "bg-blue-500/10",
-    text: "text-blue-600",
-    border: "border-blue-500/30",
+    bg: "bg-cyan-500/10",
+    text: "text-cyan-400",
+    border: "border-cyan-500/30",
   },
   macOS: {
-    label: "macOS Universal",
+    label: "macOS",
     bg: "bg-purple-500/10",
-    text: "text-purple-600",
+    text: "text-purple-400",
     border: "border-purple-500/30",
   },
   Linux: {
     label: "Linux AMD64",
     bg: "bg-amber-500/10",
-    text: "text-amber-700",
+    text: "text-amber-400",
     border: "border-amber-500/30",
   },
   Web: {
-    label: "Browser Native",
-    bg: "bg-teal-500/10",
-    text: "text-teal-700",
-    border: "border-teal-500/30",
+    label: "In-Browser Web Tool",
+    bg: "bg-emerald-500/10",
+    text: "text-emerald-400",
+    border: "border-emerald-500/30",
   },
   "Cross-Platform": {
     label: "Universal",
     bg: "bg-indigo-500/10",
-    text: "text-indigo-600",
+    text: "text-indigo-400",
     border: "border-indigo-500/30",
   },
 };
 
 const currentPlatform = platformConfig[platform] || {
   label: platform,
-  bg: "bg-black/5",
-  text: "text-text-dark/80",
-  border: "border-black/10",
+  bg: "bg-zinc-800/80",
+  text: "text-zinc-300",
+  border: "border-zinc-700",
 };
 
 const isWeb = type === "web" || !downloadUrl;
@@ -81,7 +81,7 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
 ---
 
 <div
-  class="tool-card group relative flex flex-col justify-between rounded-[32px] bg-white/85 hover:bg-white p-7 border border-black/10 hover:border-black/20 transition-all duration-300 shadow-md hover:shadow-2xl hover:-translate-y-1.5 backdrop-blur-md"
+  class="tool-card group relative flex flex-col justify-between rounded-xl bg-hub-surface/80 p-6 border border-hub-border hover:border-hub-borderHover transition-all duration-200 hover:shadow-xl hover:shadow-black/40 backdrop-blur-sm"
   data-id={id}
   data-category={category.toLowerCase()}
   data-platform={platform.toLowerCase()}
@@ -91,9 +91,9 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
 >
   <!-- Card Header -->
   <div>
-    <div class="flex items-start justify-between gap-3 mb-4">
+    <div class="flex items-start justify-between gap-3 mb-3">
       <!-- Platform badge -->
-      <span class={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium border ${currentPlatform.bg} ${currentPlatform.text} ${currentPlatform.border}`}>
+      <span class={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-medium border ${currentPlatform.bg} ${currentPlatform.text} ${currentPlatform.border}`}>
         {platform === "Windows" && (
           <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
             <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.949-1.95" />
@@ -110,14 +110,14 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
           </svg>
         )}
         {platform === "Web" && (
-          <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
+          <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
             <path d="M2 12h20" />
           </svg>
         )}
         {platform === "Cross-Platform" && (
-          <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
+          <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="12 2 2 7 12 12 22 7 12 2" />
             <polyline points="2 17 12 22 22 17" />
             <polyline points="2 12 12 17 22 12" />
@@ -127,30 +127,30 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
       </span>
 
       <!-- Version & Size Badges -->
-      <div class="flex items-center gap-1.5 font-mono text-xs">
-        <span class="text-text-dark/70 bg-black/5 px-2.5 py-0.5 rounded-full border border-black/5 font-medium">
+      <div class="flex items-center gap-2 font-mono text-xs">
+        <span class="text-zinc-400 bg-hub-surfaceElevated px-2 py-0.5 rounded border border-hub-border">
           {version}
         </span>
         {size && size !== "N/A" && (
-          <span class="px-2.5 py-0.5 rounded-full bg-black/5 text-text-dark/80 font-medium border border-black/5">
+          <span class={`px-2 py-0.5 rounded border ${isWeb ? 'bg-emerald-950/40 text-emerald-400 border-emerald-900/50' : 'bg-zinc-800/80 text-zinc-300 border-zinc-700/60'}`}>
             {size}
           </span>
         )}
       </div>
     </div>
 
-    <!-- Title in Syne display font -->
-    <h3 class="font-primary text-xl font-bold text-text-dark group-hover:text-brand-vibrant-purple transition-colors flex items-center gap-2">
+    <!-- Title -->
+    <h3 class="text-lg font-semibold text-hub-textBright group-hover:text-emerald-400 transition-colors flex items-center gap-2">
       {title}
       {featured && (
-        <span class="inline-flex items-center px-2 py-0.5 text-[10px] uppercase font-mono font-bold tracking-wider bg-brand-vibrant-purple/15 text-brand-vibrant-purple rounded-full">
+        <span class="inline-flex items-center px-1.5 py-0.2 text-[10px] uppercase font-mono font-bold tracking-wider bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30">
           Featured
         </span>
       )}
     </h3>
 
     <!-- Description -->
-    <p class="mt-2.5 text-sm font-secondary text-text-dark/70 leading-relaxed line-clamp-3">
+    <p class="mt-2 text-sm text-hub-textMuted leading-relaxed line-clamp-3">
       {description}
     </p>
 
@@ -158,7 +158,7 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
     {tags.length > 0 && (
       <div class="mt-4 flex flex-wrap gap-1.5">
         {tags.map((tag) => (
-          <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-black/5 text-text-dark/60 border border-black/5">
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-hub-bg/60 text-zinc-400 border border-hub-border/60">
             #{tag}
           </span>
         ))}
@@ -167,20 +167,20 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
   </div>
 
   <!-- Card Footer -->
-  <div class="mt-6 pt-5 border-t border-black/10 space-y-3.5">
+  <div class="mt-6 pt-4 border-t border-hub-border/60 space-y-3">
     <!-- Meta Info: Filename or Release Date -->
-    <div class="flex items-center justify-between text-xs font-mono text-text-dark/60">
-      <span class="truncate max-w-[200px]" title={filename || (isWeb ? 'Browser-native execution' : '')}>
+    <div class="flex items-center justify-between text-xs font-mono text-zinc-400">
+      <span class="truncate max-w-[200px]" title={filename || (isWeb ? 'Browser-executed' : '')}>
         {filename ? (
-          <span class="flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-text-dark/40 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <span class="flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-zinc-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
             <span class="truncate">{filename}</span>
           </span>
         ) : (
-          <span class="flex items-center gap-1.5 text-teal-700">
-            <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+          <span class="flex items-center gap-1 text-emerald-400/90">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             Zero Install
           </span>
         )}
@@ -193,9 +193,9 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
       {isWeb ? (
         <a
           href={targetActionUrl}
-          class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-text-dark hover:bg-brand-vibrant-purple text-white font-secondary font-semibold text-sm transition-all duration-200 shadow-md hover:scale-[1.02]"
+          class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-all duration-150 shadow-md shadow-emerald-950/40 hover:shadow-emerald-900/60"
         >
-          <svg class="w-4 h-4 text-brand-vibrant-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -206,9 +206,9 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
           <a
             href={targetActionUrl}
             download={filename || true}
-            class="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-text-dark hover:bg-brand-vibrant-purple text-white font-secondary font-semibold text-sm transition-all duration-200 shadow-md hover:scale-[1.02] group/btn"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-hub-surfaceElevated hover:bg-emerald-600/90 text-hub-textBright hover:text-white font-medium text-sm border border-hub-borderHover hover:border-emerald-500/50 transition-all duration-150 group/btn"
           >
-            <svg class="w-4 h-4 text-brand-vibrant-teal group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg class="w-4 h-4 text-emerald-400 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             Download Binary
@@ -217,7 +217,7 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
           <!-- Copy Link Button -->
           <button
             type="button"
-            class="copy-link-btn p-3 rounded-full bg-black/5 hover:bg-black/10 text-text-dark/70 hover:text-text-dark border border-black/10 transition-all hover:scale-105"
+            class="copy-link-btn p-2.5 rounded-lg bg-hub-surfaceElevated hover:bg-zinc-800 text-zinc-400 hover:text-white border border-hub-border hover:border-zinc-600 transition-all duration-150"
             data-url={targetActionUrl}
             title="Copy Direct Download Link"
           >
@@ -229,27 +229,27 @@ const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
       )}
     </div>
 
-    <!-- SHA256 Checksum Accordion -->
+    <!-- SHA256 Checksum Accordion if available -->
     {sha256 && (
-      <details class="text-[11px] font-mono text-text-dark/50 group/sha cursor-pointer">
-        <summary class="hover:text-text-dark transition-colors list-none flex items-center justify-between py-1">
+      <details class="text-[11px] font-mono text-zinc-500 group/sha cursor-pointer">
+        <summary class="hover:text-zinc-300 transition-colors list-none flex items-center justify-between py-1">
           <span class="flex items-center gap-1">
-            <svg class="w-3 h-3 text-text-dark/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-3 h-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
             SHA-256 Checksum
           </span>
-          <span class="text-[10px] text-text-dark/40 group-open/sha:rotate-180 transition-transform">▼</span>
+          <span class="text-[10px] text-zinc-600 group-open/sha:rotate-180 transition-transform">▼</span>
         </summary>
-        <div class="mt-1.5 p-2.5 rounded-2xl bg-black/5 border border-black/10 text-text-dark/80 break-all select-all flex items-center justify-between gap-2">
+        <div class="mt-1 p-2 rounded bg-black/40 border border-hub-border text-zinc-400 break-all select-all flex items-center justify-between gap-2">
           <span>{sha256}</span>
           <button
             type="button"
-            class="copy-sha-btn flex-shrink-0 text-text-dark/50 hover:text-brand-vibrant-purple p-1"
+            class="copy-sha-btn flex-shrink-0 text-zinc-500 hover:text-emerald-400 p-1"
             data-sha={sha256}
             title="Copy SHA-256"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
           </button>

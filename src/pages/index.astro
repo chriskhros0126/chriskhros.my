@@ -1,262 +1,209 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import ToolCard from "../components/ToolCard.astro";
-import SearchFilter from "../components/SearchFilter.astro";
-import initialTools from "../data/tools.json";
-
-const totalBinaries = initialTools.filter(t => t.type === "binary").length;
-const totalWebApps = initialTools.filter(t => t.type === "web").length;
+import tools from "../data/tools.json";
 ---
 
-<Layout title="CHRISKHROS.MY // Personal Tools & Binary Distribution Hub">
-  <!-- Top Hero Section with SVG Text Mask & Iridescent Card -->
-  <section class="w-full bg-neutral-background pt-6 pb-12 px-4 md:px-10 overflow-hidden">
-    <div class="max-w-[1440px] mx-auto">
-      
-      <!-- Masked Heading Section: Deep dark iridescent fluid clipped through Syne font -->
-      <div class="relative w-full h-[110px] md:h-[170px] mb-4 overflow-hidden flex items-end">
-        <svg class="w-full h-full" viewBox="0 0 1600 150" preserveAspectRatio="xMinYMid meet">
-          <defs>
-            <mask id="textMask">
-              <text x="0" y="120" font-family="'Syne', sans-serif" font-size="114" font-weight="800" fill="white" style="text-transform: uppercase; letter-spacing: -3px;">
-                TOOLS & BINARIES
-              </text>
-            </mask>
-          </defs>
-          <foreignObject mask="url(#textMask)" width="100%" height="100%">
-            <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full relative">
-              <img
-                src="https://images.unsplash.com/photo-1652982261193-8160514e985b?ixid=M3w4NjU0NDF8MHwxfHNlYXJjaHwxfHxEZWVwJTIwYmxhY2slMjBhbmQlMjBkYXJrJTIwYmx1ZSUyMGlyaWRlc2NlbnQlMjBmbHVpZCUyMHdhdmVzJTIwd2l0aCUyMHN1YnRsZSUyMG1ldGFsbGljJTIwaGlnaGxpZ2h0cyUyMGFuZCUyMGxpcXVpZCUyMHRleHR1cmV8ZW58MHwwfHx8MTc3MjAyMDgzN3ww&ixlib=rb-4.1.0&w=1600&fit=crop&fm=jpg&q=80"
-                alt="Deep iridescent fluid text mask"
-                class="w-full h-full object-cover"
-              />
-            </div>
-          </foreignObject>
-        </svg>
+<Layout title="chriskhros.my">
+  <div class="flex items-center justify-center min-h-screen p-4 sm:p-8">
+    <!-- Explorer Window -->
+    <div id="explorer" class="w-full max-w-5xl flex flex-col rounded-lg overflow-hidden border border-[#444] shadow-2xl shadow-black/60" style="min-height: 620px; max-height: 85vh;">
+
+      <!-- Title Bar -->
+      <div class="flex items-center justify-between px-3 h-8 bg-[#2d2d2d] border-b border-[#444] select-none flex-shrink-0">
+        <div class="flex items-center gap-2 text-xs text-[#ccc]">
+          <span>📁</span>
+          <span>chriskhros.my</span>
+        </div>
+        <div class="flex items-center gap-0.5">
+          <span class="w-10 h-7 flex items-center justify-center text-[#888] hover:bg-[#3c3c3c] text-xs cursor-default">─</span>
+          <span class="w-10 h-7 flex items-center justify-center text-[#888] hover:bg-[#3c3c3c] text-xs cursor-default">☐</span>
+          <span class="w-10 h-7 flex items-center justify-center text-[#888] hover:bg-[#c42b1c] hover:text-white text-xs cursor-default">✕</span>
+        </div>
       </div>
 
-      <!-- Main Showcase Box with Iridescent Background -->
-      <div class="relative w-full min-h-[580px] rounded-2xl md:rounded-[50px] overflow-hidden border border-white/10 shadow-2xl">
-        <!-- Main Background: Iridescent fluid abstract with gradient overlay -->
-        <div class="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1766340118459-2af615146bcd?ixid=M3w4NjU0NDF8MHwxfHNlYXJjaHwxfHxEYXJrJTIwaXJpZGVzY2VudCUyMGZsdWlkJTIwYWJzdHJhY3QlMjByaXBwbGVzJTIwbGlxdWlkJTIwd2F2ZXMlMjBwdXJwbGUlMjBibHVlJTIwYmxhY2slMjBtZXRhbGxpYyUyMGdsb3NzeXxlbnwwfDB8fHwxNzcyMDIxNzk5fDA&ixlib=rb-4.1.0&w=1600&fit=crop&fm=jpg&q=80"
-            alt="Iridescent fluid background"
-            class="w-full h-full object-cover"
+      <!-- Toolbar -->
+      <div class="flex items-center justify-between px-2 py-1 bg-[#2d2d2d] border-b border-[#3a3a3a] flex-shrink-0 gap-2">
+        <div class="flex items-center gap-0.5" id="filter-group">
+          <button data-filter="all" class="filter-btn active px-3 py-1 text-xs rounded text-white bg-[#3c3c3c]">All</button>
+          <button data-filter="web" class="filter-btn px-3 py-1 text-xs rounded text-[#888] hover:text-[#ccc] hover:bg-[#333]">Web Tools</button>
+          <button data-filter="binary" class="filter-btn px-3 py-1 text-xs rounded text-[#888] hover:text-[#ccc] hover:bg-[#333]">Binaries</button>
+        </div>
+        <div class="relative">
+          <input
+            type="text"
+            id="search"
+            placeholder="🔍  Search chriskhros.my"
+            class="w-48 sm:w-56 px-3 py-1 text-xs bg-[#3c3c3c] border border-[#555] rounded text-[#ccc] placeholder-[#666] focus:outline-none focus:border-[#007acc]"
+            autocomplete="off"
+            spellcheck="false"
           />
-          <div class="absolute inset-0 bg-gradient-to-b from-black/85 via-black/50 to-black/75"></div>
-          <div class="absolute inset-0 opacity-[0.04] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/stardust.png');"></div>
-        </div>
-
-        <!-- Content Overlay -->
-        <div class="relative z-10 w-full h-full grid grid-cols-1 lg:grid-cols-[380px_1fr] p-8 md:p-14 min-h-[580px]">
-          
-          <!-- Left Column -->
-          <div class="flex flex-col justify-between relative z-20">
-            <div>
-              <!-- Interactive Glassmorphic Badge with Pulse Glow -->
-              <div class="relative w-20 h-20 mb-8 group">
-                <div class="absolute inset-0 bg-brand-vibrant-teal/20 rounded-full blur-2xl group-hover:bg-brand-vibrant-purple/30 transition-all duration-700"></div>
-                <div class="relative w-full h-full bg-white/10 border border-white/20 backdrop-blur-xl rounded-[24px] flex items-center justify-center overflow-hidden shadow-2xl transform group-hover:rotate-6 transition-transform duration-500">
-                  <div class="absolute -inset-2 bg-gradient-to-br from-brand-vibrant-purple/20 via-transparent to-brand-vibrant-teal/20 animate-pulse"></div>
-                  <svg class="w-8 h-8 text-white group-hover:text-brand-vibrant-purple transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                  </svg>
-                </div>
-              </div>
-
-              <p class="text-xl md:text-2xl font-primary font-bold text-white tracking-tight">
-                High-throughput binary distribution
-              </p>
-              <p class="text-sm font-secondary text-white/70 mt-2">
-                Engineered for Cloudflare Pages + R2 ecosystem
-              </p>
-
-              <!-- Pill tags -->
-              <div class="mt-6 flex flex-wrap gap-2 text-xs font-mono">
-                <span class="px-3 py-1 rounded-full bg-white/10 text-white/90 border border-white/15 backdrop-blur-md">
-                  100MB – 250MB+ Direct S3 PUT
-                </span>
-                <span class="px-3 py-1 rounded-full bg-white/10 text-white/90 border border-white/15 backdrop-blur-md">
-                  Zero Egress Bandwidth Fees
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right Column -->
-          <div class="flex flex-col justify-between items-start lg:items-end lg:pr-6 mt-10 lg:mt-0 relative z-20">
-            <div class="max-w-lg lg:text-left">
-              <p class="text-lg md:text-xl font-secondary text-white/90 leading-relaxed mb-8">
-                Personal tools, compiled desktop executables, and zero-latency browser utilities engineered to run directly on the Cloudflare edge, bypassing standard proxy limits via direct S3 pre-signed streaming.
-              </p>
-              
-              <div class="flex flex-wrap items-center gap-3">
-                <a
-                  href="#tools-section"
-                  class="inline-flex items-center justify-center px-8 py-3.5 bg-white text-text-dark hover:bg-brand-primary font-secondary text-base font-bold rounded-full hover:scale-105 transition-all duration-300 shadow-xl shadow-white/10"
-                >
-                  Explore Catalog
-                </a>
-                <a
-                  href="/tools/demo-tool"
-                  class="inline-flex items-center justify-center px-7 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-secondary text-base font-semibold rounded-full hover:scale-105 transition-all duration-300 backdrop-blur-md"
-                >
-                  Launch DevForge
-                </a>
-              </div>
-            </div>
-
-            <!-- Bottom Right Arrow Button (Scrolls to catalog) -->
-            <div class="mt-auto self-end lg:self-end pt-10">
-              <a
-                href="#tools-section"
-                class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300 group shadow-xl shadow-white/10"
-                title="Scroll down to tools directory"
-              >
-                <svg viewBox="19.588 20.146 159.561 159.541" class="w-8 h-8 md:w-10 md:h-10 text-text-dark group-hover:translate-x-1 group-hover:translate-y-1 transition-transform">
-                  <path fill="currentColor" d="M170.281 20.146v144.371L25.892 20.16l-6.27 6.268 144.421 144.393H19.588v8.866h159.561V20.146h-8.868z"></path>
-                </svg>
-              </a>
-            </div>
-          </div>
-
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Metrics Cards Section -->
-  <section class="w-full bg-neutral-background py-6 px-4 md:px-10">
-    <div class="max-w-[1440px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="p-6 rounded-[28px] bg-white/80 border border-black/10 backdrop-blur-md shadow-sm">
-        <div class="text-xs font-mono uppercase tracking-wider text-text-dark/50">Total Catalog</div>
-        <div class="mt-2 text-3xl font-extrabold font-primary text-text-dark" id="metric-total">{initialTools.length}</div>
-      </div>
-      <div class="p-6 rounded-[28px] bg-white/80 border border-black/10 backdrop-blur-md shadow-sm">
-        <div class="text-xs font-mono uppercase tracking-wider text-text-dark/50">Cloudflare R2 Binaries</div>
-        <div class="mt-2 text-3xl font-extrabold font-primary text-blue-600">{totalBinaries}</div>
-      </div>
-      <div class="p-6 rounded-[28px] bg-white/80 border border-black/10 backdrop-blur-md shadow-sm">
-        <div class="text-xs font-mono uppercase tracking-wider text-text-dark/50">In-Browser Apps</div>
-        <div class="mt-2 text-3xl font-extrabold font-primary text-teal-700">{totalWebApps}</div>
-      </div>
-      <div class="p-6 rounded-[28px] bg-white/80 border border-black/10 backdrop-blur-md shadow-sm">
-        <div class="text-xs font-mono uppercase tracking-wider text-text-dark/50">Storage Engine</div>
-        <div class="mt-2 text-2xl font-extrabold font-primary text-purple-600">Cloudflare R2</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Tools Directory Section -->
-  <section id="tools-section" class="w-full bg-neutral-background py-10 px-4 md:px-10">
-    <div class="max-w-[1440px] mx-auto">
-      
-      <div class="mb-8">
-        <h2 class="font-primary text-3xl md:text-5xl font-extrabold text-text-dark tracking-tight">
-          Tools Directory
-        </h2>
-        <p class="text-sm font-secondary text-text-dark/60 mt-1">
-          Direct R2 downloads and browser-executed client utilities
-        </p>
+      <!-- Address Bar -->
+      <div class="px-2 py-1 flex-shrink-0 bg-[#2d2d2d]">
+        <div class="flex items-center gap-1 px-3 py-1 bg-[#3c3c3c] rounded text-xs text-[#888]">
+          <span>📁 This PC</span>
+          <span class="text-[#555]">›</span>
+          <span>chriskhros.my</span>
+          <span class="text-[#555]">›</span>
+          <span class="text-white font-medium">Tools</span>
+        </div>
       </div>
 
-      <!-- Search & Filter Bar -->
-      <SearchFilter totalTools={initialTools.length} />
+      <!-- Column Headers -->
+      <div class="flex items-center px-3 py-1.5 bg-[#2d2d2d] border-b border-[#444] text-[10px] uppercase tracking-wider text-[#888] select-none flex-shrink-0">
+        <div class="flex-1 min-w-0">Name</div>
+        <div class="w-24 text-center hidden sm:block">Type</div>
+        <div class="w-20 text-right hidden sm:block">Size</div>
+        <div class="w-24 text-center hidden md:block">Platform</div>
+        <div class="w-24 text-right hidden md:block">Date</div>
+      </div>
 
-      <!-- Tools Grid -->
-      <div id="tools-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {initialTools.map((tool) => (
-          <ToolCard {...tool} />
-        ))}
+      <!-- File List -->
+      <div id="file-list" class="flex-1 overflow-y-auto bg-[#1e1e1e]">
+        {tools.map((tool: any) => {
+          const isWeb = tool.type === "web";
+          const icon = isWeb ? "🌐" : 
+            tool.filename?.endsWith(".dmg") ? "💿" :
+            tool.filename?.endsWith(".tar.gz") ? "📄" :
+            "📦";
+          const fileType = isWeb ? "Web App" : 
+            tool.filename ? "." + tool.filename.split(".").pop() : "Binary";
+          const href = isWeb ? (tool.route || "/tools/demo-tool") : (tool.downloadUrl || "#");
+
+          return (
+            <a
+              href={href}
+              download={!isWeb ? (tool.filename || true) : undefined}
+              class="file-row flex items-center px-3 py-1.5 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] no-underline text-[#ccc] transition-colors duration-75"
+              data-type={tool.type}
+              data-title={tool.title?.toLowerCase()}
+              data-tags={(tool.tags || []).join(",").toLowerCase()}
+              data-id={tool.id}
+            >
+              <div class="flex-1 min-w-0 flex items-center gap-2 truncate">
+                <span class="text-sm flex-shrink-0">{icon}</span>
+                <span class="truncate font-mono text-[13px]">{tool.title}</span>
+                {tool.version && <span class="text-[10px] text-[#666] flex-shrink-0">{tool.version}</span>}
+              </div>
+              <div class="w-24 text-center text-xs text-[#888] hidden sm:block font-mono">{fileType}</div>
+              <div class="w-20 text-right text-xs text-[#888] hidden sm:block">{isWeb ? "—" : (tool.size || "—")}</div>
+              <div class="w-24 text-center text-xs text-[#888] hidden md:block">{tool.platform}</div>
+              <div class="w-24 text-right text-xs text-[#666] hidden md:block">{tool.releaseDate || "—"}</div>
+            </a>
+          );
+        })}
       </div>
 
       <!-- Empty State -->
-      <div id="empty-state" class={`${initialTools.length === 0 ? '' : 'hidden'} text-center py-20 px-4 rounded-[40px] border border-dashed border-black/20 bg-white/50 mt-8 backdrop-blur-sm`}>
-        <div class="w-16 h-16 mx-auto rounded-full bg-black/5 flex items-center justify-center text-text-dark/40 mb-4">
-          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-        </div>
-        <h3 class="font-primary text-2xl font-bold text-text-dark">Catalog is currently empty</h3>
-        <p class="text-sm font-secondary text-text-dark/60 mt-2 max-w-md mx-auto">
-          No binaries or tools published yet. Visit the <a href="/admin" class="text-purple-600 underline hover:text-purple-700 font-semibold">Admin Console</a> to stream your first release directly into Cloudflare R2!
-        </p>
+      <div id="empty-state" class={`flex-1 flex items-center justify-center bg-[#1e1e1e] text-[#555] text-sm ${tools.length === 0 ? "" : "hidden"}`}>
+        This folder is empty
       </div>
 
-      <!-- Admin Upload Banner -->
-      <div class="mt-16 p-8 md:p-12 rounded-[40px] bg-text-dark text-white border border-white/10 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div class="space-y-2 max-w-xl">
-          <div class="text-xs font-mono text-brand-vibrant-teal flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-brand-vibrant-teal animate-pulse"></span>
-            Direct S3 Multipart & Presigned Architecture
-          </div>
-          <h4 class="font-primary text-2xl md:text-3xl font-bold text-white">Deploy a binary or tool release</h4>
-          <p class="text-sm font-secondary text-white/70 leading-relaxed">
-            Use the secure upload console to stream files directly into Cloudflare R2 with automatic presigned PUT signatures and SHA-256 integrity verification.
-          </p>
-        </div>
-        <a
-          href="/admin"
-          class="flex-shrink-0 inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-text-dark hover:bg-brand-primary font-secondary font-bold text-sm transition-all hover:scale-105 shadow-xl"
-        >
-          <span>Open Admin Console</span>
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </a>
+      <!-- Status Bar -->
+      <div class="flex items-center justify-between px-3 py-1 bg-[#2d2d2d] border-t border-[#444] text-[11px] text-[#888] select-none flex-shrink-0">
+        <span id="item-count">{tools.length} item{tools.length !== 1 ? "s" : ""}</span>
+        <span>chriskhros.my · Cloudflare R2</span>
       </div>
 
     </div>
-  </section>
+  </div>
 
-  <!-- Live Dynamic Sync Script -->
   <script>
-    async function syncLiveCatalog() {
+    const filterBtns = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
+    const searchInput = document.getElementById("search") as HTMLInputElement;
+    const rows = document.querySelectorAll<HTMLAnchorElement>(".file-row");
+    const itemCount = document.getElementById("item-count");
+    const emptyState = document.getElementById("empty-state");
+    const fileList = document.getElementById("file-list");
+
+    let activeFilter = "all";
+    let query = "";
+    let selectedRow: HTMLAnchorElement | null = null;
+
+    function update() {
+      let count = 0;
+      rows.forEach(row => {
+        const type = row.getAttribute("data-type") || "";
+        const title = row.getAttribute("data-title") || "";
+        const tags = row.getAttribute("data-tags") || "";
+
+        const matchFilter = activeFilter === "all" || type === activeFilter;
+        const matchQuery = !query || title.includes(query) || tags.includes(query);
+
+        if (matchFilter && matchQuery) {
+          row.classList.remove("hidden");
+          count++;
+        } else {
+          row.classList.add("hidden");
+        }
+      });
+
+      if (itemCount) itemCount.textContent = `${count} item${count !== 1 ? "s" : ""}`;
+      if (emptyState) emptyState.classList.toggle("hidden", count > 0);
+      if (fileList) fileList.classList.toggle("hidden", count === 0);
+    }
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filterBtns.forEach(b => {
+          b.classList.remove("active", "text-white", "bg-[#3c3c3c]");
+          b.classList.add("text-[#888]");
+        });
+        btn.classList.add("active", "text-white", "bg-[#3c3c3c]");
+        btn.classList.remove("text-[#888]");
+        activeFilter = btn.getAttribute("data-filter") || "all";
+        update();
+      });
+    });
+
+    searchInput?.addEventListener("input", () => {
+      query = searchInput.value.trim().toLowerCase();
+      update();
+    });
+
+    // Row selection (visual only, navigation handled by <a>)
+    rows.forEach(row => {
+      row.addEventListener("mousedown", (e) => {
+        if (selectedRow) selectedRow.style.backgroundColor = "";
+        selectedRow = row;
+        row.style.backgroundColor = "#264f78";
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".file-row") && selectedRow) {
+        selectedRow.style.backgroundColor = "";
+        selectedRow = null;
+      }
+    });
+
+    // Keyboard: / focuses search
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "/" && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput?.focus();
+        searchInput?.select();
+      }
+    });
+
+    // Live catalog sync
+    async function syncCatalog() {
       try {
         const res = await fetch("/api/tools");
         if (!res.ok) return;
-        const liveTools = await res.json();
-        if (!Array.isArray(liveTools)) return;
-
-        const liveIds = new Set(liveTools.map((t: any) => t.id));
-        const cards = document.querySelectorAll<HTMLElement>(".tool-card");
-
-        // Remove any cards that were deleted from the live R2 catalog
-        cards.forEach((card) => {
-          const id = card.getAttribute("data-id");
-          if (id && !liveIds.has(id)) {
-            card.remove();
-          }
+        const live = await res.json();
+        if (!Array.isArray(live)) return;
+        const liveIds = new Set(live.map((t: any) => t.id));
+        rows.forEach(row => {
+          const id = row.getAttribute("data-id");
+          if (id && !liveIds.has(id)) row.remove();
         });
-
-        // Update metrics
-        const metricTotal = document.getElementById("metric-total");
-        if (metricTotal) metricTotal.textContent = String(liveTools.length);
-
-        const remainingCards = document.querySelectorAll<HTMLElement>(".tool-card");
-        const resultsCount = document.getElementById("results-count");
-        if (resultsCount) {
-          resultsCount.textContent = `Showing ${remainingCards.length} of ${remainingCards.length} tools`;
-        }
-
-        const emptyState = document.getElementById("empty-state");
-        if (emptyState) {
-          if (remainingCards.length === 0) {
-            emptyState.classList.remove("hidden");
-          } else {
-            emptyState.classList.add("hidden");
-          }
-        }
-      } catch {
-        // Fallback silently to pre-rendered tools
-      }
+        update();
+      } catch {}
     }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", syncLiveCatalog);
-    } else {
-      syncLiveCatalog();
-    }
+    syncCatalog();
   </script>
 </Layout>

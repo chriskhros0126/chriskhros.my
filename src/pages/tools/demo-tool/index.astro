@@ -2,26 +2,26 @@
 import Layout from "../../../layouts/Layout.astro";
 ---
 
-<Layout title="DevForge // Client-Side Crypto & Binary Inspector // CHRISKHROS.MY">
+<Layout title="DevForge // Client-Side Crypto & Binary Inspector // chriskhros.my">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
     <!-- Header -->
-    <div class="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-black/10">
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-hub-border">
       <div>
-        <div class="flex items-center gap-2 text-xs font-mono font-semibold text-teal-800 uppercase tracking-wider mb-1.5">
-          <span class="w-2 h-2 rounded-full bg-brand-vibrant-teal animate-pulse"></span>
+        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 mb-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           100% Client-Side • Zero Network Latency • Offline-Ready
         </div>
-        <h1 class="font-primary text-3xl sm:text-4xl font-extrabold text-text-dark tracking-tight">
-          DevForge: Crypto & Binary Inspector
+        <h1 class="text-2xl sm:text-4xl font-bold font-sans text-hub-textBright">
+          DevForge: Crypto, Hash & Binary Inspector
         </h1>
-        <p class="text-sm font-secondary text-text-dark/60 mt-1">
-          Verify checksums of binaries downloaded from <code class="text-text-dark font-mono font-medium">chriskhros.my</code>, inspect JWTs, and perform cryptographic encoding directly in your browser.
+        <p class="text-xs sm:text-sm text-hub-textMuted mt-1">
+          Verify checksums of binaries downloaded from <code class="text-zinc-300">chriskhros.my</code>, inspect JWTs, and perform cryptographic encoding directly in your browser.
         </p>
       </div>
 
       <a
         href="/"
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-black/10 hover:border-black/25 text-xs font-secondary font-semibold text-text-dark transition-all hover:scale-105 shadow-sm self-start"
+        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-hub-surface border border-hub-border hover:border-hub-borderHover text-xs font-mono text-zinc-300 transition-colors self-start"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -31,31 +31,31 @@ import Layout from "../../../layouts/Layout.astro";
     </div>
 
     <!-- Tool Tabs -->
-    <div class="flex flex-wrap gap-2.5 mb-8">
+    <div class="flex flex-wrap gap-2 mb-8 border-b border-hub-border pb-3">
       <button
         type="button"
-        class="tool-tab active px-5 py-2.5 rounded-full text-xs font-secondary font-semibold transition-all border bg-text-dark text-white border-text-dark shadow-md"
+        class="tool-tab active px-4 py-2 rounded-lg text-xs font-mono transition-all border bg-emerald-500/15 text-emerald-300 border-emerald-500/40 font-medium"
         data-target="panel-binary-hash"
       >
         1. Binary File Checksum Verifier
       </button>
       <button
         type="button"
-        class="tool-tab px-5 py-2.5 rounded-full text-xs font-secondary font-medium transition-all border bg-white/70 text-text-dark/70 border-black/10 hover:text-text-dark hover:bg-white"
+        class="tool-tab px-4 py-2 rounded-lg text-xs font-mono transition-all border bg-hub-surface/60 text-zinc-400 border-hub-border hover:text-zinc-200"
         data-target="panel-text-hash"
       >
         2. Text Hashing (SHA-256 / SHA-512)
       </button>
       <button
         type="button"
-        class="tool-tab px-5 py-2.5 rounded-full text-xs font-secondary font-medium transition-all border bg-white/70 text-text-dark/70 border-black/10 hover:text-text-dark hover:bg-white"
+        class="tool-tab px-4 py-2 rounded-lg text-xs font-mono transition-all border bg-hub-surface/60 text-zinc-400 border-hub-border hover:text-zinc-200"
         data-target="panel-encoders"
       >
         3. Base64 & Hex Encoder
       </button>
       <button
         type="button"
-        class="tool-tab px-5 py-2.5 rounded-full text-xs font-secondary font-medium transition-all border bg-white/70 text-text-dark/70 border-black/10 hover:text-text-dark hover:bg-white"
+        class="tool-tab px-4 py-2 rounded-lg text-xs font-mono transition-all border bg-hub-surface/60 text-zinc-400 border-hub-border hover:text-zinc-200"
         data-target="panel-jwt"
       >
         4. JWT Inspector
@@ -64,13 +64,13 @@ import Layout from "../../../layouts/Layout.astro";
 
     <!-- PANEL 1: Binary File Checksum Verifier -->
     <div id="panel-binary-hash" class="tab-panel space-y-6">
-      <div class="p-8 rounded-[36px] bg-white/90 border border-black/10 shadow-lg backdrop-blur-md space-y-5">
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
         <div>
-          <h2 class="font-primary text-xl font-bold text-text-dark flex items-center gap-2.5">
+          <h2 class="text-base font-semibold text-hub-textBright flex items-center gap-2">
             <span>Direct Binary Checksum Verification</span>
-            <span class="text-xs font-mono px-3 py-1 rounded-full bg-teal-500/10 text-teal-800 border border-teal-500/30">WebCrypto API</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">WebCrypto API</span>
           </h2>
-          <p class="text-xs text-text-dark/60 font-secondary mt-1">
+          <p class="text-xs text-zinc-400 font-mono mt-1">
             Drop your downloaded .exe, .dmg, or .zip binary here. Checksums are computed locally using hardware-accelerated WebCrypto—zero bytes are sent over the network.
           </p>
         </div>
@@ -78,55 +78,55 @@ import Layout from "../../../layouts/Layout.astro";
         <!-- File Drop Area -->
         <div
           id="verify-drop-zone"
-          class="border-2 border-dashed border-black/15 hover:border-brand-vibrant-purple rounded-[30px] p-10 text-center cursor-pointer bg-neutral-background/50 hover:bg-neutral-background transition-all group"
+          class="border-2 border-dashed border-hub-border hover:border-emerald-500/50 rounded-xl p-8 text-center cursor-pointer bg-hub-bg/50 transition-colors"
         >
           <input type="file" id="verify-file-input" class="hidden" />
-          <div class="space-y-3 pointer-events-none">
-            <div class="w-14 h-14 mx-auto rounded-full bg-white shadow-md flex items-center justify-center text-text-dark group-hover:scale-110 group-hover:text-brand-vibrant-purple transition-all">
-              <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="space-y-2 pointer-events-none">
+            <div class="w-10 h-10 mx-auto rounded-full bg-hub-surfaceElevated flex items-center justify-center text-emerald-400">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
             </div>
-            <div class="font-primary text-base font-bold text-text-dark">
-              Drop binary to verify, or <span class="text-brand-vibrant-purple underline">click to select</span>
+            <div class="text-sm font-medium text-hub-textBright">
+              Drop binary to verify, or <span class="text-emerald-400 underline">click to select</span>
             </div>
-            <div id="verify-file-info" class="text-xs font-mono text-text-dark/50">
-              Tested with 250MB+ binaries smoothly
+            <div id="verify-file-info" class="text-xs font-mono text-zinc-500">
+              Tested with 250MB+ files smoothly
             </div>
           </div>
         </div>
 
         <!-- Expected Checksum Input -->
         <div>
-          <label for="expected-hash-input" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">
-            Expected SHA-256 (Paste from catalog card to compare):
+          <label for="expected-hash-input" class="block text-xs font-mono text-zinc-400 mb-1.5">
+            Expected SHA-256 (Paste from Hub catalog card to verify):
           </label>
           <input
             type="text"
             id="expected-hash-input"
-            placeholder="Paste official SHA-256 hash here for automated instant match comparison..."
-            class="w-full px-5 py-3 rounded-full bg-neutral-background/70 border border-black/10 text-text-dark font-mono text-xs focus:outline-none focus:border-brand-vibrant-purple transition-all"
+            placeholder="Paste SHA-256 hash here for automated instant match comparison..."
+            class="w-full px-3.5 py-2.5 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright font-mono text-xs focus:outline-none focus:border-emerald-500"
           />
         </div>
 
         <!-- Verification Results -->
-        <div id="hash-results-card" class="hidden space-y-4 pt-4 border-t border-black/10">
-          <div id="match-status-banner" class="p-4 rounded-2xl text-xs font-mono flex items-center gap-2"></div>
+        <div id="hash-results-card" class="hidden space-y-3 pt-4 border-t border-hub-border">
+          <div id="match-status-banner" class="p-3 rounded-lg text-xs font-mono flex items-center gap-2"></div>
 
           <div>
-            <div class="text-xs font-mono text-text-dark/60 mb-1 flex items-center justify-between">
+            <div class="text-xs font-mono text-zinc-400 mb-1 flex items-center justify-between">
               <span>Calculated SHA-256:</span>
-              <button type="button" id="copy-calculated-sha256" class="text-purple-600 hover:underline font-bold">Copy</button>
+              <button type="button" id="copy-calculated-sha256" class="text-emerald-400 hover:underline">Copy</button>
             </div>
-            <div id="calc-sha256-output" class="p-3.5 rounded-2xl bg-black/5 border border-black/10 text-text-dark font-mono text-xs break-all select-all font-medium"></div>
+            <div id="calc-sha256-output" class="p-3 rounded-lg bg-black/40 border border-hub-border text-emerald-400 font-mono text-xs break-all select-all"></div>
           </div>
 
           <div>
-            <div class="text-xs font-mono text-text-dark/60 mb-1 flex items-center justify-between">
+            <div class="text-xs font-mono text-zinc-400 mb-1 flex items-center justify-between">
               <span>Calculated SHA-512:</span>
-              <button type="button" id="copy-calculated-sha512" class="text-purple-600 hover:underline font-bold">Copy</button>
+              <button type="button" id="copy-calculated-sha512" class="text-zinc-400 hover:underline">Copy</button>
             </div>
-            <div id="calc-sha512-output" class="p-3.5 rounded-2xl bg-black/5 border border-black/10 text-text-dark/80 font-mono text-xs break-all select-all"></div>
+            <div id="calc-sha512-output" class="p-3 rounded-lg bg-black/40 border border-hub-border text-zinc-300 font-mono text-xs break-all select-all"></div>
           </div>
         </div>
       </div>
@@ -134,35 +134,35 @@ import Layout from "../../../layouts/Layout.astro";
 
     <!-- PANEL 2: Text Hashing -->
     <div id="panel-text-hash" class="tab-panel hidden space-y-6">
-      <div class="p-8 rounded-[36px] bg-white/90 border border-black/10 shadow-lg backdrop-blur-md space-y-5">
-        <h2 class="font-primary text-xl font-bold text-text-dark">Text Cryptographic Hasher</h2>
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+        <h2 class="text-base font-semibold text-hub-textBright">Text Cryptographic Hasher</h2>
 
         <div>
-          <label for="text-hash-input" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">Input String</label>
+          <label for="text-hash-input" class="block text-xs font-mono text-zinc-400 mb-1.5">Input String</label>
           <textarea
             id="text-hash-input"
             rows="3"
             placeholder="Type or paste any text to hash in real-time..."
-            class="w-full px-5 py-3 rounded-2xl bg-neutral-background/70 border border-black/10 text-text-dark font-mono text-sm focus:outline-none focus:border-brand-vibrant-purple transition-all"
+            class="w-full px-3.5 py-2.5 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright font-mono text-sm focus:outline-none focus:border-emerald-500"
           ></textarea>
         </div>
 
-        <div class="space-y-4 pt-2">
+        <div class="space-y-3 pt-2">
           <div>
-            <div class="text-xs font-mono text-text-dark/60 mb-1">SHA-256:</div>
-            <div id="text-sha256" class="p-3.5 rounded-2xl bg-black/5 border border-black/10 text-text-dark font-mono text-xs break-all select-all font-medium">
+            <div class="text-xs font-mono text-zinc-400 mb-1">SHA-256:</div>
+            <div id="text-sha256" class="p-3 rounded-lg bg-black/40 border border-hub-border text-emerald-400 font-mono text-xs break-all select-all">
               e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
             </div>
           </div>
           <div>
-            <div class="text-xs font-mono text-text-dark/60 mb-1">SHA-512:</div>
-            <div id="text-sha512" class="p-3.5 rounded-2xl bg-black/5 border border-black/10 text-text-dark font-mono text-xs break-all select-all">
+            <div class="text-xs font-mono text-zinc-400 mb-1">SHA-512:</div>
+            <div id="text-sha512" class="p-3 rounded-lg bg-black/40 border border-hub-border text-cyan-400 font-mono text-xs break-all select-all">
               cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
             </div>
           </div>
           <div>
-            <div class="text-xs font-mono text-text-dark/60 mb-1">SHA-1:</div>
-            <div id="text-sha1" class="p-3.5 rounded-2xl bg-black/5 border border-black/10 text-text-dark font-mono text-xs break-all select-all">
+            <div class="text-xs font-mono text-zinc-400 mb-1">SHA-1:</div>
+            <div id="text-sha1" class="p-3 rounded-lg bg-black/40 border border-hub-border text-zinc-300 font-mono text-xs break-all select-all">
               da39a3ee5e6b4b0d3255bfef95601890afd80709
             </div>
           </div>
@@ -172,43 +172,43 @@ import Layout from "../../../layouts/Layout.astro";
 
     <!-- PANEL 3: Base64 & Hex Encoder -->
     <div id="panel-encoders" class="tab-panel hidden space-y-6">
-      <div class="p-8 rounded-[36px] bg-white/90 border border-black/10 shadow-lg backdrop-blur-md space-y-5">
-        <h2 class="font-primary text-xl font-bold text-text-dark">Base64 & Hex Transcoder</h2>
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+        <h2 class="text-base font-semibold text-hub-textBright">Base64 & Hex Transcoder</h2>
 
         <div>
-          <label for="encoder-plain" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">Plaintext Input</label>
+          <label for="encoder-plain" class="block text-xs font-mono text-zinc-400 mb-1.5">Plaintext Input</label>
           <textarea
             id="encoder-plain"
             rows="3"
             placeholder="Enter plaintext to convert..."
-            class="w-full px-5 py-3 rounded-2xl bg-neutral-background/70 border border-black/10 text-text-dark font-mono text-sm focus:outline-none focus:border-brand-vibrant-purple transition-all"
+            class="w-full px-3.5 py-2.5 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright font-mono text-sm focus:outline-none focus:border-emerald-500"
           ></textarea>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <span class="text-xs font-mono text-text-dark/60">Base64 Output</span>
-              <button type="button" id="copy-b64-btn" class="text-xs font-mono text-purple-600 hover:underline font-bold">Copy</button>
+              <span class="text-xs font-mono text-zinc-400">Base64 Output</span>
+              <button type="button" id="copy-b64-btn" class="text-xs font-mono text-emerald-400 hover:underline">Copy</button>
             </div>
             <textarea
               id="encoder-b64"
               rows="4"
               placeholder="Base64 encoded string..."
-              class="w-full px-4 py-3 rounded-2xl bg-black/5 border border-black/10 text-text-dark font-mono text-xs focus:outline-none focus:border-brand-vibrant-purple"
+              class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-hub-border text-emerald-300 font-mono text-xs focus:outline-none focus:border-emerald-500"
             ></textarea>
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <span class="text-xs font-mono text-text-dark/60">Hex (Hexadecimal) Output</span>
-              <button type="button" id="copy-hex-btn" class="text-xs font-mono text-purple-600 hover:underline font-bold">Copy</button>
+              <span class="text-xs font-mono text-zinc-400">Hex (Hexadecimal) Output</span>
+              <button type="button" id="copy-hex-btn" class="text-xs font-mono text-cyan-400 hover:underline">Copy</button>
             </div>
             <textarea
               id="encoder-hex"
               rows="4"
               placeholder="Hexadecimal encoded string..."
-              class="w-full px-4 py-3 rounded-2xl bg-black/5 border border-black/10 text-text-dark font-mono text-xs focus:outline-none focus:border-brand-vibrant-purple"
+              class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-hub-border text-cyan-300 font-mono text-xs focus:outline-none focus:border-cyan-500"
             ></textarea>
           </div>
         </div>
@@ -217,33 +217,31 @@ import Layout from "../../../layouts/Layout.astro";
 
     <!-- PANEL 4: JWT Inspector -->
     <div id="panel-jwt" class="tab-panel hidden space-y-6">
-      <div class="p-8 rounded-[36px] bg-white/90 border border-black/10 shadow-lg backdrop-blur-md space-y-5">
-        <div>
-          <h2 class="font-primary text-xl font-bold text-text-dark">Client-Side JWT Inspector</h2>
-          <p class="text-xs text-text-dark/60 font-secondary mt-1">
-            Paste a JSON Web Token to inspect its header and claims payload in isolation without exposing it to third-party debugging servers.
-          </p>
-        </div>
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+        <h2 class="text-base font-semibold text-hub-textBright">Client-Side JWT Inspector</h2>
+        <p class="text-xs text-zinc-400 font-mono">
+          Paste a JSON Web Token to inspect its header and claims payload in isolation without exposing it to third-party debugging servers.
+        </p>
 
         <div>
-          <label for="jwt-input" class="block text-xs font-mono text-text-dark/60 mb-1.5 uppercase tracking-wider">Encoded JWT Token</label>
+          <label for="jwt-input" class="block text-xs font-mono text-zinc-400 mb-1.5">Encoded JWT Token</label>
           <textarea
             id="jwt-input"
             rows="3"
             placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-            class="w-full px-5 py-3 rounded-2xl bg-neutral-background/70 border border-black/10 text-text-dark font-mono text-xs focus:outline-none focus:border-brand-vibrant-purple"
+            class="w-full px-3.5 py-2.5 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright font-mono text-xs focus:outline-none focus:border-emerald-500"
           ></textarea>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <span class="block text-xs font-mono text-rose-700 font-semibold mb-1.5 uppercase tracking-wider">Header (Algorithm & Type)</span>
-            <pre id="jwt-header-output" class="p-4 rounded-2xl bg-black/5 border border-black/10 text-text-dark font-mono text-xs min-h-[140px] overflow-x-auto">// Decoded header will appear here</pre>
+            <span class="block text-xs font-mono text-pink-400 mb-1.5">Header (Algorithm & Token Type)</span>
+            <pre id="jwt-header-output" class="p-3.5 rounded-lg bg-black/50 border border-hub-border text-pink-300 font-mono text-xs min-h-[140px] overflow-x-auto">// Decoded header will appear here</pre>
           </div>
 
           <div>
-            <span class="block text-xs font-mono text-purple-700 font-semibold mb-1.5 uppercase tracking-wider">Payload (Claims & Timestamps)</span>
-            <pre id="jwt-payload-output" class="p-4 rounded-2xl bg-black/5 border border-black/10 text-text-dark font-mono text-xs min-h-[140px] overflow-x-auto">// Decoded payload claims will appear here</pre>
+            <span class="block text-xs font-mono text-indigo-400 mb-1.5">Payload (Data Claims & Timestamps)</span>
+            <pre id="jwt-payload-output" class="p-3.5 rounded-lg bg-black/50 border border-hub-border text-indigo-300 font-mono text-xs min-h-[140px] overflow-x-auto">// Decoded payload claims will appear here</pre>
           </div>
         </div>
       </div>
@@ -261,11 +259,11 @@ import Layout from "../../../layouts/Layout.astro";
       const targetId = tab.getAttribute("data-target");
 
       tabs.forEach((t) => {
-        t.classList.remove("active", "bg-text-dark", "text-white", "border-text-dark", "shadow-md");
-        t.classList.add("bg-white/70", "text-text-dark/70", "border-black/10");
+        t.classList.remove("active", "bg-emerald-500/15", "text-emerald-300", "border-emerald-500/40", "font-medium");
+        t.classList.add("bg-hub-surface/60", "text-zinc-400", "border-hub-border");
       });
-      tab.classList.remove("bg-white/70", "text-text-dark/70", "border-black/10");
-      tab.classList.add("active", "bg-text-dark", "text-white", "border-text-dark", "shadow-md");
+      tab.classList.remove("bg-hub-surface/60", "text-zinc-400", "border-hub-border");
+      tab.classList.add("active", "bg-emerald-500/15", "text-emerald-300", "border-emerald-500/40", "font-medium");
 
       panels.forEach((p) => {
         p.classList.toggle("hidden", p.id !== targetId);
@@ -290,16 +288,16 @@ import Layout from "../../../layouts/Layout.astro";
 
   verifyDropZone?.addEventListener("dragover", (e) => {
     e.preventDefault();
-    verifyDropZone.classList.add("border-brand-vibrant-purple", "bg-brand-vibrant-purple/5");
+    verifyDropZone.classList.add("border-emerald-500", "bg-emerald-500/5");
   });
 
   verifyDropZone?.addEventListener("dragleave", () => {
-    verifyDropZone.classList.remove("border-brand-vibrant-purple", "bg-brand-vibrant-purple/5");
+    verifyDropZone.classList.remove("border-emerald-500", "bg-emerald-500/5");
   });
 
   verifyDropZone?.addEventListener("drop", (e) => {
     e.preventDefault();
-    verifyDropZone.classList.remove("border-brand-vibrant-purple", "bg-brand-vibrant-purple/5");
+    verifyDropZone.classList.remove("border-emerald-500", "bg-emerald-500/5");
     if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
       processBinaryFile(e.dataTransfer.files[0]);
     }
@@ -353,26 +351,26 @@ import Layout from "../../../layouts/Layout.astro";
     const expected = expectedHashInput.value.trim().toLowerCase();
 
     if (!expected) {
-      matchStatusBanner.className = "p-3.5 rounded-2xl text-xs font-mono flex items-center gap-2 bg-black/5 text-text-dark/70 border border-black/10";
+      matchStatusBanner.className = "p-3 rounded-lg text-xs font-mono flex items-center gap-2 bg-hub-surfaceElevated text-zinc-400 border border-hub-border";
       matchStatusBanner.innerHTML = `
-        <span class="w-2 h-2 rounded-full bg-text-dark/40"></span>
+        <span class="w-2 h-2 rounded-full bg-zinc-400"></span>
         Paste an expected checksum above to verify against this binary.
       `;
       return;
     }
 
     if (computedSha256.toLowerCase() === expected) {
-      matchStatusBanner.className = "p-3.5 rounded-2xl text-xs font-mono flex items-center gap-2 bg-teal-50 text-teal-900 border border-teal-500/40";
+      matchStatusBanner.className = "p-3 rounded-lg text-xs font-mono flex items-center gap-2 bg-emerald-950/40 text-emerald-300 border border-emerald-500/50";
       matchStatusBanner.innerHTML = `
-        <svg class="w-4 h-4 text-teal-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
         <span class="font-bold">VERIFIED MATCH:</span> Binary checksum is 100% genuine and matches the official release hash!
       `;
     } else {
-      matchStatusBanner.className = "p-3.5 rounded-2xl text-xs font-mono flex items-center gap-2 bg-rose-50 text-rose-900 border border-rose-500/40";
+      matchStatusBanner.className = "p-3 rounded-lg text-xs font-mono flex items-center gap-2 bg-rose-950/40 text-rose-300 border border-rose-500/50";
       matchStatusBanner.innerHTML = `
-        <svg class="w-4 h-4 text-rose-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
         <span class="font-bold">MISMATCH:</span> The calculated SHA-256 does not match the expected hash. Do not execute untrusted binaries.
