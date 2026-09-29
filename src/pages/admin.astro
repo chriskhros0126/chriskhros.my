@@ -3,7 +3,19 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Admin // chriskhros.my">
-  <div class="max-w-2xl mx-auto px-4 py-10 font-mono text-xs text-neutral-300">
+  <div id="admin-container" class="max-w-2xl mx-auto px-4 py-8 font-mono text-xs text-neutral-300 transition-transform origin-top">
+
+    <!-- Header with Scale Slider -->
+    <div class="flex items-center justify-between pb-3 mb-6 border-b border-neutral-700">
+      <span class="text-neutral-400 font-bold uppercase tracking-wider text-[11px]">Admin Console</span>
+      <div class="flex items-center gap-1.5 text-[10px] text-neutral-400 bg-neutral-800/80 px-2 py-0.5 rounded border border-neutral-700">
+        <span class="text-neutral-500">Scale</span>
+        <button type="button" id="admin-zoom-out" class="hover:text-white px-0.5 cursor-pointer select-none">−</button>
+        <input type="range" id="admin-scale-slider" min="70" max="140" value="100" step="5" class="w-16 h-1 accent-neutral-400 cursor-pointer" title="Zoom" />
+        <button type="button" id="admin-zoom-in" class="hover:text-white px-0.5 cursor-pointer select-none">+</button>
+        <span id="admin-scale-val" class="w-7 text-right text-neutral-200">100%</span>
+      </div>
+    </div>
 
     <!-- Auth -->
     <div class="mb-6 pb-4 border-b border-neutral-700">
@@ -82,6 +94,35 @@ import Layout from "../layouts/Layout.astro";
   const mCategory = document.getElementById("m-category") as HTMLSelectElement;
   const mDesc = document.getElementById("m-desc") as HTMLTextAreaElement;
   const mTags = document.getElementById("m-tags") as HTMLInputElement;
+
+  const adminContainer = document.getElementById("admin-container");
+  const adminScaleSlider = document.getElementById("admin-scale-slider") as HTMLInputElement;
+  const adminScaleVal = document.getElementById("admin-scale-val");
+  const adminZoomOut = document.getElementById("admin-zoom-out");
+  const adminZoomIn = document.getElementById("admin-zoom-in");
+
+  function applyAdminScale(val: number) {
+    const pct = Math.max(70, Math.min(140, val));
+    if (adminScaleSlider) adminScaleSlider.value = String(pct);
+    if (adminScaleVal) adminScaleVal.textContent = `${pct}%`;
+    if (adminContainer) (adminContainer.style as any).zoom = `${pct}%`;
+    localStorage.setItem("ck_admin_scale", String(pct));
+  }
+
+  adminScaleSlider?.addEventListener("input", () => {
+    applyAdminScale(parseInt(adminScaleSlider.value, 10));
+  });
+  adminZoomOut?.addEventListener("click", () => {
+    applyAdminScale(parseInt(adminScaleSlider.value, 10) - 5);
+  });
+  adminZoomIn?.addEventListener("click", () => {
+    applyAdminScale(parseInt(adminScaleSlider.value, 10) + 5);
+  });
+
+  const savedAdminScale = parseInt(localStorage.getItem("ck_admin_scale") || "100", 10);
+  if (savedAdminScale && savedAdminScale !== 100) {
+    applyAdminScale(savedAdminScale);
+  }
 
   function getToken() { return tk.value.trim(); }
 

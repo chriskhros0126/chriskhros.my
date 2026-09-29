@@ -1,12 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import tools from "../data/tools.json";
 ---
 
 <Layout title="chriskhros.my">
   <div class="flex items-center justify-center min-h-screen p-4 sm:p-8">
     <!-- Explorer Window -->
-    <div id="explorer" class="w-full max-w-5xl flex flex-col rounded-lg overflow-hidden border border-[#444] shadow-2xl shadow-black/60" style="min-height: 620px; max-height: 85vh;">
+    <div id="explorer" class="w-full max-w-5xl flex flex-col rounded-lg overflow-hidden border border-[#444] shadow-2xl shadow-black/60 transition-transform origin-top" style="min-height: 620px; max-height: 85vh;">
 
       <!-- Title Bar -->
       <div class="flex items-center justify-between px-3 h-8 bg-[#2d2d2d] border-b border-[#444] select-none flex-shrink-0">
@@ -28,12 +27,20 @@ import tools from "../data/tools.json";
           <button data-filter="web" class="filter-btn px-3 py-1 text-xs rounded text-[#888] hover:text-[#ccc] hover:bg-[#333]">Web Tools</button>
           <button data-filter="binary" class="filter-btn px-3 py-1 text-xs rounded text-[#888] hover:text-[#ccc] hover:bg-[#333]">Binaries</button>
         </div>
-        <div class="relative">
+        <div class="flex items-center gap-2">
+          <!-- Scale Slider -->
+          <div class="hidden sm:flex items-center gap-1 text-[10px] text-[#888] bg-[#222] px-2 py-0.5 rounded border border-[#3a3a3a]">
+            <span class="text-[#666]">Scale</span>
+            <button type="button" id="zoom-out" class="hover:text-white px-0.5 text-xs select-none cursor-pointer">−</button>
+            <input type="range" id="scale-slider" min="70" max="130" value="100" step="5" class="w-16 h-1 accent-[#007acc] cursor-pointer" title="Zoom" />
+            <button type="button" id="zoom-in" class="hover:text-white px-0.5 text-xs select-none cursor-pointer">+</button>
+            <span id="scale-val" class="text-white text-[10px] w-7 text-right">100%</span>
+          </div>
           <input
             type="text"
             id="search"
             placeholder="🔍  Search chriskhros.my"
-            class="w-48 sm:w-56 px-3 py-1 text-xs bg-[#3c3c3c] border border-[#555] rounded text-[#ccc] placeholder-[#666] focus:outline-none focus:border-[#007acc]"
+            class="w-40 sm:w-56 px-3 py-1 text-xs bg-[#3c3c3c] border border-[#555] rounded text-[#ccc] placeholder-[#666] focus:outline-none focus:border-[#007acc]"
             autocomplete="off"
             spellcheck="false"
           />
@@ -52,7 +59,7 @@ import tools from "../data/tools.json";
       </div>
 
       <!-- Column Headers -->
-      <div class="flex items-center px-3 py-1.5 bg-[#2d2d2d] border-b border-[#444] text-[10px] uppercase tracking-wider text-[#888] select-none flex-shrink-0">
+      <div id="col-headers" class="flex items-center px-3 py-1.5 bg-[#2d2d2d] border-b border-[#444] text-[10px] uppercase tracking-wider text-[#888] select-none flex-shrink-0">
         <div class="flex-1 min-w-0">Name</div>
         <div class="w-24 text-center hidden sm:block">Type</div>
         <div class="w-20 text-right hidden sm:block">Size</div>
@@ -60,50 +67,19 @@ import tools from "../data/tools.json";
         <div class="w-24 text-right hidden md:block">Date</div>
       </div>
 
-      <!-- File List -->
+      <!-- File List (dynamically populated) -->
       <div id="file-list" class="flex-1 overflow-y-auto bg-[#1e1e1e]">
-        {tools.map((tool: any) => {
-          const isWeb = tool.type === "web";
-          const icon = isWeb ? "🌐" : 
-            tool.filename?.endsWith(".dmg") ? "💿" :
-            tool.filename?.endsWith(".tar.gz") ? "📄" :
-            "📦";
-          const fileType = isWeb ? "Web App" : 
-            tool.filename ? "." + tool.filename.split(".").pop() : "Binary";
-          const href = isWeb ? (tool.route || "/tools/demo-tool") : (tool.downloadUrl || "#");
-
-          return (
-            <a
-              href={href}
-              download={!isWeb ? (tool.filename || true) : undefined}
-              class="file-row flex items-center px-3 py-1.5 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] no-underline text-[#ccc] transition-colors duration-75"
-              data-type={tool.type}
-              data-title={tool.title?.toLowerCase()}
-              data-tags={(tool.tags || []).join(",").toLowerCase()}
-              data-id={tool.id}
-            >
-              <div class="flex-1 min-w-0 flex items-center gap-2 truncate">
-                <span class="text-sm flex-shrink-0">{icon}</span>
-                <span class="truncate font-mono text-[13px]">{tool.title}</span>
-                {tool.version && <span class="text-[10px] text-[#666] flex-shrink-0">{tool.version}</span>}
-              </div>
-              <div class="w-24 text-center text-xs text-[#888] hidden sm:block font-mono">{fileType}</div>
-              <div class="w-20 text-right text-xs text-[#888] hidden sm:block">{isWeb ? "—" : (tool.size || "—")}</div>
-              <div class="w-24 text-center text-xs text-[#888] hidden md:block">{tool.platform}</div>
-              <div class="w-24 text-right text-xs text-[#666] hidden md:block">{tool.releaseDate || "—"}</div>
-            </a>
-          );
-        })}
+        <div class="flex items-center justify-center h-full text-[#555] text-sm">Loading tools...</div>
       </div>
 
       <!-- Empty State -->
-      <div id="empty-state" class={`flex-1 flex items-center justify-center bg-[#1e1e1e] text-[#555] text-sm ${tools.length === 0 ? "" : "hidden"}`}>
+      <div id="empty-state" class="hidden flex-1 flex items-center justify-center bg-[#1e1e1e] text-[#555] text-sm">
         This folder is empty
       </div>
 
       <!-- Status Bar -->
       <div class="flex items-center justify-between px-3 py-1 bg-[#2d2d2d] border-t border-[#444] text-[11px] text-[#888] select-none flex-shrink-0">
-        <span id="item-count">{tools.length} item{tools.length !== 1 ? "s" : ""}</span>
+        <span id="item-count">0 items</span>
         <span>chriskhros.my · Cloudflare R2</span>
       </div>
 
@@ -111,40 +87,121 @@ import tools from "../data/tools.json";
   </div>
 
   <script>
+    const explorer = document.getElementById("explorer");
     const filterBtns = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
     const searchInput = document.getElementById("search") as HTMLInputElement;
-    const rows = document.querySelectorAll<HTMLAnchorElement>(".file-row");
     const itemCount = document.getElementById("item-count");
     const emptyState = document.getElementById("empty-state");
     const fileList = document.getElementById("file-list");
 
+    const scaleSlider = document.getElementById("scale-slider") as HTMLInputElement;
+    const scaleVal = document.getElementById("scale-val");
+    const zoomOut = document.getElementById("zoom-out");
+    const zoomIn = document.getElementById("zoom-in");
+
     let activeFilter = "all";
     let query = "";
-    let selectedRow: HTMLAnchorElement | null = null;
+    let selectedRow: HTMLElement | null = null;
+    let allTools: any[] = [];
 
-    function update() {
-      let count = 0;
-      rows.forEach(row => {
-        const type = row.getAttribute("data-type") || "";
-        const title = row.getAttribute("data-title") || "";
-        const tags = row.getAttribute("data-tags") || "";
+    // --- Scale Slider Logic ---
+    function applyScale(val: number) {
+      const pct = Math.max(70, Math.min(130, val));
+      if (scaleSlider) scaleSlider.value = String(pct);
+      if (scaleVal) scaleVal.textContent = `${pct}%`;
+      if (explorer) (explorer.style as any).zoom = `${pct}%`;
+      localStorage.setItem("ck_explorer_scale", String(pct));
+    }
+
+    scaleSlider?.addEventListener("input", () => {
+      applyScale(parseInt(scaleSlider.value, 10));
+    });
+
+    zoomOut?.addEventListener("click", () => {
+      applyScale(parseInt(scaleSlider.value, 10) - 5);
+    });
+
+    zoomIn?.addEventListener("click", () => {
+      applyScale(parseInt(scaleSlider.value, 10) + 5);
+    });
+
+    const savedScale = parseInt(localStorage.getItem("ck_explorer_scale") || "100", 10);
+    if (savedScale && savedScale !== 100) {
+      applyScale(savedScale);
+    }
+
+    // --- Helper formatting ---
+    function getIcon(tool: any): string {
+      if (tool.type === "web") return "🌐";
+      const fn = (tool.filename || "").toLowerCase();
+      if (fn.endsWith(".dmg")) return "💿";
+      if (fn.endsWith(".tar.gz") || fn.endsWith(".tgz")) return "📄";
+      return "📦";
+    }
+
+    function getFileType(tool: any): string {
+      if (tool.type === "web") return "Web App";
+      if (tool.filename) {
+        const parts = tool.filename.split(".");
+        if (parts.length > 1) return "." + parts[parts.length - 1];
+      }
+      return "Binary";
+    }
+
+    function renderRows() {
+      if (!fileList) return;
+
+      const filtered = allTools.filter(tool => {
+        const type = tool.type || "";
+        const title = (tool.title || "").toLowerCase();
+        const tags = (tool.tags || []).join(",").toLowerCase();
 
         const matchFilter = activeFilter === "all" || type === activeFilter;
         const matchQuery = !query || title.includes(query) || tags.includes(query);
-
-        if (matchFilter && matchQuery) {
-          row.classList.remove("hidden");
-          count++;
-        } else {
-          row.classList.add("hidden");
-        }
+        return matchFilter && matchQuery;
       });
 
-      if (itemCount) itemCount.textContent = `${count} item${count !== 1 ? "s" : ""}`;
-      if (emptyState) emptyState.classList.toggle("hidden", count > 0);
-      if (fileList) fileList.classList.toggle("hidden", count === 0);
+      if (filtered.length === 0) {
+        fileList.classList.add("hidden");
+        emptyState?.classList.remove("hidden");
+      } else {
+        fileList.classList.remove("hidden");
+        emptyState?.classList.add("hidden");
+      }
+
+      fileList.innerHTML = filtered.map(tool => {
+        const isWeb = tool.type === "web";
+        const icon = getIcon(tool);
+        const fileType = getFileType(tool);
+        const href = isWeb ? (tool.route || "/tools/demo-tool") : (tool.downloadUrl || "#");
+        const dl = !isWeb ? ` download="${tool.filename || ""}"` : "";
+
+        return `<a href="${href}"${dl} class="file-row flex items-center px-3 py-1.5 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] no-underline text-[#ccc] transition-colors duration-75" data-id="${tool.id}">
+          <div class="flex-1 min-w-0 flex items-center gap-2 truncate">
+            <span class="text-sm flex-shrink-0">${icon}</span>
+            <span class="truncate font-mono text-[13px]">${tool.title || "Untitled"}</span>
+            ${tool.version ? `<span class="text-[10px] text-[#666] flex-shrink-0">${tool.version}</span>` : ""}
+          </div>
+          <div class="w-24 text-center text-xs text-[#888] hidden sm:block font-mono">${fileType}</div>
+          <div class="w-20 text-right text-xs text-[#888] hidden sm:block">${isWeb ? "—" : (tool.size || "—")}</div>
+          <div class="w-24 text-center text-xs text-[#888] hidden md:block">${tool.platform || "—"}</div>
+          <div class="w-24 text-right text-xs text-[#666] hidden md:block">${tool.releaseDate || "—"}</div>
+        </a>`;
+      }).join("");
+
+      if (itemCount) itemCount.textContent = `${filtered.length} item${filtered.length !== 1 ? "s" : ""}`;
+
+      // Row selection visual
+      fileList.querySelectorAll<HTMLElement>(".file-row").forEach(row => {
+        row.addEventListener("mousedown", () => {
+          if (selectedRow) selectedRow.style.backgroundColor = "";
+          selectedRow = row;
+          row.style.backgroundColor = "#264f78";
+        });
+      });
     }
 
+    // --- Filter Buttons ---
     filterBtns.forEach(btn => {
       btn.addEventListener("click", () => {
         filterBtns.forEach(b => {
@@ -154,22 +211,13 @@ import tools from "../data/tools.json";
         btn.classList.add("active", "text-white", "bg-[#3c3c3c]");
         btn.classList.remove("text-[#888]");
         activeFilter = btn.getAttribute("data-filter") || "all";
-        update();
+        renderRows();
       });
     });
 
     searchInput?.addEventListener("input", () => {
       query = searchInput.value.trim().toLowerCase();
-      update();
-    });
-
-    // Row selection (visual only, navigation handled by <a>)
-    rows.forEach(row => {
-      row.addEventListener("mousedown", (e) => {
-        if (selectedRow) selectedRow.style.backgroundColor = "";
-        selectedRow = row;
-        row.style.backgroundColor = "#264f78";
-      });
+      renderRows();
     });
 
     document.addEventListener("click", (e) => {
@@ -180,7 +228,7 @@ import tools from "../data/tools.json";
       }
     });
 
-    // Keyboard: / focuses search
+    // Keyboard shortcut: / focuses search
     window.addEventListener("keydown", (e) => {
       if (e.key === "/" && document.activeElement !== searchInput) {
         e.preventDefault();
@@ -189,21 +237,25 @@ import tools from "../data/tools.json";
       }
     });
 
-    // Live catalog sync
-    async function syncCatalog() {
+    // --- Dynamic API Fetching ---
+    async function loadTools() {
       try {
         const res = await fetch("/api/tools");
-        if (!res.ok) return;
-        const live = await res.json();
-        if (!Array.isArray(live)) return;
-        const liveIds = new Set(live.map((t: any) => t.id));
-        rows.forEach(row => {
-          const id = row.getAttribute("data-id");
-          if (id && !liveIds.has(id)) row.remove();
-        });
-        update();
-      } catch {}
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            allTools = data;
+            renderRows();
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load tools from API:", err);
+      }
+      allTools = [];
+      renderRows();
     }
-    syncCatalog();
+
+    loadTools();
   </script>
 </Layout>
