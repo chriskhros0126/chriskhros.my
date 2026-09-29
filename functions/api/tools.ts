@@ -12,6 +12,7 @@ export interface ToolItem {
   filename?: string;
   fileKey?: string;
   route?: string;
+  code?: string;
   size?: string;
   sizeBytes?: number;
   sha256?: string;
@@ -254,8 +255,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     downloadUrl: body.downloadUrl,
     filename: body.filename,
     fileKey: body.fileKey,
-    route: body.route,
-    size: body.size || (body.sizeBytes ? `${(body.sizeBytes / (1024 * 1024)).toFixed(1)} MB` : "N/A"),
+    route: body.route || (body.type === "web" || body.category === "Web Apps" ? `/tools/app?id=${generatedId}` : undefined),
+    code: body.code,
+    size: body.size || (body.sizeBytes ? `${(body.sizeBytes / (1024 * 1024)).toFixed(1)} MB` : (body.type === "web" || body.category === "Web Apps" ? "Web App" : "N/A")),
     sizeBytes: body.sizeBytes,
     sha256: body.sha256,
     releaseDate: body.releaseDate || new Date().toISOString().split("T")[0],

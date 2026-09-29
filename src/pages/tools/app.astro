@@ -1,0 +1,193 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Web App Runner // chriskhros.my">
+  <!-- Floating Top Controls -->
+  <div class="fixed top-4 right-4 z-50 flex items-center gap-2 select-none font-mono text-xs">
+    <!-- Theme Toggle -->
+    <button
+      type="button"
+      id="theme-toggle"
+      class="px-2.5 py-1.5 rounded-lg bg-[#222]/90 dark:bg-[#222]/90 bg-white/90 border border-[#444] dark:border-[#444] border-neutral-300 shadow-md text-[#ccc] dark:text-[#ccc] text-neutral-700 hover:text-white dark:hover:text-white hover:bg-[#333] transition-colors cursor-pointer"
+      title="Toggle Light / Dark Mode"
+    >
+      <span id="theme-icon">☀️</span>
+    </button>
+
+    <!-- Scale Control -->
+    <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222]/90 dark:bg-[#222]/90 bg-white/90 border border-[#444] dark:border-[#444] border-neutral-300 shadow-md text-[#ccc] dark:text-[#ccc] text-neutral-700">
+      <span class="text-[10px] text-[#888] dark:text-[#888] text-neutral-500">Zoom:</span>
+      <button type="button" id="zoom-out" class="w-5 h-5 flex items-center justify-center rounded bg-[#333] dark:bg-[#333] bg-neutral-200 hover:bg-[#444] text-[#ccc] dark:text-[#ccc] text-neutral-800 hover:text-white cursor-pointer select-none text-xs">−</button>
+      <input type="range" id="scale-slider" min="70" max="130" value="100" step="5" class="w-16 h-1 accent-[#007acc] cursor-pointer" title="Zoom" />
+      <button type="button" id="zoom-in" class="w-5 h-5 flex items-center justify-center rounded bg-[#333] dark:bg-[#333] bg-neutral-200 hover:bg-[#444] text-[#ccc] dark:text-[#ccc] text-neutral-800 hover:text-white cursor-pointer select-none text-xs">+</button>
+      <span id="scale-val" class="w-8 text-right text-white dark:text-white text-neutral-900 font-medium text-[10px]">100%</span>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-center min-h-screen p-3 sm:p-6">
+    <!-- Window Container -->
+    <div id="runner-window" class="w-full max-w-5xl flex flex-col rounded-lg overflow-hidden border border-[#444] dark:border-[#444] border-neutral-300 shadow-2xl shadow-black/40 bg-[#1e1e1e] dark:bg-[#1e1e1e] bg-white transition-transform origin-top" style="height: 86vh;">
+
+      <!-- Window Title Bar -->
+      <div class="flex items-center justify-between px-3 h-8 bg-[#2d2d2d] dark:bg-[#2d2d2d] bg-[#f3f3f3] border-b border-[#444] dark:border-[#444] border-neutral-300 select-none flex-shrink-0 text-xs">
+        <div class="flex items-center gap-2 truncate text-[#ccc] dark:text-[#ccc] text-neutral-700">
+          <span>🌐</span>
+          <span id="app-title" class="font-medium truncate font-mono">Loading Web App...</span>
+          <span id="app-version" class="text-[10px] text-[#888] font-mono"></span>
+        </div>
+        <div class="flex items-center gap-1">
+          <a
+            href="/"
+            class="px-2 py-0.5 rounded text-[11px] text-[#aaa] hover:text-white dark:hover:text-white hover:text-neutral-900 hover:bg-[#3c3c3c] dark:hover:bg-[#3c3c3c] hover:bg-neutral-200 no-underline transition-colors flex items-center gap-1"
+          >
+            ← Explorer
+          </a>
+          <button type="button" id="reload-btn" class="w-6 h-6 flex items-center justify-center text-[#888] hover:text-white dark:hover:text-white hover:text-neutral-900 text-xs" title="Reload App">
+            ⟳
+          </button>
+          <button type="button" id="fullscreen-btn" class="w-6 h-6 flex items-center justify-center text-[#888] hover:text-white dark:hover:text-white hover:text-neutral-900 text-xs" title="Toggle Fullscreen">
+            ⛶
+          </button>
+        </div>
+      </div>
+
+      <!-- App Sandbox Frame -->
+      <div class="flex-1 relative bg-neutral-950 dark:bg-neutral-950 bg-white overflow-hidden">
+        <iframe
+          id="app-frame"
+          sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-same-origin"
+          class="w-full h-full border-0 bg-white"
+        ></iframe>
+
+        <!-- Loading / Error Overlay -->
+        <div id="loading-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-[#1e1e1e] dark:bg-[#1e1e1e] bg-neutral-100 text-[#888] font-mono text-xs gap-3 p-6 text-center">
+          <div class="w-8 h-8 rounded-full border-2 border-[#007acc] border-t-transparent animate-spin"></div>
+          <span id="loading-msg">Initializing sandbox environment...</span>
+        </div>
+      </div>
+
+      <!-- App Status Bar -->
+      <div class="flex items-center justify-between px-3 py-1 bg-[#2d2d2d] dark:bg-[#2d2d2d] bg-[#f3f3f3] border-t border-[#444] dark:border-[#444] border-neutral-300 text-[11px] text-[#888] select-none flex-shrink-0 font-mono">
+        <span id="app-platform">Client Sandbox: HTML5 / JavaScript / CSS</span>
+        <span>chriskhros.my</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const runnerWindow = document.getElementById("runner-window");
+    const appFrame = document.getElementById("app-frame") as HTMLIFrameElement;
+    const appTitle = document.getElementById("app-title");
+    const appVersion = document.getElementById("app-version");
+    const appPlatform = document.getElementById("app-platform");
+    const loadingOverlay = document.getElementById("loading-overlay");
+    const loadingMsg = document.getElementById("loading-msg");
+    const reloadBtn = document.getElementById("reload-btn");
+    const fullscreenBtn = document.getElementById("fullscreen-btn");
+
+    const themeToggle = document.getElementById("theme-toggle");
+    const themeIcon = document.getElementById("theme-icon");
+    const scaleSlider = document.getElementById("scale-slider") as HTMLInputElement;
+    const scaleVal = document.getElementById("scale-val");
+    const zoomOut = document.getElementById("zoom-out");
+    const zoomIn = document.getElementById("zoom-in");
+
+    // --- Theme Toggle ---
+    function updateThemeIcon() {
+      const isDark = document.documentElement.classList.contains("dark");
+      if (themeIcon) themeIcon.textContent = isDark ? "☀️" : "🌙";
+    }
+    updateThemeIcon();
+
+    themeToggle?.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("ck_theme", isDark ? "dark" : "light");
+      updateThemeIcon();
+    });
+
+    // --- Scale Logic ---
+    function applyScale(val: number) {
+      const pct = Math.max(70, Math.min(130, val));
+      if (scaleSlider) scaleSlider.value = String(pct);
+      if (scaleVal) scaleVal.textContent = `${pct}%`;
+      if (runnerWindow) (runnerWindow.style as any).zoom = `${pct}%`;
+      localStorage.setItem("ck_runner_scale", String(pct));
+    }
+
+    scaleSlider?.addEventListener("input", () => applyScale(parseInt(scaleSlider.value, 10)));
+    zoomOut?.addEventListener("click", () => applyScale(parseInt(scaleSlider.value, 10) - 5));
+    zoomIn?.addEventListener("click", () => applyScale(parseInt(scaleSlider.value, 10) + 5));
+
+    const savedScale = parseInt(localStorage.getItem("ck_runner_scale") || "100", 10);
+    if (savedScale && savedScale !== 100) applyScale(savedScale);
+
+    // --- Load Tool and Inject Code ---
+    let currentCode = "";
+
+    async function loadApp() {
+      const params = new URLSearchParams(window.location.search);
+      const toolId = params.get("id");
+
+      if (!toolId) {
+        if (loadingMsg) loadingMsg.textContent = "Error: Missing ?id= query parameter.";
+        return;
+      }
+
+      if (toolId === "devforge-web" || toolId === "demo-tool") {
+        window.location.href = "/tools/demo-tool";
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/tools");
+        if (!res.ok) throw new Error(`API returned status ${res.status}`);
+        const tools = await res.json();
+        const tool = tools.find((t: any) => t.id === toolId);
+
+        if (!tool) {
+          if (loadingMsg) loadingMsg.textContent = `Tool "${toolId}" not found in catalog.`;
+          return;
+        }
+
+        if (appTitle) appTitle.textContent = tool.title || toolId;
+        if (appVersion) appVersion.textContent = tool.version || "";
+        if (appPlatform) appPlatform.textContent = `${tool.platform || "Web"} • ${tool.category || "Web App"}`;
+
+        if (tool.code) {
+          currentCode = tool.code;
+          appFrame.srcdoc = currentCode;
+          if (loadingOverlay) loadingOverlay.classList.add("hidden");
+        } else if (tool.route) {
+          window.location.href = tool.route;
+        } else {
+          if (loadingMsg) loadingMsg.textContent = "This web tool has no saved source code.";
+        }
+      } catch (err: any) {
+        if (loadingMsg) loadingMsg.textContent = `Failed to load tool: ${err.message}`;
+      }
+    }
+
+    reloadBtn?.addEventListener("click", () => {
+      if (currentCode) {
+        appFrame.srcdoc = "";
+        setTimeout(() => {
+          appFrame.srcdoc = currentCode;
+        }, 50);
+      } else {
+        loadApp();
+      }
+    });
+
+    fullscreenBtn?.addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        runnerWindow?.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    loadApp();
+  </script>
+</Layout>

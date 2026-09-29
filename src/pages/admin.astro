@@ -3,69 +3,188 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Admin // chriskhros.my">
-  <div id="admin-container" class="max-w-2xl mx-auto px-4 py-8 font-mono text-xs text-neutral-300 transition-transform origin-top">
+  <div id="admin-container" class="max-w-4xl mx-auto px-4 py-8 font-mono text-xs text-neutral-300 dark:text-neutral-300 text-neutral-800 transition-transform origin-top">
 
-    <!-- Header with Scale Slider -->
-    <div class="flex items-center justify-between pb-3 mb-6 border-b border-neutral-700">
-      <span class="text-neutral-400 font-bold uppercase tracking-wider text-[11px]">Admin Console</span>
-      <div class="flex items-center gap-1.5 text-[10px] text-neutral-400 bg-neutral-800/80 px-2 py-0.5 rounded border border-neutral-700">
-        <span class="text-neutral-500">Scale</span>
-        <button type="button" id="admin-zoom-out" class="hover:text-white px-0.5 cursor-pointer select-none">−</button>
-        <input type="range" id="admin-scale-slider" min="70" max="140" value="100" step="5" class="w-16 h-1 accent-neutral-400 cursor-pointer" title="Zoom" />
-        <button type="button" id="admin-zoom-in" class="hover:text-white px-0.5 cursor-pointer select-none">+</button>
-        <span id="admin-scale-val" class="w-7 text-right text-neutral-200">100%</span>
+    <!-- Header with Scale Slider and Light/Dark Toggle -->
+    <div class="flex items-center justify-between pb-3 mb-6 border-b border-neutral-700 dark:border-neutral-700 border-neutral-300">
+      <div class="flex items-center gap-2">
+        <span class="text-neutral-400 dark:text-neutral-400 text-neutral-700 font-bold uppercase tracking-wider text-xs">Admin Console</span>
+        <span class="text-[10px] text-neutral-500">// chriskhros.my</span>
+      </div>
+
+      <!-- Controls: Theme Toggle & Scale Slider -->
+      <div class="flex items-center gap-3">
+        <!-- Theme Toggle -->
+        <button
+          type="button"
+          id="theme-toggle"
+          class="flex items-center gap-1 px-2 py-0.5 rounded bg-neutral-800 dark:bg-neutral-800 bg-neutral-200 border border-neutral-700 dark:border-neutral-700 border-neutral-300 hover:border-neutral-500 text-neutral-300 dark:text-neutral-300 text-neutral-700 cursor-pointer text-[10px]"
+          title="Toggle Light / Dark Mode"
+        >
+          <span id="theme-icon">☀️</span>
+          <span id="theme-text">Light</span>
+        </button>
+
+        <!-- Scale Slider -->
+        <div class="flex items-center gap-1.5 text-[10px] text-neutral-400 bg-neutral-800/80 dark:bg-neutral-800/80 bg-neutral-200 px-2.5 py-1 rounded border border-neutral-700 dark:border-neutral-700 border-neutral-300">
+          <span class="text-neutral-500 dark:text-neutral-500 text-neutral-600">Scale:</span>
+          <button type="button" id="admin-zoom-out" class="hover:text-white dark:hover:text-white hover:text-black px-1 cursor-pointer select-none text-xs">−</button>
+          <input type="range" id="admin-scale-slider" min="80" max="160" value="115" step="5" class="w-20 h-1 accent-blue-500 cursor-pointer" title="Zoom" />
+          <button type="button" id="admin-zoom-in" class="hover:text-white dark:hover:text-white hover:text-black px-1 cursor-pointer select-none text-xs">+</button>
+          <span id="admin-scale-val" class="w-8 text-right text-neutral-200 dark:text-neutral-200 text-neutral-900 font-bold">115%</span>
+        </div>
       </div>
     </div>
 
-    <!-- Auth -->
-    <div class="mb-6 pb-4 border-b border-neutral-700">
+    <!-- Auth Section -->
+    <div class="mb-6 pb-4 border-b border-neutral-700 dark:border-neutral-700 border-neutral-300">
       <div class="flex items-center gap-2 mb-2">
-        <label for="tk" class="text-neutral-500">Admin Key</label>
-        <input type="password" id="tk" class="flex-1 px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500" />
-        <button type="button" id="test-btn" class="px-2 py-1 bg-neutral-700 border border-neutral-600 rounded hover:bg-neutral-600 text-neutral-300">Test</button>
-        <button type="button" id="save-btn" class="px-2 py-1 bg-neutral-700 border border-neutral-600 rounded hover:bg-neutral-600 text-neutral-300">Save</button>
+        <label for="tk" class="text-neutral-500 dark:text-neutral-500 text-neutral-600 w-20 flex-shrink-0">Admin Key</label>
+        <input
+          type="password"
+          id="tk"
+          placeholder="Enter Cloudflare Pages ADMIN_SECRET_KEY..."
+          class="flex-1 px-2.5 py-1.5 bg-neutral-800 dark:bg-neutral-800 bg-white border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded text-neutral-200 dark:text-neutral-200 text-neutral-900 focus:outline-none focus:border-blue-500"
+        />
+        <button type="button" id="test-btn" class="px-3 py-1.5 bg-neutral-700 dark:bg-neutral-700 bg-neutral-200 border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded hover:bg-neutral-600 dark:hover:bg-neutral-600 hover:bg-neutral-300 text-neutral-200 dark:text-neutral-200 text-neutral-800 cursor-pointer">Test</button>
+        <button type="button" id="save-btn" class="px-3 py-1.5 bg-neutral-700 dark:bg-neutral-700 bg-neutral-200 border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded hover:bg-neutral-600 dark:hover:bg-neutral-600 hover:bg-neutral-300 text-neutral-200 dark:text-neutral-200 text-neutral-800 cursor-pointer">Save</button>
       </div>
-      <div id="auth-status" class="text-neutral-500">—</div>
+      <div id="auth-status" class="text-neutral-500 dark:text-neutral-500 text-neutral-600 pl-22 text-[11px]">—</div>
     </div>
 
-    <!-- Upload -->
-    <form id="upload-form" class="mb-6 pb-4 border-b border-neutral-700 space-y-2">
-      <div class="text-neutral-500 mb-1">Upload Binary</div>
-      <input type="file" id="file-input" class="block w-full text-neutral-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border file:border-neutral-600 file:bg-neutral-800 file:text-neutral-300 file:text-xs" />
-      <div class="grid grid-cols-2 gap-2">
-        <input type="text" id="m-title" placeholder="Title" class="px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500" />
-        <input type="text" id="m-version" placeholder="Version" class="px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500" />
-        <select id="m-platform" class="px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none">
-          <option>Windows</option><option>macOS</option><option>Linux</option><option>Web</option><option>Cross-Platform</option>
-        </select>
-        <select id="m-category" class="px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none">
-          <option>Binaries</option><option>Web Apps</option>
-        </select>
+    <!-- Upload / App Creator Section -->
+    <form id="upload-form" class="mb-6 pb-4 border-b border-neutral-700 dark:border-neutral-700 border-neutral-300 space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="text-neutral-400 dark:text-neutral-400 text-neutral-700 font-bold" id="form-heading">Register Tool / Binary</div>
+        <div id="editing-indicator" class="hidden text-amber-500 font-medium text-[11px] flex items-center gap-1">
+          <span>Editing existing item:</span>
+          <span id="editing-id" class="underline"></span>
+          <button type="button" id="cancel-edit-btn" class="ml-2 text-neutral-400 hover:text-white dark:hover:text-white hover:text-black">Cancel</button>
+        </div>
       </div>
-      <textarea id="m-desc" placeholder="Description" rows="2" class="w-full px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500 resize-none"></textarea>
-      <input type="text" id="m-tags" placeholder="Tags (comma separated)" class="w-full px-2 py-1 bg-neutral-800 border border-neutral-600 rounded text-neutral-200 focus:outline-none focus:border-blue-500" />
-      <!-- Progress -->
+
+      <!-- Metadata Fields -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+        <div class="sm:col-span-2">
+          <input type="text" id="m-title" placeholder="Title (e.g. Hash Workbench)" class="w-full px-2.5 py-1.5 bg-neutral-800 dark:bg-neutral-800 bg-white border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded text-neutral-200 dark:text-neutral-200 text-neutral-900 focus:outline-none focus:border-blue-500" required />
+        </div>
+        <div>
+          <input type="text" id="m-version" placeholder="Version (e.g. v1.0.0)" class="w-full px-2.5 py-1.5 bg-neutral-800 dark:bg-neutral-800 bg-white border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded text-neutral-200 dark:text-neutral-200 text-neutral-900 focus:outline-none focus:border-blue-500" />
+        </div>
+        <div>
+          <select id="m-category" class="w-full px-2.5 py-1.5 bg-neutral-800 dark:bg-neutral-800 bg-white border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded text-neutral-200 dark:text-neutral-200 text-neutral-900 focus:outline-none">
+            <option value="Binaries">Binaries (Desktop File)</option>
+            <option value="Web Apps">Web Apps (Code Playground)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <select id="m-platform" class="w-full px-2.5 py-1.5 bg-neutral-800 dark:bg-neutral-800 bg-white border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded text-neutral-200 dark:text-neutral-200 text-neutral-900 focus:outline-none">
+          <option>Windows</option>
+          <option>macOS</option>
+          <option>Linux</option>
+          <option>Web</option>
+          <option>Cross-Platform</option>
+        </select>
+        <input type="text" id="m-tags" placeholder="Tags (comma separated, e.g. utility, hash, crypto)" class="w-full px-2.5 py-1.5 bg-neutral-800 dark:bg-neutral-800 bg-white border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded text-neutral-200 dark:text-neutral-200 text-neutral-900 focus:outline-none focus:border-blue-500" />
+      </div>
+
+      <textarea id="m-desc" placeholder="Brief description of the tool or application..." rows="2" class="w-full px-2.5 py-1.5 bg-neutral-800 dark:bg-neutral-800 bg-white border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded text-neutral-200 dark:text-neutral-200 text-neutral-900 focus:outline-none focus:border-blue-500 resize-none"></textarea>
+
+      <!-- Binary File Upload (Shown when Category = Binaries) -->
+      <div id="binary-upload-section" class="space-y-2">
+        <label class="text-neutral-400 dark:text-neutral-400 text-neutral-600 block">Select Binary File</label>
+        <input
+          type="file"
+          id="file-input"
+          class="block w-full text-neutral-400 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border file:border-neutral-600 file:bg-neutral-800 dark:file:bg-neutral-800 file:bg-neutral-200 file:text-neutral-200 dark:file:text-neutral-200 file:text-neutral-800 file:text-xs cursor-pointer"
+        />
+      </div>
+
+      <!-- Web App Code Editor (Shown when Category = Web Apps) -->
+      <div id="web-editor-section" class="hidden space-y-2">
+        <!-- Guidelines Banner -->
+        <div class="p-3 bg-neutral-900 dark:bg-neutral-900 bg-neutral-100 border border-neutral-700 dark:border-neutral-700 border-neutral-300 rounded text-[11px] leading-relaxed">
+          <div class="font-bold text-blue-400 mb-1 flex items-center gap-1.5">
+            <span>ℹ️</span> Web App Code Editor Guidelines
+          </div>
+          <div class="text-neutral-400 dark:text-neutral-400 text-neutral-600 space-y-1">
+            <p>• <strong class="text-neutral-200 dark:text-neutral-200 text-neutral-800">Permitted Languages:</strong> HTML5, CSS3, Vanilla JavaScript (ES6+), Canvas 2D/WebGL, Web Audio, WebCrypto, LocalStorage, Fetch.</p>
+            <p>• <strong class="text-neutral-200 dark:text-neutral-200 text-neutral-800">Permitted Frameworks / CDNs:</strong> You can load any CDN library via script or link tags (e.g. Tailwind CSS, Vue, React, Chart.js, Three.js, Lucide).</p>
+            <p>• <strong class="text-neutral-200 dark:text-neutral-200 text-neutral-800">Execution Sandbox:</strong> Runs 100% in a secure client-side browser sandbox. No server-side runtimes (Node.js/Python) run directly.</p>
+          </div>
+        </div>
+
+        <!-- Editor Toolbar -->
+        <div class="flex items-center justify-between text-[11px]">
+          <div class="flex items-center gap-2">
+            <span class="text-neutral-400">Template Starter:</span>
+            <select id="template-select" class="px-2 py-1 bg-neutral-800 dark:bg-neutral-800 bg-white border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded text-neutral-200 dark:text-neutral-200 text-neutral-900 focus:outline-none">
+              <option value="calculator">Tailwind UI Calculator</option>
+              <option value="canvas">Interactive Canvas Game / Visualizer</option>
+              <option value="hasher">WebCrypto Hash Utility</option>
+              <option value="blank">Blank HTML5 Starter</option>
+            </select>
+            <button type="button" id="load-template-btn" class="px-2 py-1 bg-neutral-700 dark:bg-neutral-700 bg-neutral-200 border border-neutral-600 rounded hover:bg-neutral-600 dark:hover:bg-neutral-600 text-neutral-200 dark:text-neutral-200 text-neutral-800 cursor-pointer">Load</button>
+          </div>
+
+          <button type="button" id="preview-toggle-btn" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded cursor-pointer flex items-center gap-1">
+            <span>👁️</span> <span id="preview-btn-text">Test / Live Preview</span>
+          </button>
+        </div>
+
+        <!-- Code Editor Textarea -->
+        <div class="relative">
+          <textarea
+            id="code-editor"
+            rows="14"
+            spellcheck="false"
+            class="w-full px-3 py-2 bg-neutral-950 dark:bg-neutral-950 bg-neutral-50 border border-neutral-700 dark:border-neutral-700 border-neutral-300 rounded text-emerald-400 dark:text-emerald-400 text-emerald-700 font-mono text-xs focus:outline-none focus:border-blue-500 resize-y leading-normal"
+            placeholder="<!DOCTYPE html><html>...</html>"
+          ></textarea>
+        </div>
+
+        <!-- Live Preview Sandbox Drawer -->
+        <div id="preview-container" class="hidden border border-neutral-700 dark:border-neutral-700 border-neutral-300 rounded overflow-hidden">
+          <div class="flex items-center justify-between px-3 py-1 bg-neutral-800 dark:bg-neutral-800 bg-neutral-200 text-[10px] text-neutral-400 border-b border-neutral-700 dark:border-neutral-700 border-neutral-300">
+            <span>Sandboxed Live Execution Preview</span>
+            <button type="button" id="refresh-preview-btn" class="text-neutral-300 hover:text-white cursor-pointer">⟳ Re-run</button>
+          </div>
+          <iframe id="preview-frame" sandbox="allow-scripts allow-modals allow-downloads allow-forms" class="w-full h-64 bg-white border-0"></iframe>
+        </div>
+      </div>
+
+      <!-- Upload Progress -->
       <div id="progress-wrap" class="hidden">
-        <div class="w-full h-1.5 bg-neutral-800 rounded overflow-hidden">
+        <div class="w-full h-1.5 bg-neutral-800 dark:bg-neutral-800 bg-neutral-200 rounded overflow-hidden">
           <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-100" style="width:0%"></div>
         </div>
-        <div id="progress-text" class="text-neutral-500 mt-0.5">0%</div>
+        <div id="progress-text" class="text-neutral-500 mt-0.5 text-[10px]">0%</div>
       </div>
-      <div id="upload-status" class="text-neutral-500"></div>
-      <button type="submit" id="upload-btn" class="w-full py-1.5 bg-neutral-700 border border-neutral-600 rounded hover:bg-neutral-600 text-neutral-200 disabled:opacity-40">Upload</button>
+
+      <div id="upload-status" class="text-neutral-500 text-[11px]"></div>
+
+      <button
+        type="submit"
+        id="upload-btn"
+        class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium disabled:opacity-40 cursor-pointer transition-colors"
+      >
+        Save & Publish Tool
+      </button>
     </form>
 
-    <!-- Catalog -->
+    <!-- Catalog Management -->
     <div>
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-neutral-500">Catalog</span>
-        <div class="flex gap-1">
-          <button type="button" id="refresh-btn" class="px-2 py-0.5 bg-neutral-700 border border-neutral-600 rounded hover:bg-neutral-600 text-neutral-300">Refresh</button>
-          <button type="button" id="clear-btn" class="px-2 py-0.5 bg-neutral-800 border border-red-900 rounded hover:bg-red-900/30 text-red-400">Clear All</button>
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-neutral-400 dark:text-neutral-400 text-neutral-700 font-bold">Catalog Management</span>
+        <div class="flex gap-2">
+          <button type="button" id="refresh-btn" class="px-2.5 py-1 bg-neutral-700 dark:bg-neutral-700 bg-neutral-200 border border-neutral-600 dark:border-neutral-600 border-neutral-300 rounded hover:bg-neutral-600 text-neutral-200 dark:text-neutral-200 text-neutral-800 cursor-pointer">Refresh</button>
+          <button type="button" id="clear-btn" class="px-2.5 py-1 bg-neutral-800 dark:bg-neutral-800 bg-neutral-200 border border-red-900 rounded hover:bg-red-900/40 text-red-400 cursor-pointer">Clear All</button>
         </div>
       </div>
-      <div id="catalog" class="space-y-1">
-        <div class="text-neutral-600 py-4 text-center">loading...</div>
+      <div id="catalog" class="space-y-1.5">
+        <div class="text-neutral-600 py-4 text-center">loading catalog...</div>
       </div>
     </div>
 
@@ -73,98 +192,351 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
-  const tk = document.getElementById("tk") as HTMLInputElement;
-  const testBtn = document.getElementById("test-btn");
-  const saveBtn = document.getElementById("save-btn");
-  const authStatus = document.getElementById("auth-status");
-  const fileInput = document.getElementById("file-input") as HTMLInputElement;
-  const form = document.getElementById("upload-form") as HTMLFormElement;
-  const uploadBtn = document.getElementById("upload-btn") as HTMLButtonElement;
-  const progressWrap = document.getElementById("progress-wrap");
-  const progressBar = document.getElementById("progress-bar");
-  const progressText = document.getElementById("progress-text");
-  const uploadStatus = document.getElementById("upload-status");
-  const refreshBtn = document.getElementById("refresh-btn");
-  const clearBtn = document.getElementById("clear-btn");
-  const catalog = document.getElementById("catalog");
+  // Templates
+  const TEMPLATES: Record<string, string> = {
+    calculator: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <style>body { background: #0f172a; color: #f8fafc; font-family: system-ui; }</style>
+</head>
+<body class="p-6 flex flex-col items-center justify-center min-h-screen">
+  <div class="w-full max-w-xs bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+    <div id="display" class="w-full h-12 bg-slate-900 rounded-lg flex items-center justify-end px-3 text-2xl font-mono text-emerald-400 mb-4 overflow-x-auto">0</div>
+    <div class="grid grid-cols-4 gap-2">
+      <button class="btn col-span-2 bg-rose-600 hover:bg-rose-500 py-2 rounded text-white font-bold" onclick="clearDisplay()">C</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('/')">/</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('*')">×</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('7')">7</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('8')">8</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('9')">9</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('-')">-</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('4')">4</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('5')">5</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('6')">6</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('+')">+</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('1')">1</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('2')">2</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('3')">3</button>
+      <button class="btn row-span-2 bg-blue-600 hover:bg-blue-500 rounded text-white font-bold flex items-center justify-center text-xl" onclick="calculate()">=</button>
+      <button class="btn col-span-2 bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('0')">0</button>
+      <button class="btn bg-slate-700 hover:bg-slate-600 py-2 rounded text-white" onclick="append('.')">.</button>
+    </div>
+  </div>
+  <script>
+    let expr = "";
+    const disp = document.getElementById("display");
+    function append(val) { expr += val; disp.textContent = expr; }
+    function clearDisplay() { expr = ""; disp.textContent = "0"; }
+    function calculate() {
+      try {
+        expr = String(Function('"use strict";return (' + expr + ')')());
+        disp.textContent = expr;
+      } catch { disp.textContent = "Error"; expr = ""; }
+    }
+  <\/script>
+</body>
+</html>`,
 
-  const mTitle = document.getElementById("m-title") as HTMLInputElement;
-  const mVersion = document.getElementById("m-version") as HTMLInputElement;
-  const mPlatform = document.getElementById("m-platform") as HTMLSelectElement;
-  const mCategory = document.getElementById("m-category") as HTMLSelectElement;
-  const mDesc = document.getElementById("m-desc") as HTMLTextAreaElement;
-  const mTags = document.getElementById("m-tags") as HTMLInputElement;
+    canvas: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { margin: 0; background: #000; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #fff; font-family: monospace; }
+    canvas { border: 1px solid #333; box-shadow: 0 0 20px rgba(0,255,200,0.2); }
+  </style>
+</head>
+<body>
+  <div style="margin-bottom: 8px;">Interactive Particle Field (Move mouse over canvas)</div>
+  <canvas id="c" width="600" height="350"></canvas>
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    let mouse = { x: canvas.width/2, y: canvas.height/2 };
+    const particles = Array.from({length: 60}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 2,
+      vy: (Math.random() - 0.5) * 2,
+      radius: Math.random() * 3 + 2,
+      color: 'hsl(' + (Math.random() * 60 + 170) + ', 100%, 60%)'
+    }));
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+    function loop() {
+      ctx.fillStyle = 'rgba(10, 15, 25, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        const dx = mouse.x - p.x, dy = mouse.y - p.y, dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 100) {
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 1 - dist/100;
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+        }
+      });
+      requestAnimationFrame(loop);
+    }
+    loop();
+  <\/script>
+</body>
+</html>`,
 
+    hasher: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-neutral-900 text-neutral-200 p-6 font-mono text-sm">
+  <h2 class="text-base font-bold text-white mb-2">⚡ Client-Side WebCrypto SHA-256 Hasher</h2>
+  <textarea id="inp" rows="4" class="w-full bg-neutral-800 border border-neutral-700 p-2 rounded mb-3 text-neutral-100" placeholder="Type text here to hash..."></textarea>
+  <div class="text-xs text-neutral-400 mb-1">SHA-256 Hex:</div>
+  <div id="out" class="p-2 bg-neutral-950 border border-neutral-800 rounded break-all text-emerald-400 select-all">—</div>
+  <script>
+    const inp = document.getElementById('inp');
+    const out = document.getElementById('out');
+    inp.addEventListener('input', async () => {
+      const text = inp.value;
+      if (!text) { out.textContent = '—'; return; }
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      out.textContent = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    });
+  <\/script>
+</body>
+</html>`,
+
+    blank: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Web Tool</title>
+  <style>
+    body { margin: 0; padding: 2rem; background: #121212; color: #fff; font-family: system-ui, sans-serif; }
+  </style>
+</head>
+<body>
+  <h1>Hello from my custom tool!</h1>
+  <p>Standard HTML5, CSS3, and JavaScript are supported.</p>
+  <script>
+    console.log("Ready!");
+  <\/script>
+</body>
+</html>`
+  };
+
+  // Elements
   const adminContainer = document.getElementById("admin-container");
   const adminScaleSlider = document.getElementById("admin-scale-slider") as HTMLInputElement;
   const adminScaleVal = document.getElementById("admin-scale-val");
   const adminZoomOut = document.getElementById("admin-zoom-out");
   const adminZoomIn = document.getElementById("admin-zoom-in");
 
+  const themeToggle = document.getElementById("theme-toggle");
+  const themeIcon = document.getElementById("theme-icon");
+  const themeText = document.getElementById("theme-text");
+
+  const tk = document.getElementById("tk") as HTMLInputElement;
+  const testBtn = document.getElementById("test-btn");
+  const saveBtn = document.getElementById("save-btn");
+  const authStatus = document.getElementById("auth-status");
+
+  const form = document.getElementById("upload-form") as HTMLFormElement;
+  const formHeading = document.getElementById("form-heading");
+  const editingIndicator = document.getElementById("editing-indicator");
+  const editingId = document.getElementById("editing-id");
+  const cancelEditBtn = document.getElementById("cancel-edit-btn");
+
+  const mTitle = document.getElementById("m-title") as HTMLInputElement;
+  const mVersion = document.getElementById("m-version") as HTMLInputElement;
+  const mCategory = document.getElementById("m-category") as HTMLSelectElement;
+  const mPlatform = document.getElementById("m-platform") as HTMLSelectElement;
+  const mDesc = document.getElementById("m-desc") as HTMLTextAreaElement;
+  const mTags = document.getElementById("m-tags") as HTMLInputElement;
+
+  const binarySection = document.getElementById("binary-upload-section");
+  const fileInput = document.getElementById("file-input") as HTMLInputElement;
+
+  const webEditorSection = document.getElementById("web-editor-section");
+  const codeEditor = document.getElementById("code-editor") as HTMLTextAreaElement;
+  const templateSelect = document.getElementById("template-select") as HTMLSelectElement;
+  const loadTemplateBtn = document.getElementById("load-template-btn");
+  const previewToggleBtn = document.getElementById("preview-toggle-btn");
+  const previewBtnText = document.getElementById("preview-btn-text");
+  const previewContainer = document.getElementById("preview-container");
+  const previewFrame = document.getElementById("preview-frame") as HTMLIFrameElement;
+  const refreshPreviewBtn = document.getElementById("refresh-preview-btn");
+
+  const uploadBtn = document.getElementById("upload-btn") as HTMLButtonElement;
+  const progressWrap = document.getElementById("progress-wrap");
+  const progressBar = document.getElementById("progress-bar");
+  const progressText = document.getElementById("progress-text");
+  const uploadStatus = document.getElementById("upload-status");
+
+  const refreshBtn = document.getElementById("refresh-btn");
+  const clearBtn = document.getElementById("clear-btn");
+  const catalog = document.getElementById("catalog");
+
+  let currentEditingToolId: string | null = null;
+
+  // --- 1. Theme Toggle ---
+  function updateThemeUI() {
+    const isDark = document.documentElement.classList.contains("dark");
+    if (themeIcon) themeIcon.textContent = isDark ? "☀️" : "🌙";
+    if (themeText) themeText.textContent = isDark ? "Light" : "Dark";
+  }
+  updateThemeUI();
+
+  themeToggle?.addEventListener("click", () => {
+    const isDark = document.documentElement.classList.toggle("dark");
+    localStorage.setItem("ck_theme", isDark ? "dark" : "light");
+    updateThemeUI();
+  });
+
+  // --- 2. Scale Slider (Default 115%) ---
   function applyAdminScale(val: number) {
-    const pct = Math.max(70, Math.min(140, val));
+    const pct = Math.max(80, Math.min(160, val));
     if (adminScaleSlider) adminScaleSlider.value = String(pct);
     if (adminScaleVal) adminScaleVal.textContent = `${pct}%`;
     if (adminContainer) (adminContainer.style as any).zoom = `${pct}%`;
     localStorage.setItem("ck_admin_scale", String(pct));
   }
 
-  adminScaleSlider?.addEventListener("input", () => {
-    applyAdminScale(parseInt(adminScaleSlider.value, 10));
-  });
-  adminZoomOut?.addEventListener("click", () => {
-    applyAdminScale(parseInt(adminScaleSlider.value, 10) - 5);
-  });
-  adminZoomIn?.addEventListener("click", () => {
-    applyAdminScale(parseInt(adminScaleSlider.value, 10) + 5);
-  });
+  adminScaleSlider?.addEventListener("input", () => applyAdminScale(parseInt(adminScaleSlider.value, 10)));
+  adminZoomOut?.addEventListener("click", () => applyAdminScale(parseInt(adminScaleSlider.value, 10) - 5));
+  adminZoomIn?.addEventListener("click", () => applyAdminScale(parseInt(adminScaleSlider.value, 10) + 5));
 
-  const savedAdminScale = parseInt(localStorage.getItem("ck_admin_scale") || "100", 10);
-  if (savedAdminScale && savedAdminScale !== 100) {
-    applyAdminScale(savedAdminScale);
-  }
+  const savedAdminScale = parseInt(localStorage.getItem("ck_admin_scale") || "115", 10);
+  applyAdminScale(savedAdminScale);
 
+  // --- 3. Auth Token ---
   function getToken() { return tk.value.trim(); }
 
-  // Restore
-  const saved = sessionStorage.getItem("ck_admin_key") || "";
-  if (saved) tk.value = saved;
+  const savedToken = sessionStorage.getItem("ck_admin_key") || "";
+  if (savedToken) tk.value = savedToken;
 
   saveBtn?.addEventListener("click", () => {
     const v = getToken();
-    if (v) { sessionStorage.setItem("ck_admin_key", v); if (authStatus) authStatus.textContent = "saved"; }
-    else { sessionStorage.removeItem("ck_admin_key"); if (authStatus) authStatus.textContent = "cleared"; }
+    if (v) {
+      sessionStorage.setItem("ck_admin_key", v);
+      if (authStatus) authStatus.textContent = "✓ Key saved in current session";
+    } else {
+      sessionStorage.removeItem("ck_admin_key");
+      if (authStatus) authStatus.textContent = "Key cleared";
+    }
   });
 
   testBtn?.addEventListener("click", async () => {
     const v = getToken();
-    if (!v) { if (authStatus) authStatus.textContent = "enter a key first"; return; }
-    if (authStatus) authStatus.textContent = "testing...";
+    if (!v) { if (authStatus) authStatus.textContent = "Please enter an admin key first"; return; }
+    if (authStatus) authStatus.textContent = "Testing key against Cloudflare...";
     try {
       const r = await fetch("/api/tools?verify=true", { headers: { "x-admin-token": v } });
       const d = await r.json().catch(() => ({}));
-      if (authStatus) authStatus.textContent = r.ok ? "✓ verified" : `✗ ${d.error || "failed"}`;
+      if (authStatus) authStatus.textContent = r.ok ? "✓ Verified! Admin token is valid." : `✗ ${d.error || "Authentication failed"}`;
     } catch (e: any) {
-      if (authStatus) authStatus.textContent = `✗ ${e.message}`;
+      if (authStatus) authStatus.textContent = `✗ Connection error: ${e.message}`;
     }
   });
 
-  // Upload
+  // --- 4. Category Switch: Binaries vs Web Apps ---
+  function updateCategoryView() {
+    const isWeb = mCategory.value === "Web Apps";
+    if (isWeb) {
+      binarySection?.classList.add("hidden");
+      webEditorSection?.classList.remove("hidden");
+      mPlatform.value = "Web";
+      if (!codeEditor.value.trim()) {
+        codeEditor.value = TEMPLATES.calculator;
+      }
+    } else {
+      binarySection?.classList.remove("hidden");
+      webEditorSection?.classList.add("hidden");
+      if (mPlatform.value === "Web") mPlatform.value = "Windows";
+    }
+  }
+
+  mCategory.addEventListener("change", updateCategoryView);
+
+  // Templates
+  loadTemplateBtn?.addEventListener("click", () => {
+    const chosen = templateSelect.value;
+    if (TEMPLATES[chosen]) {
+      if (codeEditor.value.trim() && !confirm("Replace current editor contents with template?")) return;
+      codeEditor.value = TEMPLATES[chosen];
+      if (previewFrame) previewFrame.srcdoc = codeEditor.value;
+    }
+  });
+
+  // Live Preview Toggle
+  let isPreviewOpen = false;
+  previewToggleBtn?.addEventListener("click", () => {
+    isPreviewOpen = !isPreviewOpen;
+    if (previewContainer) previewContainer.classList.toggle("hidden", !isPreviewOpen);
+    if (previewBtnText) previewBtnText.textContent = isPreviewOpen ? "Close Preview" : "Test / Live Preview";
+    if (isPreviewOpen && previewFrame) {
+      previewFrame.srcdoc = codeEditor.value;
+    }
+  });
+
+  refreshPreviewBtn?.addEventListener("click", () => {
+    if (previewFrame) {
+      previewFrame.srcdoc = "";
+      setTimeout(() => { previewFrame.srcdoc = codeEditor.value; }, 50);
+    }
+  });
+
+  // Cancel edit mode
+  cancelEditBtn?.addEventListener("click", () => {
+    currentEditingToolId = null;
+    editingIndicator?.classList.add("hidden");
+    if (formHeading) formHeading.textContent = "Register Tool / Binary";
+    mTitle.value = ""; mVersion.value = ""; mDesc.value = ""; mTags.value = "";
+    fileInput.value = "";
+    codeEditor.value = "";
+    uploadBtn.textContent = "Save & Publish Tool";
+    updateCategoryView();
+  });
+
+  // --- 5. Submit Form ---
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const token = getToken();
-    if (!token) { if (uploadStatus) uploadStatus.textContent = "enter admin key first"; return; }
+    if (!token) {
+      if (uploadStatus) uploadStatus.textContent = "✗ Please enter and test your Admin Key first";
+      return;
+    }
+
+    const isWeb = mCategory.value === "Web Apps";
     const file = fileInput.files?.[0];
-    if (!file && mCategory.value === "Binaries") { if (uploadStatus) uploadStatus.textContent = "select a file"; return; }
+
+    if (!isWeb && !file && !currentEditingToolId) {
+      if (uploadStatus) uploadStatus.textContent = "✗ Please select a binary file to upload";
+      return;
+    }
 
     uploadBtn.disabled = true;
-    if (uploadStatus) uploadStatus.textContent = "signing...";
     progressWrap?.classList.remove("hidden");
+    if (uploadStatus) uploadStatus.textContent = "Processing...";
 
     try {
-      let downloadUrl = "", fileKey = "";
+      let downloadUrl = "", fileKey = "", sizeBytes: number | undefined;
 
-      if (file) {
+      // Upload binary to R2 if file attached
+      if (!isWeb && file) {
+        if (uploadStatus) uploadStatus.textContent = "Requesting presigned upload URL...";
         const signRes = await fetch("/api/sign-upload", {
           method: "POST",
           headers: { "Content-Type": "application/json", "x-admin-token": token },
@@ -176,12 +548,16 @@ import Layout from "../layouts/Layout.astro";
             version: mVersion.value,
           }),
         });
-        if (!signRes.ok) { const e = await signRes.json().catch(() => ({})); throw new Error(e.error || `sign failed ${signRes.status}`); }
+        if (!signRes.ok) {
+          const err = await signRes.json().catch(() => ({}));
+          throw new Error(err.error || `Upload signing failed: HTTP ${signRes.status}`);
+        }
         const signData = await signRes.json();
         downloadUrl = signData.downloadUrl;
         fileKey = signData.fileKey;
+        sizeBytes = file.size;
 
-        if (uploadStatus) uploadStatus.textContent = "uploading to R2...";
+        if (uploadStatus) uploadStatus.textContent = "Streaming binary directly to Cloudflare R2...";
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.upload.onprogress = (ev) => {
@@ -191,81 +567,154 @@ import Layout from "../layouts/Layout.astro";
               if (progressText) progressText.textContent = `${pct}%`;
             }
           };
-          xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error(`R2 PUT ${xhr.status}`));
-          xhr.onerror = () => reject(new Error("network error"));
+          xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error(`R2 upload failed: HTTP ${xhr.status}`));
+          xhr.onerror = () => reject(new Error("Network error during R2 binary upload"));
           xhr.open("PUT", signData.uploadUrl, true);
           xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
           xhr.send(file);
         });
       }
 
-      if (uploadStatus) uploadStatus.textContent = "registering...";
+      // Save / Update Metadata in Catalog
+      if (uploadStatus) uploadStatus.textContent = "Registering tool in catalog index...";
       const tags = mTags.value.split(",").map(t => t.trim()).filter(Boolean);
+
+      const payload: any = {
+        id: currentEditingToolId || undefined,
+        title: mTitle.value.trim(),
+        version: mVersion.value.trim() || "v1.0.0",
+        platform: mPlatform.value,
+        category: mCategory.value,
+        description: mDesc.value.trim(),
+        tags: tags.length ? tags : [mPlatform.value],
+        type: isWeb ? "web" : "binary",
+        releaseDate: new Date().toISOString().split("T")[0],
+      };
+
+      if (isWeb) {
+        payload.code = codeEditor.value;
+      } else {
+        if (downloadUrl) payload.downloadUrl = downloadUrl;
+        if (fileKey) payload.fileKey = fileKey;
+        if (file) {
+          payload.filename = file.name;
+          payload.sizeBytes = sizeBytes;
+          payload.size = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+        }
+      }
+
       const metaRes = await fetch("/api/tools", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-admin-token": token },
-        body: JSON.stringify({
-          title: mTitle.value.trim(),
-          version: mVersion.value.trim(),
-          platform: mPlatform.value,
-          category: mCategory.value,
-          description: mDesc.value.trim(),
-          tags: tags.length ? tags : [mPlatform.value],
-          type: mCategory.value === "Web Apps" ? "web" : "binary",
-          downloadUrl: downloadUrl || undefined,
-          filename: file?.name,
-          fileKey: fileKey || undefined,
-          sizeBytes: file?.size,
-          size: file ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` : undefined,
-          releaseDate: new Date().toISOString().split("T")[0],
-        }),
+        body: JSON.stringify(payload),
       });
-      if (!metaRes.ok) { const e = await metaRes.json().catch(() => ({})); throw new Error(e.error || "register failed"); }
 
-      if (uploadStatus) uploadStatus.textContent = "✓ done";
+      if (!metaRes.ok) {
+        const err = await metaRes.json().catch(() => ({}));
+        throw new Error(err.error || `Catalog update failed: HTTP ${metaRes.status}`);
+      }
+
+      if (uploadStatus) uploadStatus.textContent = "✓ Success! Tool is live.";
+      currentEditingToolId = null;
+      editingIndicator?.classList.add("hidden");
+      if (formHeading) formHeading.textContent = "Register Tool / Binary";
       mTitle.value = ""; mVersion.value = ""; mDesc.value = ""; mTags.value = "";
       fileInput.value = "";
+      codeEditor.value = "";
+      uploadBtn.textContent = "Save & Publish Tool";
       loadCatalog();
-    } catch (e: any) {
-      if (uploadStatus) uploadStatus.textContent = `✗ ${e.message}`;
+    } catch (err: any) {
+      if (uploadStatus) uploadStatus.textContent = `✗ ${err.message}`;
     } finally {
       uploadBtn.disabled = false;
     }
   });
 
-  // Catalog
+  // --- 6. Catalog Listing & Actions ---
   async function loadCatalog() {
     if (!catalog) return;
     try {
       const r = await fetch("/api/tools");
-      if (!r.ok) throw new Error("fetch failed");
+      if (!r.ok) throw new Error("Failed to load catalog");
       const items = await r.json();
+
       if (!Array.isArray(items) || items.length === 0) {
-        catalog.innerHTML = `<div class="text-neutral-600 py-4 text-center">empty</div>`;
+        catalog.innerHTML = `<div class="text-neutral-500 py-4 text-center">Catalog is empty. Register tools above!</div>`;
         return;
       }
-      catalog.innerHTML = items.map((t: any) =>
-        `<div class="flex items-center justify-between py-1 px-2 bg-neutral-800 rounded border border-neutral-700">
-          <div class="truncate"><span class="text-neutral-200">${t.title}</span> <span class="text-neutral-600">${t.version || ""} · ${t.platform}</span></div>
-          <button class="del-btn text-red-500 hover:text-red-400 px-1" data-id="${t.id}">×</button>
-        </div>`
-      ).join("");
 
+      catalog.innerHTML = items.map((t: any) => {
+        const isWeb = t.type === "web";
+        const icon = isWeb ? "🌐" : "📦";
+        const editBtn = isWeb ? `<button type="button" class="edit-btn px-2 py-0.5 bg-blue-900/40 hover:bg-blue-900/70 text-blue-300 rounded border border-blue-800 text-[10px]" data-id="${t.id}">Edit Code</button>` : "";
+        const runLink = isWeb ? `<a href="${t.route || `/tools/app?id=${t.id}`}" target="_blank" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 rounded text-[10px] no-underline">Open ↗</a>` : "";
+
+        return `
+          <div class="flex items-center justify-between py-2 px-3 bg-neutral-800/80 dark:bg-neutral-800/80 bg-neutral-100 rounded border border-neutral-700 dark:border-neutral-700 border-neutral-300 text-xs">
+            <div class="flex items-center gap-2 truncate min-w-0 mr-2">
+              <span>${icon}</span>
+              <span class="font-bold text-neutral-200 dark:text-neutral-200 text-neutral-900 truncate">${t.title}</span>
+              <span class="text-[10px] text-neutral-500 font-mono">${t.version || ""} · ${t.platform}</span>
+              ${isWeb && t.code ? '<span class="text-[9px] px-1 py-0.2 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded">custom code</span>' : ''}
+            </div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              ${runLink}
+              ${editBtn}
+              <button type="button" class="del-btn text-red-400 hover:text-red-300 px-2 py-0.5 rounded border border-red-950 hover:bg-red-950/50 text-[11px]" data-id="${t.id}" title="Delete">✕</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Edit Code handler
+      catalog.querySelectorAll<HTMLButtonElement>(".edit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          const targetTool = items.find((t: any) => t.id === id);
+          if (!targetTool) return;
+
+          currentEditingToolId = targetTool.id;
+          if (editingIndicator) editingIndicator.classList.remove("hidden");
+          if (editingId) editingId.textContent = targetTool.title;
+          if (formHeading) formHeading.textContent = `Edit Web App: ${targetTool.title}`;
+
+          mTitle.value = targetTool.title || "";
+          mVersion.value = targetTool.version || "";
+          mCategory.value = "Web Apps";
+          mPlatform.value = targetTool.platform || "Web";
+          mDesc.value = targetTool.description || "";
+          mTags.value = (targetTool.tags || []).join(", ");
+          codeEditor.value = targetTool.code || TEMPLATES.calculator;
+
+          uploadBtn.textContent = `Update & Save "${targetTool.title}"`;
+          updateCategoryView();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+
+      // Delete handler
       catalog.querySelectorAll<HTMLButtonElement>(".del-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-id");
           const token = getToken();
-          if (!token) { alert("enter admin key"); return; }
-          if (!confirm(`Delete "${id}"?`)) return;
+          if (!token) { alert("Please enter and test your Admin Key first"); return; }
+          if (!confirm(`Delete "${id}" from catalog?`)) return;
+
           try {
-            const r = await fetch(`/api/tools?id=${encodeURIComponent(id || "")}`, { method: "DELETE", headers: { "x-admin-token": token } });
-            if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || "delete failed"); }
+            const r = await fetch(`/api/tools?id=${encodeURIComponent(id || "")}`, {
+              method: "DELETE",
+              headers: { "x-admin-token": token },
+            });
+            if (!r.ok) {
+              const e = await r.json().catch(() => ({}));
+              throw new Error(e.error || "Delete failed");
+            }
             loadCatalog();
           } catch (e: any) { alert(e.message); }
         });
       });
     } catch {
-      catalog.innerHTML = `<div class="text-red-500 py-2 text-center">failed to load</div>`;
+      catalog.innerHTML = `<div class="text-red-400 py-3 text-center">Failed to load catalog. Check network or API.</div>`;
     }
   }
 
@@ -273,14 +722,23 @@ import Layout from "../layouts/Layout.astro";
 
   clearBtn?.addEventListener("click", async () => {
     const token = getToken();
-    if (!token) { alert("enter admin key"); return; }
-    if (!confirm("Delete ALL items?")) return;
+    if (!token) { alert("Please enter and test your Admin Key first"); return; }
+    if (!confirm("Are you sure you want to delete ALL items from the catalog?")) return;
+
     try {
-      const r = await fetch("/api/tools?all=true", { method: "DELETE", headers: { "x-admin-token": token } });
-      if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || "clear failed"); }
+      const r = await fetch("/api/tools?all=true", {
+        method: "DELETE",
+        headers: { "x-admin-token": token },
+      });
+      if (!r.ok) {
+        const e = await r.json().catch(() => ({}));
+        throw new Error(e.error || "Clear failed");
+      }
       loadCatalog();
     } catch (e: any) { alert(e.message); }
   });
 
+  // Init
+  updateCategoryView();
   loadCatalog();
 </script>

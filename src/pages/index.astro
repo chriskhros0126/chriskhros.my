@@ -3,41 +3,61 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="chriskhros.my // File Explorer">
-  <!-- Floating Scale Slider in Top-Right Corner (Outside Explorer) -->
-  <div class="fixed top-4 right-4 z-50 flex items-center gap-1.5 bg-[#222]/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-[#444] shadow-xl text-xs font-mono text-[#ccc] select-none">
-    <span class="text-[#888] text-[11px]">Zoom:</span>
-    <button type="button" id="zoom-out" class="w-6 h-6 flex items-center justify-center rounded bg-[#333] hover:bg-[#444] text-[#ccc] hover:text-white cursor-pointer select-none text-xs transition-colors" title="Zoom Out">−</button>
-    <input type="range" id="scale-slider" min="70" max="130" value="100" step="5" class="w-20 h-1 accent-[#007acc] cursor-pointer" title="Adjust Scale" />
-    <button type="button" id="zoom-in" class="w-6 h-6 flex items-center justify-center rounded bg-[#333] hover:bg-[#444] text-[#ccc] hover:text-white cursor-pointer select-none text-xs transition-colors" title="Zoom In">+</button>
-    <span id="scale-val" class="w-9 text-right text-white font-medium text-[11px]">100%</span>
+  <!-- Floating Top-Right Controls (Outside Explorer Window) -->
+  <div class="fixed top-4 right-4 z-50 flex items-center gap-2 select-none font-mono text-xs">
+    <!-- Light / Dark Mode Toggle -->
+    <button
+      type="button"
+      id="theme-toggle"
+      class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222]/90 dark:bg-[#222]/90 bg-white/90 border border-[#444] dark:border-[#444] border-neutral-300 shadow-xl text-[#ccc] dark:text-[#ccc] text-neutral-800 hover:text-white dark:hover:text-white hover:bg-[#333] dark:hover:bg-[#333] hover:bg-neutral-100 transition-colors cursor-pointer"
+      title="Toggle Light / Dark Mode"
+    >
+      <span id="theme-icon">☀️</span>
+      <span id="theme-text" class="text-[11px]">Light</span>
+    </button>
+
+    <!-- Scale / Zoom Controller -->
+    <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222]/90 dark:bg-[#222]/90 bg-white/90 border border-[#444] dark:border-[#444] border-neutral-300 shadow-xl text-[#ccc] dark:text-[#ccc] text-neutral-800">
+      <span class="text-[11px] text-[#888] dark:text-[#888] text-neutral-500">Zoom:</span>
+      <button type="button" id="zoom-out" class="w-6 h-6 flex items-center justify-center rounded bg-[#333] dark:bg-[#333] bg-neutral-200 hover:bg-[#444] dark:hover:bg-[#444] hover:bg-neutral-300 text-[#ccc] dark:text-[#ccc] text-neutral-800 hover:text-white dark:hover:text-white cursor-pointer select-none text-xs transition-colors" title="Zoom Out">−</button>
+      <input type="range" id="scale-slider" min="70" max="130" value="100" step="5" class="w-20 h-1 accent-[#007acc] cursor-pointer" title="Adjust Scale" />
+      <button type="button" id="zoom-in" class="w-6 h-6 flex items-center justify-center rounded bg-[#333] dark:bg-[#333] bg-neutral-200 hover:bg-[#444] dark:hover:bg-[#444] hover:bg-neutral-300 text-[#ccc] dark:text-[#ccc] text-neutral-800 hover:text-white dark:hover:text-white cursor-pointer select-none text-xs transition-colors" title="Zoom In">+</button>
+      <span id="scale-val" class="w-9 text-right text-white dark:text-white text-neutral-900 font-medium text-[11px]">100%</span>
+    </div>
+  </div>
+
+  <!-- Osu! Easter Egg Canvas & Overlay Container -->
+  <div id="osu-stage" class="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+    <svg id="osu-svg-lines" class="w-full h-full absolute inset-0 pointer-events-none"></svg>
+    <div id="osu-targets" class="w-full h-full relative"></div>
   </div>
 
   <div class="flex items-center justify-center min-h-screen p-4 sm:p-8">
     <!-- Explorer Window Container -->
-    <div id="explorer" class="w-full max-w-5xl flex flex-col rounded-lg overflow-hidden border border-[#444] shadow-2xl shadow-black/60 transition-transform origin-top" style="min-height: 600px; max-height: 85vh;">
+    <div id="explorer" class="w-full max-w-5xl flex flex-col rounded-lg overflow-hidden border border-[#444] dark:border-[#444] border-neutral-300 shadow-2xl shadow-black/40 bg-[#1e1e1e] dark:bg-[#1e1e1e] bg-white transition-transform origin-top" style="min-height: 600px; max-height: 85vh;">
 
       <!-- Title Bar -->
-      <div class="flex items-center justify-between px-3 h-8 bg-[#2d2d2d] border-b border-[#444] select-none flex-shrink-0">
-        <div class="flex items-center gap-2 text-xs text-[#ccc]">
+      <div class="flex items-center justify-between px-3 h-8 bg-[#2d2d2d] dark:bg-[#2d2d2d] bg-[#f3f3f3] border-b border-[#444] dark:border-[#444] border-neutral-300 select-none flex-shrink-0">
+        <div class="flex items-center gap-2 text-xs text-[#ccc] dark:text-[#ccc] text-neutral-800">
           <span>📁</span>
-          <span id="window-title">chriskhros.my</span>
+          <span id="window-title" class="font-medium">chriskhros.my</span>
         </div>
         <div class="flex items-center gap-0.5">
-          <span class="w-10 h-7 flex items-center justify-center text-[#888] hover:bg-[#3c3c3c] text-xs cursor-default">─</span>
-          <span class="w-10 h-7 flex items-center justify-center text-[#888] hover:bg-[#3c3c3c] text-xs cursor-default">☐</span>
-          <span class="w-10 h-7 flex items-center justify-center text-[#888] hover:bg-[#c42b1c] hover:text-white text-xs cursor-default">✕</span>
+          <span class="w-10 h-7 flex items-center justify-center text-[#888] dark:text-[#888] text-neutral-500 hover:bg-[#3c3c3c] dark:hover:bg-[#3c3c3c] hover:bg-neutral-200 text-xs cursor-default">─</span>
+          <span class="w-10 h-7 flex items-center justify-center text-[#888] dark:text-[#888] text-neutral-500 hover:bg-[#3c3c3c] dark:hover:bg-[#3c3c3c] hover:bg-neutral-200 text-xs cursor-default">☐</span>
+          <span id="close-btn" class="w-10 h-7 flex items-center justify-center text-[#888] dark:text-[#888] text-neutral-500 hover:bg-[#c42b1c] hover:text-white text-xs cursor-pointer transition-colors" title="Close (or is it?)">✕</span>
         </div>
       </div>
 
       <!-- Navigation & Address Bar Area -->
-      <div class="flex items-center px-2 py-1.5 bg-[#2d2d2d] border-b border-[#3a3a3a] gap-2 flex-shrink-0">
+      <div class="flex items-center px-2 py-1.5 bg-[#2d2d2d] dark:bg-[#2d2d2d] bg-[#f8f9fa] border-b border-[#3a3a3a] dark:border-[#3a3a3a] border-neutral-200 gap-2 flex-shrink-0">
         <!-- Back, Forward, Up Navigation Buttons -->
         <div class="flex items-center gap-0.5 flex-shrink-0">
           <button
             type="button"
             id="nav-back"
             disabled
-            class="w-7 h-7 flex items-center justify-center rounded text-sm text-[#888] hover:text-white hover:bg-[#3c3c3c] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#888] cursor-pointer disabled:cursor-default transition-colors"
+            class="w-7 h-7 flex items-center justify-center rounded text-sm text-[#888] dark:text-[#888] text-neutral-600 hover:text-white dark:hover:text-white hover:text-black hover:bg-[#3c3c3c] dark:hover:bg-[#3c3c3c] hover:bg-neutral-200 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#888] cursor-pointer disabled:cursor-default transition-colors"
             title="Back (Alt+Left)"
           >
             ←
@@ -46,7 +66,7 @@ import Layout from "../layouts/Layout.astro";
             type="button"
             id="nav-forward"
             disabled
-            class="w-7 h-7 flex items-center justify-center rounded text-sm text-[#888] hover:text-white hover:bg-[#3c3c3c] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#888] cursor-pointer disabled:cursor-default transition-colors"
+            class="w-7 h-7 flex items-center justify-center rounded text-sm text-[#888] dark:text-[#888] text-neutral-600 hover:text-white dark:hover:text-white hover:text-black hover:bg-[#3c3c3c] dark:hover:bg-[#3c3c3c] hover:bg-neutral-200 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#888] cursor-pointer disabled:cursor-default transition-colors"
             title="Forward (Alt+Right)"
           >
             →
@@ -55,7 +75,7 @@ import Layout from "../layouts/Layout.astro";
             type="button"
             id="nav-up"
             disabled
-            class="w-7 h-7 flex items-center justify-center rounded text-sm text-[#888] hover:text-white hover:bg-[#3c3c3c] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#888] cursor-pointer disabled:cursor-default transition-colors"
+            class="w-7 h-7 flex items-center justify-center rounded text-sm text-[#888] dark:text-[#888] text-neutral-600 hover:text-white dark:hover:text-white hover:text-black hover:bg-[#3c3c3c] dark:hover:bg-[#3c3c3c] hover:bg-neutral-200 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#888] cursor-pointer disabled:cursor-default transition-colors"
             title="Up to root (Alt+Up)"
           >
             ↑
@@ -63,13 +83,13 @@ import Layout from "../layouts/Layout.astro";
         </div>
 
         <!-- Address Bar (Breadcrumb) -->
-        <div class="flex-1 flex items-center justify-between px-2.5 py-1 bg-[#3c3c3c] border border-[#4f4f4f] rounded text-xs min-w-0">
-          <div id="breadcrumb" class="flex items-center gap-1.5 truncate text-[#aaa]">
+        <div class="flex-1 flex items-center justify-between px-2.5 py-1 bg-[#3c3c3c] dark:bg-[#3c3c3c] bg-white border border-[#4f4f4f] dark:border-[#4f4f4f] border-neutral-300 rounded text-xs min-w-0">
+          <div id="breadcrumb" class="flex items-center gap-1.5 truncate text-[#aaa] dark:text-[#aaa] text-neutral-600">
             <span>📁 This PC</span>
-            <span class="text-[#666]">›</span>
-            <span class="text-white font-medium">chriskhros.my</span>
+            <span class="text-[#666] dark:text-[#666] text-neutral-400">›</span>
+            <span class="text-white dark:text-white text-neutral-900 font-medium">chriskhros.my</span>
           </div>
-          <button type="button" id="refresh-view-btn" class="text-[#888] hover:text-white px-1 ml-2 text-xs flex-shrink-0 cursor-pointer" title="Refresh">
+          <button type="button" id="refresh-view-btn" class="text-[#888] dark:text-[#888] text-neutral-500 hover:text-white dark:hover:text-white hover:text-black px-1 ml-2 text-xs flex-shrink-0 cursor-pointer" title="Refresh">
             ⟳
           </button>
         </div>
@@ -80,7 +100,7 @@ import Layout from "../layouts/Layout.astro";
             type="text"
             id="search"
             placeholder="🔍 Search..."
-            class="w-40 sm:w-52 px-3 py-1 text-xs bg-[#3c3c3c] border border-[#555] rounded text-[#ccc] placeholder-[#777] focus:outline-none focus:border-[#007acc]"
+            class="w-40 sm:w-52 px-3 py-1 text-xs bg-[#3c3c3c] dark:bg-[#3c3c3c] bg-white border border-[#555] dark:border-[#555] border-neutral-300 rounded text-[#ccc] dark:text-[#ccc] text-neutral-900 placeholder-[#777] dark:placeholder-[#777] placeholder-neutral-400 focus:outline-none focus:border-[#007acc]"
             autocomplete="off"
             spellcheck="false"
           />
@@ -88,7 +108,7 @@ import Layout from "../layouts/Layout.astro";
       </div>
 
       <!-- Column Headers -->
-      <div id="col-headers" class="flex items-center px-3 py-1.5 bg-[#2d2d2d] border-b border-[#444] text-[10px] uppercase tracking-wider text-[#888] select-none flex-shrink-0">
+      <div id="col-headers" class="flex items-center px-3 py-1.5 bg-[#2d2d2d] dark:bg-[#2d2d2d] bg-[#f8fafc] border-b border-[#444] dark:border-[#444] border-neutral-200 text-[10px] uppercase tracking-wider text-[#888] dark:text-[#888] text-neutral-500 select-none flex-shrink-0">
         <div class="flex-1 min-w-0">Name</div>
         <div class="w-24 text-center hidden sm:block">Type</div>
         <div class="w-20 text-right hidden sm:block">Size</div>
@@ -97,24 +117,80 @@ import Layout from "../layouts/Layout.astro";
       </div>
 
       <!-- File / Folder Content Area -->
-      <div id="file-list" class="flex-1 overflow-y-auto bg-[#1e1e1e]">
-        <div class="flex items-center justify-center h-full text-[#555] text-sm">Loading folder contents...</div>
+      <div id="file-list" class="flex-1 overflow-y-auto bg-[#1e1e1e] dark:bg-[#1e1e1e] bg-white">
+        <div class="flex items-center justify-center h-full text-[#555] dark:text-[#555] text-neutral-400 text-sm">Loading folder contents...</div>
       </div>
 
       <!-- Empty State -->
-      <div id="empty-state" class="hidden flex-1 flex flex-col items-center justify-center bg-[#1e1e1e] text-[#555] text-sm p-6 text-center">
+      <div id="empty-state" class="hidden flex-1 flex flex-col items-center justify-center bg-[#1e1e1e] dark:bg-[#1e1e1e] bg-white text-[#555] dark:text-[#555] text-neutral-400 text-sm p-6 text-center">
         <span class="text-3xl mb-2">📁</span>
         <span>This folder is empty.</span>
       </div>
 
       <!-- Status Bar -->
-      <div class="flex items-center justify-between px-3 py-1 bg-[#2d2d2d] border-t border-[#444] text-[11px] text-[#888] select-none flex-shrink-0">
+      <div class="flex items-center justify-between px-3 py-1 bg-[#2d2d2d] dark:bg-[#2d2d2d] bg-[#f3f3f3] border-t border-[#444] dark:border-[#444] border-neutral-300 text-[11px] text-[#888] dark:text-[#888] text-neutral-500 select-none flex-shrink-0">
         <span id="item-count">0 items</span>
-        <span class="text-[10px] text-[#666]">chriskhros.my · Cloudflare R2</span>
+        <span class="text-[10px] text-[#666] dark:text-[#666] text-neutral-400">chriskhros.my · Cloudflare R2</span>
       </div>
 
     </div>
   </div>
+
+  <style>
+    /* Osu! Approach Circle Animation */
+    @keyframes osu-approach {
+      0% {
+        transform: scale(2.8);
+        opacity: 0.15;
+      }
+      50% {
+        opacity: 0.9;
+      }
+      100% {
+        transform: scale(1.0);
+        opacity: 1;
+      }
+    }
+
+    .osu-approach-ring {
+      animation: osu-approach 0.75s cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
+    }
+
+    /* Dashed trace line animation */
+    @keyframes osu-dash-draw {
+      from {
+        stroke-dashoffset: 1000;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .osu-trace-line {
+      stroke-dasharray: 8 6;
+      animation: osu-dash-draw 0.4s ease-out forwards;
+    }
+
+    /* Score popup */
+    @keyframes osu-score-float {
+      0% {
+        transform: scale(0.6) translateY(0);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.2) translateY(-25px);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.4) translateY(-50px);
+        opacity: 0;
+      }
+    }
+
+    .osu-score-burst {
+      animation: osu-score-float 0.65s ease-out forwards;
+    }
+  </style>
 
   <script>
     // Elements
@@ -123,6 +199,10 @@ import Layout from "../layouts/Layout.astro";
     const scaleVal = document.getElementById("scale-val");
     const zoomOut = document.getElementById("zoom-out");
     const zoomIn = document.getElementById("zoom-in");
+
+    const themeToggle = document.getElementById("theme-toggle");
+    const themeIcon = document.getElementById("theme-icon");
+    const themeText = document.getElementById("theme-text");
 
     const navBack = document.getElementById("nav-back") as HTMLButtonElement;
     const navForward = document.getElementById("nav-forward") as HTMLButtonElement;
@@ -134,9 +214,13 @@ import Layout from "../layouts/Layout.astro";
     const emptyState = document.getElementById("empty-state");
     const itemCount = document.getElementById("item-count");
     const refreshViewBtn = document.getElementById("refresh-view-btn");
+    const closeBtn = document.getElementById("close-btn");
+
+    const osuStage = document.getElementById("osu-stage");
+    const osuSvgLines = document.getElementById("osu-svg-lines");
+    const osuTargets = document.getElementById("osu-targets");
 
     // State
-    // Folders: 'root' | 'apps' | 'web'
     let currentFolder: "root" | "apps" | "web" = "root";
     let history: ("root" | "apps" | "web")[] = ["root"];
     let historyIndex = 0;
@@ -144,7 +228,21 @@ import Layout from "../layouts/Layout.astro";
     let selectedRow: HTMLElement | null = null;
     let allTools: any[] = [];
 
-    // --- 1. Scale Slider (Outside Explorer Window) ---
+    // --- 1. Theme Toggle ---
+    function updateThemeUI() {
+      const isDark = document.documentElement.classList.contains("dark");
+      if (themeIcon) themeIcon.textContent = isDark ? "☀️" : "🌙";
+      if (themeText) themeText.textContent = isDark ? "Light" : "Dark";
+    }
+    updateThemeUI();
+
+    themeToggle?.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("ck_theme", isDark ? "dark" : "light");
+      updateThemeUI();
+    });
+
+    // --- 2. Scale Slider (Outside Explorer Window) ---
     function applyScale(val: number) {
       const pct = Math.max(70, Math.min(130, val));
       if (scaleSlider) scaleSlider.value = String(pct);
@@ -153,24 +251,14 @@ import Layout from "../layouts/Layout.astro";
       localStorage.setItem("ck_explorer_scale", String(pct));
     }
 
-    scaleSlider?.addEventListener("input", () => {
-      applyScale(parseInt(scaleSlider.value, 10));
-    });
-
-    zoomOut?.addEventListener("click", () => {
-      applyScale(parseInt(scaleSlider.value, 10) - 5);
-    });
-
-    zoomIn?.addEventListener("click", () => {
-      applyScale(parseInt(scaleSlider.value, 10) + 5);
-    });
+    scaleSlider?.addEventListener("input", () => applyScale(parseInt(scaleSlider.value, 10)));
+    zoomOut?.addEventListener("click", () => applyScale(parseInt(scaleSlider.value, 10) - 5));
+    zoomIn?.addEventListener("click", () => applyScale(parseInt(scaleSlider.value, 10) + 5));
 
     const savedScale = parseInt(localStorage.getItem("ck_explorer_scale") || "100", 10);
-    if (savedScale && savedScale !== 100) {
-      applyScale(savedScale);
-    }
+    if (savedScale && savedScale !== 100) applyScale(savedScale);
 
-    // --- 2. Navigation State Machine (Back, Forward, Up) ---
+    // --- 3. Navigation Controls (Back, Forward, Up) ---
     function updateNavButtons() {
       if (navBack) navBack.disabled = historyIndex <= 0;
       if (navForward) navForward.disabled = historyIndex >= history.length - 1;
@@ -216,9 +304,7 @@ import Layout from "../layouts/Layout.astro";
     }
 
     function goUp() {
-      if (currentFolder !== "root") {
-        navigateTo("root");
-      }
+      if (currentFolder !== "root") navigateTo("root");
     }
 
     navBack?.addEventListener("click", goBack);
@@ -226,53 +312,53 @@ import Layout from "../layouts/Layout.astro";
     navUp?.addEventListener("click", goUp);
     refreshViewBtn?.addEventListener("click", () => loadTools());
 
-    // Keyboard navigation: Alt+Left / Alt+Right / Alt+Up
+    // Keyboard navigation
     window.addEventListener("keydown", (e) => {
       if (e.altKey && e.key === "ArrowLeft") {
-        e.preventDefault();
-        goBack();
+        e.preventDefault(); goBack();
       } else if (e.altKey && e.key === "ArrowRight") {
-        e.preventDefault();
-        goForward();
+        e.preventDefault(); goForward();
       } else if (e.altKey && e.key === "ArrowUp") {
-        e.preventDefault();
-        goUp();
+        e.preventDefault(); goUp();
       } else if (e.key === "/" && document.activeElement !== searchInput) {
         e.preventDefault();
         searchInput?.focus();
         searchInput?.select();
+      } else if (e.key === "Escape") {
+        // Clear Osu! circles on Escape
+        clearOsuStage();
       }
     });
 
-    // --- 3. Breadcrumb & Title Update ---
+    // --- 4. Breadcrumb & Title ---
     function updateBreadcrumb() {
       if (!breadcrumb) return;
 
       if (currentFolder === "root") {
         breadcrumb.innerHTML = `
           <span>📁 This PC</span>
-          <span class="text-[#666]">›</span>
-          <span class="text-white font-medium">chriskhros.my</span>
+          <span class="text-[#666] dark:text-[#666] text-neutral-400">›</span>
+          <span class="text-white dark:text-white text-neutral-900 font-medium">chriskhros.my</span>
         `;
         if (windowTitle) windowTitle.textContent = "chriskhros.my";
         if (searchInput) searchInput.placeholder = "🔍 Search chriskhros.my...";
       } else if (currentFolder === "apps") {
         breadcrumb.innerHTML = `
           <span>📁 This PC</span>
-          <span class="text-[#666]">›</span>
-          <button type="button" id="crumb-root" class="hover:underline text-[#aaa] cursor-pointer">chriskhros.my</button>
-          <span class="text-[#666]">›</span>
-          <span class="text-white font-medium">Apps</span>
+          <span class="text-[#666] dark:text-[#666] text-neutral-400">›</span>
+          <button type="button" id="crumb-root" class="hover:underline text-[#aaa] dark:text-[#aaa] text-neutral-600 cursor-pointer">chriskhros.my</button>
+          <span class="text-[#666] dark:text-[#666] text-neutral-400">›</span>
+          <span class="text-white dark:text-white text-neutral-900 font-medium">Apps</span>
         `;
         if (windowTitle) windowTitle.textContent = "Apps - chriskhros.my";
         if (searchInput) searchInput.placeholder = "🔍 Search in Apps...";
       } else if (currentFolder === "web") {
         breadcrumb.innerHTML = `
           <span>📁 This PC</span>
-          <span class="text-[#666]">›</span>
-          <button type="button" id="crumb-root" class="hover:underline text-[#aaa] cursor-pointer">chriskhros.my</button>
-          <span class="text-[#666]">›</span>
-          <span class="text-white font-medium">Web Tools</span>
+          <span class="text-[#666] dark:text-[#666] text-neutral-400">›</span>
+          <button type="button" id="crumb-root" class="hover:underline text-[#aaa] dark:text-[#aaa] text-neutral-600 cursor-pointer">chriskhros.my</button>
+          <span class="text-[#666] dark:text-[#666] text-neutral-400">›</span>
+          <span class="text-white dark:text-white text-neutral-900 font-medium">Web Tools</span>
         `;
         if (windowTitle) windowTitle.textContent = "Web Tools - chriskhros.my";
         if (searchInput) searchInput.placeholder = "🔍 Search in Web Tools...";
@@ -281,7 +367,7 @@ import Layout from "../layouts/Layout.astro";
       document.getElementById("crumb-root")?.addEventListener("click", () => navigateTo("root"));
     }
 
-    // --- 4. Render Logic ---
+    // --- 5. Render Logic ---
     function getFileIcon(tool: any): string {
       if (tool.type === "web") return "🌐";
       const fn = (tool.filename || "").toLowerCase();
@@ -305,7 +391,7 @@ import Layout from "../layouts/Layout.astro";
       const binaries = allTools.filter(t => t.type === "binary" || (t.type !== "web" && t.downloadUrl));
       const webTools = allTools.filter(t => t.type === "web" || !t.downloadUrl);
 
-      // Search Mode (global if searching)
+      // Search Mode
       if (searchQuery) {
         const matches = allTools.filter(t => {
           const title = (t.title || "").toLowerCase();
@@ -328,7 +414,7 @@ import Layout from "../layouts/Layout.astro";
         return;
       }
 
-      // Root View: Show 2 Folders (Apps & Web Tools)
+      // Root View: Show Apps & Web Tools Folders
       if (currentFolder === "root") {
         fileList.classList.remove("hidden");
         emptyState?.classList.add("hidden");
@@ -336,40 +422,39 @@ import Layout from "../layouts/Layout.astro";
         fileList.innerHTML = `
           <!-- Apps Folder Row -->
           <div
-            class="folder-row flex items-center px-3 py-2 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] text-[#ccc] transition-colors duration-75 select-none"
+            class="folder-row flex items-center px-3 py-2 border-b border-[#2a2a2a] dark:border-[#2a2a2a] border-neutral-100 hover:bg-[#2a2a2a] dark:hover:bg-[#2a2a2a] hover:bg-[#f1f5f9] cursor-pointer text-[13px] text-[#ccc] dark:text-[#ccc] text-neutral-800 transition-colors duration-75 select-none"
             data-target="apps"
           >
             <div class="flex-1 min-w-0 flex items-center gap-2.5 truncate font-medium">
               <span class="text-base flex-shrink-0">📁</span>
-              <span class="truncate font-mono text-[13px] text-white">Apps</span>
-              <span class="text-[10px] text-[#777] font-mono">(${binaries.length} binaries)</span>
+              <span class="truncate font-mono text-[13px] text-white dark:text-white text-neutral-900 font-bold">Apps</span>
+              <span class="text-[10px] text-[#777] dark:text-[#777] text-neutral-500 font-mono">(${binaries.length} binaries)</span>
             </div>
-            <div class="w-24 text-center text-xs text-[#888] hidden sm:block font-mono">File folder</div>
-            <div class="w-20 text-right text-xs text-[#888] hidden sm:block">${binaries.length} item${binaries.length !== 1 ? 's' : ''}</div>
-            <div class="w-28 text-center text-xs text-[#888] hidden md:block">Win / Mac / Linux</div>
-            <div class="w-24 text-right text-xs text-[#666] hidden md:block">—</div>
+            <div class="w-24 text-center text-xs text-[#888] dark:text-[#888] text-neutral-500 hidden sm:block font-mono">File folder</div>
+            <div class="w-20 text-right text-xs text-[#888] dark:text-[#888] text-neutral-500 hidden sm:block">${binaries.length} item${binaries.length !== 1 ? 's' : ''}</div>
+            <div class="w-28 text-center text-xs text-[#888] dark:text-[#888] text-neutral-500 hidden md:block">Win / Mac / Linux</div>
+            <div class="w-24 text-right text-xs text-[#666] dark:text-[#666] text-neutral-400 hidden md:block">—</div>
           </div>
 
           <!-- Web Tools Folder Row -->
           <div
-            class="folder-row flex items-center px-3 py-2 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] text-[#ccc] transition-colors duration-75 select-none"
+            class="folder-row flex items-center px-3 py-2 border-b border-[#2a2a2a] dark:border-[#2a2a2a] border-neutral-100 hover:bg-[#2a2a2a] dark:hover:bg-[#2a2a2a] hover:bg-[#f1f5f9] cursor-pointer text-[13px] text-[#ccc] dark:text-[#ccc] text-neutral-800 transition-colors duration-75 select-none"
             data-target="web"
           >
             <div class="flex-1 min-w-0 flex items-center gap-2.5 truncate font-medium">
               <span class="text-base flex-shrink-0">📁</span>
-              <span class="truncate font-mono text-[13px] text-white">Web Tools</span>
-              <span class="text-[10px] text-[#777] font-mono">(${webTools.length} utilities)</span>
+              <span class="truncate font-mono text-[13px] text-white dark:text-white text-neutral-900 font-bold">Web Tools</span>
+              <span class="text-[10px] text-[#777] dark:text-[#777] text-neutral-500 font-mono">(${webTools.length} utilities)</span>
             </div>
-            <div class="w-24 text-center text-xs text-[#888] hidden sm:block font-mono">File folder</div>
-            <div class="w-20 text-right text-xs text-[#888] hidden sm:block">${webTools.length} item${webTools.length !== 1 ? 's' : ''}</div>
-            <div class="w-28 text-center text-xs text-[#888] hidden md:block">Browser Native</div>
-            <div class="w-24 text-right text-xs text-[#666] hidden md:block">—</div>
+            <div class="w-24 text-center text-xs text-[#888] dark:text-[#888] text-neutral-500 hidden sm:block font-mono">File folder</div>
+            <div class="w-20 text-right text-xs text-[#888] dark:text-[#888] text-neutral-500 hidden sm:block">${webTools.length} item${webTools.length !== 1 ? 's' : ''}</div>
+            <div class="w-28 text-center text-xs text-[#888] dark:text-[#888] text-neutral-500 hidden md:block">Browser Native</div>
+            <div class="w-24 text-right text-xs text-[#666] dark:text-[#666] text-neutral-400 hidden md:block">—</div>
           </div>
         `;
 
         if (itemCount) itemCount.textContent = "2 folders";
 
-        // Folder click handlers
         fileList.querySelectorAll<HTMLElement>(".folder-row").forEach(row => {
           row.addEventListener("click", () => {
             const target = row.getAttribute("data-target") as "apps" | "web";
@@ -416,25 +501,25 @@ import Layout from "../layouts/Layout.astro";
       const isWeb = tool.type === "web";
       const icon = getFileIcon(tool);
       const fileType = getFileType(tool);
-      const href = isWeb ? (tool.route || "/tools/demo-tool") : (tool.downloadUrl || "#");
+      const href = isWeb ? (tool.route || `/tools/app?id=${tool.id}`) : (tool.downloadUrl || "#");
       const dl = !isWeb ? ` download="${tool.filename || ""}"` : "";
 
       return `
         <a
           href="${href}"
           ${dl}
-          class="file-row flex items-center px-3 py-1.5 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] no-underline text-[#ccc] transition-colors duration-75 select-none"
+          class="file-row flex items-center px-3 py-1.5 border-b border-[#2a2a2a] dark:border-[#2a2a2a] border-neutral-100 hover:bg-[#2a2a2a] dark:hover:bg-[#2a2a2a] hover:bg-[#f1f5f9] cursor-pointer text-[13px] no-underline text-[#ccc] dark:text-[#ccc] text-neutral-800 transition-colors duration-75 select-none"
           data-id="${tool.id}"
         >
           <div class="flex-1 min-w-0 flex items-center gap-2 truncate">
             <span class="text-sm flex-shrink-0">${icon}</span>
-            <span class="truncate font-mono text-[13px] text-neutral-200">${tool.title || "Untitled"}</span>
-            ${tool.version ? `<span class="text-[10px] text-[#666] flex-shrink-0 font-mono">${tool.version}</span>` : ""}
+            <span class="truncate font-mono text-[13px] text-neutral-200 dark:text-neutral-200 text-neutral-900">${tool.title || "Untitled"}</span>
+            ${tool.version ? `<span class="text-[10px] text-[#666] dark:text-[#666] text-neutral-400 flex-shrink-0 font-mono">${tool.version}</span>` : ""}
           </div>
-          <div class="w-24 text-center text-xs text-[#888] hidden sm:block font-mono">${fileType}</div>
-          <div class="w-20 text-right text-xs text-[#888] hidden sm:block">${isWeb ? "—" : (tool.size || "—")}</div>
-          <div class="w-28 text-center text-xs text-[#888] hidden md:block">${tool.platform || "—"}</div>
-          <div class="w-24 text-right text-xs text-[#666] hidden md:block">${tool.releaseDate || "—"}</div>
+          <div class="w-24 text-center text-xs text-[#888] dark:text-[#888] text-neutral-500 hidden sm:block font-mono">${fileType}</div>
+          <div class="w-20 text-right text-xs text-[#888] dark:text-[#888] text-neutral-500 hidden sm:block">${isWeb ? "—" : (tool.size || "—")}</div>
+          <div class="w-28 text-center text-xs text-[#888] dark:text-[#888] text-neutral-500 hidden md:block">${tool.platform || "—"}</div>
+          <div class="w-24 text-right text-xs text-[#666] dark:text-[#666] text-neutral-400 hidden md:block">${tool.releaseDate || "—"}</div>
         </a>
       `;
     }
@@ -444,7 +529,8 @@ import Layout from "../layouts/Layout.astro";
         row.addEventListener("mousedown", () => {
           if (selectedRow) selectedRow.style.backgroundColor = "";
           selectedRow = row;
-          row.style.backgroundColor = "#264f78";
+          const isDark = document.documentElement.classList.contains("dark");
+          row.style.backgroundColor = isDark ? "#264f78" : "#cce8ff";
         });
       });
     }
@@ -462,7 +548,169 @@ import Layout from "../layouts/Layout.astro";
       renderFolder();
     });
 
-    // --- 5. Dynamic Data Fetch from R2 ---
+    // --- 6. Osu! Easter Egg System ---
+    interface OsuNode {
+      x: number;
+      y: number;
+      combo: number;
+      element: HTMLElement;
+    }
+
+    const osuNodes: OsuNode[] = [];
+    let comboCounter = 0;
+    let audioCtx: AudioContext | null = null;
+
+    function playHitSound() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+        osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } catch {}
+    }
+
+    function clearOsuStage() {
+      if (osuTargets) osuTargets.innerHTML = "";
+      if (osuSvgLines) osuSvgLines.innerHTML = "";
+      osuNodes.length = 0;
+      comboCounter = 0;
+    }
+
+    closeBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      spawnOsuCircle();
+    });
+
+    function spawnOsuCircle() {
+      if (!osuTargets || !osuSvgLines) return;
+
+      comboCounter++;
+      const diameter = 90;
+      const margin = 110;
+
+      // Safe viewport coordinate
+      const maxX = Math.max(margin, window.innerWidth - margin);
+      const maxY = Math.max(margin, window.innerHeight - margin);
+      const x = margin + Math.random() * (maxX - margin);
+      const y = margin + Math.random() * (maxY - margin);
+
+      // 1. Draw dashed line if previous circle exists
+      if (osuNodes.length > 0) {
+        const prev = osuNodes[osuNodes.length - 1];
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", String(prev.x));
+        line.setAttribute("y1", String(prev.y));
+        line.setAttribute("x2", String(x));
+        line.setAttribute("y2", String(y));
+        line.setAttribute("stroke", "#38bdf8");
+        line.setAttribute("stroke-width", "3");
+        line.setAttribute("stroke-linecap", "round");
+        line.classList.add("osu-trace-line");
+        osuSvgLines.appendChild(line);
+      }
+
+      // 2. Create Osu! Hit Object Container
+      const container = document.createElement("div");
+      container.style.position = "absolute";
+      container.style.left = `${x - diameter / 2}px`;
+      container.style.top = `${y - diameter / 2}px`;
+      container.style.width = `${diameter}px`;
+      container.style.height = `${diameter}px`;
+      container.style.pointerEvents = "auto";
+      container.style.cursor = "pointer";
+      container.style.userSelect = "none";
+
+      // 3. Approach Circle (Closing In)
+      const approachRing = document.createElement("div");
+      approachRing.classList.add("osu-approach-ring");
+      approachRing.style.position = "absolute";
+      approachRing.style.inset = "0";
+      approachRing.style.borderRadius = "9999px";
+      approachRing.style.border = "3px solid #ffffff";
+      approachRing.style.boxShadow = "0 0 15px rgba(56, 189, 248, 0.9)";
+      approachRing.style.pointerEvents = "none";
+
+      // 4. Hit Target (Circular Wong image with white border)
+      const hitTarget = document.createElement("div");
+      hitTarget.style.position = "absolute";
+      hitTarget.style.inset = "0";
+      hitTarget.style.borderRadius = "9999px";
+      hitTarget.style.border = "4px solid #ffffff";
+      hitTarget.style.backgroundImage = 'url("/wong.png")';
+      hitTarget.style.backgroundSize = "cover";
+      hitTarget.style.backgroundPosition = "center";
+      hitTarget.style.boxShadow = "0 0 20px rgba(255, 255, 255, 0.8), 0 8px 32px rgba(0,0,0,0.8)";
+      hitTarget.style.overflow = "hidden";
+      hitTarget.style.transition = "transform 0.1s ease";
+
+      // 5. Combo Badge
+      const comboBadge = document.createElement("div");
+      comboBadge.textContent = String(comboCounter);
+      comboBadge.style.position = "absolute";
+      comboBadge.style.top = "-8px";
+      comboBadge.style.left = "-8px";
+      comboBadge.style.width = "26px";
+      comboBadge.style.height = "26px";
+      comboBadge.style.borderRadius = "9999px";
+      comboBadge.style.backgroundColor = "#0284c7";
+      comboBadge.style.color = "#ffffff";
+      comboBadge.style.border = "2px solid #ffffff";
+      comboBadge.style.display = "flex";
+      comboBadge.style.alignItems = "center";
+      comboBadge.style.justifyContent = "center";
+      comboBadge.style.fontSize = "12px";
+      comboBadge.style.fontWeight = "bold";
+      comboBadge.style.fontFamily = "monospace";
+      comboBadge.style.boxShadow = "0 2px 8px rgba(0,0,0,0.5)";
+
+      container.appendChild(approachRing);
+      container.appendChild(hitTarget);
+      container.appendChild(comboBadge);
+      osuTargets.appendChild(container);
+
+      // Track Node
+      const node: OsuNode = { x, y, combo: comboCounter, element: container };
+      osuNodes.push(node);
+
+      // Hit Interaction (Click to pop with "300" score burst)
+      container.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        playHitSound();
+
+        // 300 Score Burst
+        const score = document.createElement("div");
+        score.textContent = "300";
+        score.classList.add("osu-score-burst");
+        score.style.position = "absolute";
+        score.style.left = `${x - 25}px`;
+        score.style.top = `${y - 25}px`;
+        score.style.color = "#38bdf8";
+        score.style.fontSize = "26px";
+        score.style.fontWeight = "900";
+        score.style.fontFamily = "sans-serif";
+        score.style.textShadow = "0 0 10px #0284c7, 0 0 20px #ffffff";
+        score.style.pointerEvents = "none";
+        osuTargets.appendChild(score);
+        setTimeout(() => score.remove(), 700);
+
+        // Burst animation
+        container.style.transition = "transform 0.2s ease, opacity 0.2s ease";
+        container.style.transform = "scale(1.4)";
+        container.style.opacity = "0";
+        setTimeout(() => container.remove(), 200);
+      });
+    }
+
+    // --- 7. Load Data from API ---
     async function loadTools() {
       try {
         const res = await fetch("/api/tools");
@@ -475,7 +723,7 @@ import Layout from "../layouts/Layout.astro";
           }
         }
       } catch (err) {
-        console.warn("Failed to load catalog from API:", err);
+        console.warn("Failed to load catalog:", err);
       }
       allTools = [];
       renderFolder();

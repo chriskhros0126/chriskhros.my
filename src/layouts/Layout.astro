@@ -13,8 +13,20 @@ const { title = "chriskhros.my" } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📁</text></svg>" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+
+    <!-- Immediate theme restore to avoid flash of wrong theme -->
+    <script is:inline>
+      const theme = localStorage.getItem("ck_theme");
+      if (theme === "light") {
+        document.documentElement.classList.remove("dark");
+      } else {
+        document.documentElement.classList.add("dark");
+      }
+    </script>
+
     <style is:global>
       :root { color-scheme: dark; }
+      html:not(.dark) { color-scheme: light; }
       * { box-sizing: border-box; }
       body {
         margin: 0;
@@ -22,15 +34,24 @@ const { title = "chriskhros.my" } = Astro.props;
         color: #ccc;
         font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         -webkit-font-smoothing: antialiased;
+        transition: background-color 0.15s ease, color 0.15s ease;
+      }
+      html:not(.dark) body {
+        background: #e9ecef;
+        color: #1e293b;
       }
       code, .font-mono, .mono {
         font-family: Consolas, 'Courier New', monospace;
       }
       ::selection { background: #264f78; color: #fff; }
+      html:not(.dark) ::selection { background: #cce8ff; color: #000; }
       ::-webkit-scrollbar { width: 8px; height: 8px; }
       ::-webkit-scrollbar-track { background: #1e1e1e; }
       ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
       ::-webkit-scrollbar-thumb:hover { background: #555; }
+      html:not(.dark) ::-webkit-scrollbar-track { background: #f1f3f5; }
+      html:not(.dark) ::-webkit-scrollbar-thumb { background: #ced4da; border-radius: 4px; }
+      html:not(.dark) ::-webkit-scrollbar-thumb:hover { background: #adb5bd; }
       input, select, textarea, button { font-family: inherit; }
     </style>
   </head>
