@@ -91,15 +91,15 @@ const totalWebApps = initialTools.filter(t => t.type === "web").length;
     </div>
 
     <!-- Empty State -->
-    <div id="empty-state" class="hidden text-center py-16 px-4 rounded-2xl border border-dashed border-hub-border bg-hub-surface/30 mt-6">
+    <div id="empty-state" class={`${initialTools.length === 0 ? '' : 'hidden'} text-center py-16 px-4 rounded-2xl border border-dashed border-hub-border bg-hub-surface/30 mt-6`}>
       <div class="w-12 h-12 mx-auto rounded-full bg-hub-surfaceElevated flex items-center justify-center text-zinc-500 mb-3">
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
       </div>
-      <h3 class="text-base font-semibold text-hub-textBright">No tools match your criteria</h3>
+      <h3 class="text-base font-semibold text-hub-textBright">Catalog is currently empty</h3>
       <p class="text-sm text-zinc-400 mt-1 max-w-sm mx-auto">
-        Try adjusting your search keywords, clearing platform filters, or selecting a different category.
+        No binaries or tools published yet. Visit the <a href="/admin" class="text-emerald-400 underline hover:text-emerald-300 font-medium">Admin Console</a> to stream your first release into Cloudflare R2!
       </p>
     </div>
 
@@ -126,4 +126,53 @@ const totalWebApps = initialTools.filter(t => t.type === "web").length;
       </a>
     </div>
   </div>
+
+  <script>
+    async function syncLiveCatalog() {
+      try {
+        const res = await fetch("/api/tools");
+        if (!res.ok) return;
+        const liveTools = await res.json();
+        if (!Array.isArray(liveTools)) return;
+
+        const liveIds = new Set(liveTools.map((t: any) => t.id));
+        const cards = document.querySelectorAll<HTMLElement>(".tool-card");
+
+        // Remove any cards that were deleted from the live R2 catalog
+        cards.forEach((card) => {
+          const id = card.getAttribute("data-id");
+          if (id && !liveIds.has(id)) {
+            card.remove();
+          }
+        });
+
+        // Update metrics
+        const metricTotal = document.getElementById("metric-total");
+        if (metricTotal) metricTotal.textContent = String(liveTools.length);
+
+        const remainingCards = document.querySelectorAll<HTMLElement>(".tool-card");
+        const resultsCount = document.getElementById("results-count");
+        if (resultsCount) {
+          resultsCount.textContent = `Showing ${remainingCards.length} of ${remainingCards.length} tools`;
+        }
+
+        const emptyState = document.getElementById("empty-state");
+        if (emptyState) {
+          if (remainingCards.length === 0) {
+            emptyState.classList.remove("hidden");
+          } else {
+            emptyState.classList.add("hidden");
+          }
+        }
+      } catch {
+        // Fallback silently to pre-rendered tools
+      }
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", syncLiveCatalog);
+    } else {
+      syncLiveCatalog();
+    }
+  </script>
 </Layout>

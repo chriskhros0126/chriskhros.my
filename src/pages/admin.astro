@@ -281,13 +281,22 @@ import Layout from "../layouts/Layout.astro";
           <h2 class="text-lg font-semibold text-hub-textBright">Catalog Management</h2>
           <p class="text-xs text-zinc-400 font-mono">Live entries stored in Cloudflare R2 index</p>
         </div>
-        <button
-          type="button"
-          id="refresh-catalog-btn"
-          class="px-3 py-1.5 rounded-md bg-hub-surface border border-hub-border hover:bg-hub-surfaceElevated text-xs font-mono text-zinc-300"
-        >
-          Refresh List
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            id="clear-all-demo-btn"
+            class="px-3 py-1.5 rounded-md bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-xs font-mono text-rose-400 transition-colors"
+          >
+            Clear All Demo Tools
+          </button>
+          <button
+            type="button"
+            id="refresh-catalog-btn"
+            class="px-3 py-1.5 rounded-md bg-hub-surface border border-hub-border hover:bg-hub-surfaceElevated text-xs font-mono text-zinc-300"
+          >
+            Refresh List
+          </button>
+        </div>
       </div>
 
       <div id="catalog-list" class="space-y-3">
@@ -731,6 +740,32 @@ import Layout from "../layouts/Layout.astro";
       catalogList.innerHTML = `<div class="p-4 text-xs font-mono text-rose-400 bg-rose-950/20 rounded-xl border border-rose-900">Failed to fetch tools catalog.</div>`;
     }
   }
+
+  const clearAllDemoBtn = document.getElementById("clear-all-demo-btn");
+  clearAllDemoBtn?.addEventListener("click", async () => {
+    const token = tokenInput.value.trim();
+    if (!token) {
+      alert("Please provide the Admin Secret Key in Step 1 first.");
+      tokenInput.focus();
+      return;
+    }
+    if (confirm("Are you sure you want to delete ALL pre-made demo tools and start with an empty catalog?")) {
+      try {
+        const delRes = await fetch("/api/tools?all=true", {
+          method: "DELETE",
+          headers: { "x-admin-token": token },
+        });
+        if (!delRes.ok) {
+          const err = await delRes.json().catch(() => ({}));
+          throw new Error(err.error || `Delete failed with status ${delRes.status}`);
+        }
+        showStatus("All demo tools have been cleared from the catalog.", "success");
+        loadCatalog();
+      } catch (err: any) {
+        showStatus(`Failed to clear tools: ${err.message}`, "error");
+      }
+    }
+  });
 
   refreshCatalogBtn?.addEventListener("click", loadCatalog);
   loadCatalog();
