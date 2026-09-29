@@ -1,0 +1,259 @@
+---
+export interface Props {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  platform: "Windows" | "macOS" | "Linux" | "Web" | "Cross-Platform" | string;
+  version: string;
+  type: "binary" | "web" | string;
+  downloadUrl?: string;
+  filename?: string;
+  route?: string;
+  size?: string;
+  sha256?: string;
+  releaseDate?: string;
+  featured?: boolean;
+  tags?: string[];
+}
+
+const {
+  id,
+  title,
+  description,
+  category,
+  platform,
+  version,
+  type,
+  downloadUrl,
+  filename,
+  route,
+  size = "N/A",
+  sha256,
+  releaseDate,
+  featured = false,
+  tags = [],
+} = Astro.props;
+
+// Platform badge styling & icons
+const platformConfig: Record<string, { label: string; bg: string; text: string; border: string }> = {
+  Windows: {
+    label: "Windows x64",
+    bg: "bg-cyan-500/10",
+    text: "text-cyan-400",
+    border: "border-cyan-500/30",
+  },
+  macOS: {
+    label: "macOS",
+    bg: "bg-purple-500/10",
+    text: "text-purple-400",
+    border: "border-purple-500/30",
+  },
+  Linux: {
+    label: "Linux AMD64",
+    bg: "bg-amber-500/10",
+    text: "text-amber-400",
+    border: "border-amber-500/30",
+  },
+  Web: {
+    label: "In-Browser Web Tool",
+    bg: "bg-emerald-500/10",
+    text: "text-emerald-400",
+    border: "border-emerald-500/30",
+  },
+  "Cross-Platform": {
+    label: "Universal",
+    bg: "bg-indigo-500/10",
+    text: "text-indigo-400",
+    border: "border-indigo-500/30",
+  },
+};
+
+const currentPlatform = platformConfig[platform] || {
+  label: platform,
+  bg: "bg-zinc-800/80",
+  text: "text-zinc-300",
+  border: "border-zinc-700",
+};
+
+const isWeb = type === "web" || !downloadUrl;
+const targetActionUrl = isWeb ? (route || "/tools/demo-tool") : downloadUrl;
+---
+
+<div
+  class="tool-card group relative flex flex-col justify-between rounded-xl bg-hub-surface/80 p-6 border border-hub-border hover:border-hub-borderHover transition-all duration-200 hover:shadow-xl hover:shadow-black/40 backdrop-blur-sm"
+  data-category={category.toLowerCase()}
+  data-platform={platform.toLowerCase()}
+  data-type={type}
+  data-title={title.toLowerCase()}
+  data-tags={tags.join(",").toLowerCase()}
+>
+  <!-- Card Header -->
+  <div>
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <!-- Platform badge -->
+      <span class={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-medium border ${currentPlatform.bg} ${currentPlatform.text} ${currentPlatform.border}`}>
+        {platform === "Windows" && (
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.949-1.95" />
+          </svg>
+        )}
+        {platform === "macOS" && (
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.88c.67-.82 1.13-1.96.99-3.1-.98.05-2.15.66-2.83 1.46-.59.69-1.12 1.83-.98 2.94 1.1.09 2.19-.52 2.82-1.3" />
+          </svg>
+        )}
+        {platform === "Linux" && (
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+          </svg>
+        )}
+        {platform === "Web" && (
+          <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+            <path d="M2 12h20" />
+          </svg>
+        )}
+        {platform === "Cross-Platform" && (
+          <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2" />
+            <polyline points="2 17 12 22 22 17" />
+            <polyline points="2 12 12 17 22 12" />
+          </svg>
+        )}
+        {currentPlatform.label}
+      </span>
+
+      <!-- Version & Size Badges -->
+      <div class="flex items-center gap-2 font-mono text-xs">
+        <span class="text-zinc-400 bg-hub-surfaceElevated px-2 py-0.5 rounded border border-hub-border">
+          {version}
+        </span>
+        {size && size !== "N/A" && (
+          <span class={`px-2 py-0.5 rounded border ${isWeb ? 'bg-emerald-950/40 text-emerald-400 border-emerald-900/50' : 'bg-zinc-800/80 text-zinc-300 border-zinc-700/60'}`}>
+            {size}
+          </span>
+        )}
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-lg font-semibold text-hub-textBright group-hover:text-emerald-400 transition-colors flex items-center gap-2">
+      {title}
+      {featured && (
+        <span class="inline-flex items-center px-1.5 py-0.2 text-[10px] uppercase font-mono font-bold tracking-wider bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30">
+          Featured
+        </span>
+      )}
+    </h3>
+
+    <!-- Description -->
+    <p class="mt-2 text-sm text-hub-textMuted leading-relaxed line-clamp-3">
+      {description}
+    </p>
+
+    <!-- Tags -->
+    {tags.length > 0 && (
+      <div class="mt-4 flex flex-wrap gap-1.5">
+        {tags.map((tag) => (
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-hub-bg/60 text-zinc-400 border border-hub-border/60">
+            #{tag}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <!-- Card Footer -->
+  <div class="mt-6 pt-4 border-t border-hub-border/60 space-y-3">
+    <!-- Meta Info: Filename or Release Date -->
+    <div class="flex items-center justify-between text-xs font-mono text-zinc-400">
+      <span class="truncate max-w-[200px]" title={filename || (isWeb ? 'Browser-executed' : '')}>
+        {filename ? (
+          <span class="flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-zinc-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <span class="truncate">{filename}</span>
+          </span>
+        ) : (
+          <span class="flex items-center gap-1 text-emerald-400/90">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Zero Install
+          </span>
+        )}
+      </span>
+      {releaseDate && <span>{releaseDate}</span>}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center gap-2">
+      {isWeb ? (
+        <a
+          href={targetActionUrl}
+          class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-all duration-150 shadow-md shadow-emerald-950/40 hover:shadow-emerald-900/60"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Launch Tool
+        </a>
+      ) : (
+        <div class="w-full flex items-center gap-2">
+          <a
+            href={targetActionUrl}
+            download={filename || true}
+            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-hub-surfaceElevated hover:bg-emerald-600/90 text-hub-textBright hover:text-white font-medium text-sm border border-hub-borderHover hover:border-emerald-500/50 transition-all duration-150 group/btn"
+          >
+            <svg class="w-4 h-4 text-emerald-400 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download Binary
+          </a>
+
+          <!-- Copy Link Button -->
+          <button
+            type="button"
+            class="copy-link-btn p-2.5 rounded-lg bg-hub-surfaceElevated hover:bg-zinc-800 text-zinc-400 hover:text-white border border-hub-border hover:border-zinc-600 transition-all duration-150"
+            data-url={targetActionUrl}
+            title="Copy Direct Download Link"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+      )}
+    </div>
+
+    <!-- SHA256 Checksum Accordion if available -->
+    {sha256 && (
+      <details class="text-[11px] font-mono text-zinc-500 group/sha cursor-pointer">
+        <summary class="hover:text-zinc-300 transition-colors list-none flex items-center justify-between py-1">
+          <span class="flex items-center gap-1">
+            <svg class="w-3 h-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            SHA-256 Checksum
+          </span>
+          <span class="text-[10px] text-zinc-600 group-open/sha:rotate-180 transition-transform">▼</span>
+        </summary>
+        <div class="mt-1 p-2 rounded bg-black/40 border border-hub-border text-zinc-400 break-all select-all flex items-center justify-between gap-2">
+          <span>{sha256}</span>
+          <button
+            type="button"
+            class="copy-sha-btn flex-shrink-0 text-zinc-500 hover:text-emerald-400 p-1"
+            data-sha={sha256}
+            title="Copy SHA-256"
+          >
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+      </details>
+    )}
+  </div>
+</div>

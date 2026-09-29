@@ -1,0 +1,256 @@
+---
+export interface Props {
+  totalTools?: number;
+}
+
+const { totalTools = 0 } = Astro.props;
+
+const categories = [
+  { id: "all", label: "All Items" },
+  { id: "binaries", label: "Binaries (.exe, .dmg, .zip)" },
+  { id: "web apps", label: "Web Tools (In-Browser)" },
+];
+
+const platforms = [
+  { id: "all", label: "All Platforms" },
+  { id: "windows", label: "Windows" },
+  { id: "macos", label: "macOS" },
+  { id: "linux", label: "Linux" },
+  { id: "web", label: "Web" },
+];
+---
+
+<div class="space-y-4 mb-8">
+  <!-- Search Input and Platform Dropdown Bar -->
+  <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+    <!-- Instant Search Input -->
+    <div class="relative flex-1">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search tools, platforms, file types, or keywords (Press '/' to focus)..."
+        class="w-full pl-10 pr-20 py-2.5 rounded-lg bg-hub-surface border border-hub-border text-hub-textBright placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-sans text-sm transition-all"
+        autocomplete="off"
+        spellcheck="false"
+      />
+
+      <div class="absolute inset-y-0 right-0 pr-3 flex items-center gap-1.5 pointer-events-none">
+        <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-hub-surfaceElevated border border-hub-border rounded">
+          /
+        </kbd>
+        <button
+          type="button"
+          id="clear-search"
+          class="hidden pointer-events-auto text-zinc-500 hover:text-zinc-300 p-0.5"
+          title="Clear search"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Platform Selector -->
+    <div class="flex items-center gap-2">
+      <div class="relative w-full md:w-44">
+        <select
+          id="platform-select"
+          class="w-full appearance-none px-3.5 py-2.5 rounded-lg bg-hub-surface border border-hub-border text-zinc-200 text-sm font-sans focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+        >
+          {platforms.map((p) => (
+            <option value={p.id}>{p.label}</option>
+          ))}
+        </select>
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-zinc-500">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Pills and Results Count -->
+  <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+    <div class="flex flex-wrap items-center gap-1.5" id="category-filter-group">
+      {categories.map((cat, idx) => (
+        <button
+          type="button"
+          data-category-target={cat.id}
+          class={`category-tab px-3.5 py-1.5 rounded-md text-xs font-mono transition-all duration-150 border ${
+            idx === 0
+              ? "active bg-emerald-500/15 text-emerald-300 border-emerald-500/40 font-medium"
+              : "bg-hub-surface/60 text-zinc-400 border-hub-border hover:text-zinc-200 hover:bg-hub-surfaceElevated"
+          }`}
+        >
+          {cat.label}
+        </button>
+      ))}
+    </div>
+
+    <!-- Live Counter -->
+    <div class="text-xs font-mono text-zinc-400 flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span id="results-count">Showing {totalTools} tools</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setupSearchFilter() {
+    const searchInput = document.getElementById("search-input") as HTMLInputElement | null;
+    const clearBtn = document.getElementById("clear-search") as HTMLButtonElement | null;
+    const platformSelect = document.getElementById("platform-select") as HTMLSelectElement | null;
+    const categoryTabs = document.querySelectorAll<HTMLButtonElement>(".category-tab");
+    const cards = document.querySelectorAll<HTMLElement>(".tool-card");
+    const resultsCount = document.getElementById("results-count");
+    const emptyState = document.getElementById("empty-state");
+
+    let currentCategory = "all";
+    let currentPlatform = "all";
+    let currentQuery = "";
+
+    function filterTools() {
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const title = card.getAttribute("data-title") || "";
+        const tags = card.getAttribute("data-tags") || "";
+        const category = card.getAttribute("data-category") || "";
+        const platform = card.getAttribute("data-platform") || "";
+        const type = card.getAttribute("data-type") || "";
+
+        // Query match
+        const matchesQuery = !currentQuery || 
+          title.includes(currentQuery) || 
+          tags.includes(currentQuery) ||
+          category.includes(currentQuery) ||
+          platform.includes(currentQuery);
+
+        // Category match
+        let matchesCategory = currentCategory === "all";
+        if (currentCategory === "binaries") {
+          matchesCategory = type === "binary";
+        } else if (currentCategory === "web apps") {
+          matchesCategory = type === "web" || category.includes("web");
+        }
+
+        // Platform match
+        const matchesPlatform = currentPlatform === "all" || 
+          platform.includes(currentPlatform) || 
+          platform === "cross-platform" || 
+          platform === "universal";
+
+        if (matchesQuery && matchesCategory && matchesPlatform) {
+          card.classList.remove("hidden");
+          visibleCount++;
+        } else {
+          card.classList.add("hidden");
+        }
+      });
+
+      if (resultsCount) {
+        resultsCount.textContent = `Showing ${visibleCount} of ${cards.length} tools`;
+      }
+
+      if (emptyState) {
+        if (visibleCount === 0) {
+          emptyState.classList.remove("hidden");
+        } else {
+          emptyState.classList.add("hidden");
+        }
+      }
+    }
+
+    // Keyboard shortcut '/'
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "/" && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput?.focus();
+        searchInput?.select();
+      }
+    });
+
+    // Search input handler
+    searchInput?.addEventListener("input", (e) => {
+      const val = (e.target as HTMLInputElement).value.trim().toLowerCase();
+      currentQuery = val;
+      if (clearBtn) {
+        clearBtn.classList.toggle("hidden", val.length === 0);
+      }
+      filterTools();
+    });
+
+    clearBtn?.addEventListener("click", () => {
+      if (searchInput) {
+        searchInput.value = "";
+        currentQuery = "";
+        clearBtn.classList.add("hidden");
+        searchInput.focus();
+        filterTools();
+      }
+    });
+
+    // Category tabs
+    categoryTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        categoryTabs.forEach((t) => {
+          t.classList.remove("active", "bg-emerald-500/15", "text-emerald-300", "border-emerald-500/40", "font-medium");
+          t.classList.add("bg-hub-surface/60", "text-zinc-400", "border-hub-border");
+        });
+        tab.classList.remove("bg-hub-surface/60", "text-zinc-400", "border-hub-border");
+        tab.classList.add("active", "bg-emerald-500/15", "text-emerald-300", "border-emerald-500/40", "font-medium");
+
+        currentCategory = tab.getAttribute("data-category-target") || "all";
+        filterTools();
+      });
+    });
+
+    // Platform select
+    platformSelect?.addEventListener("change", (e) => {
+      currentPlatform = (e.target as HTMLSelectElement).value.toLowerCase();
+      filterTools();
+    });
+
+    // Clipboard handlers for download links and SHA256
+    document.querySelectorAll<HTMLButtonElement>(".copy-link-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const url = btn.getAttribute("data-url");
+        if (url) {
+          await navigator.clipboard.writeText(url);
+          const original = btn.innerHTML;
+          btn.innerHTML = `<svg class="w-4 h-4 text-emerald-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>`;
+          setTimeout(() => (btn.innerHTML = original), 2000);
+        }
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>(".copy-sha-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const sha = btn.getAttribute("data-sha");
+        if (sha) {
+          await navigator.clipboard.writeText(sha);
+          const original = btn.innerHTML;
+          btn.innerHTML = `<span class="text-[10px] text-emerald-400">Copied!</span>`;
+          setTimeout(() => (btn.innerHTML = original), 1500);
+        }
+      });
+    });
+  }
+
+  // Run on page load and view transitions
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupSearchFilter);
+  } else {
+    setupSearchFilter();
+  }
+</script>

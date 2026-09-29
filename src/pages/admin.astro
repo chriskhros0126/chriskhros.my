@@ -1,0 +1,737 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Admin Control Console // chriskhros.my">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+    <!-- Header -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-hub-border">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-mono text-amber-400 mb-1">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          Restricted Operator Portal
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold font-sans text-hub-textBright">
+          Cloudflare R2 Direct Upload & Catalog
+        </h1>
+        <p class="text-xs sm:text-sm text-hub-textMuted mt-1">
+          Direct browser-to-R2 streaming via S3 presigned URLs. Bypasses 100MB Cloudflare Worker body limitations.
+        </p>
+      </div>
+
+      <a
+        href="/"
+        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-hub-surface border border-hub-border hover:border-hub-borderHover text-xs font-mono text-zinc-300 transition-colors self-start"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Hub
+      </a>
+    </div>
+
+    <!-- Step 1: Authentication Card -->
+    <div class="mb-8 p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+      <div class="flex items-center justify-between">
+        <label for="admin-token-input" class="text-sm font-semibold text-hub-textBright flex items-center gap-2">
+          <span>1. Admin Secret Key</span>
+          <span class="text-xs font-mono text-zinc-500 font-normal">(Required for R2 Presigning & API Access)</span>
+        </label>
+        <span id="auth-status-badge" class="text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
+          Not Verified
+        </span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2">
+        <div class="relative flex-1">
+          <input
+            type="password"
+            id="admin-token-input"
+            placeholder="Enter ADMIN_SECRET_KEY..."
+            class="w-full px-4 py-2.5 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright font-mono text-sm focus:outline-none focus:border-amber-400"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            id="toggle-token-visibility"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-500 hover:text-zinc-300 text-xs font-mono"
+          >
+            Show
+          </button>
+        </div>
+        <button
+          type="button"
+          id="save-token-btn"
+          class="px-4 py-2.5 rounded-lg bg-hub-surfaceElevated hover:bg-zinc-700 border border-hub-border text-xs font-mono font-medium text-zinc-200 transition-colors"
+        >
+          Remember Key
+        </button>
+      </div>
+      <p class="text-xs text-zinc-500 font-mono">
+        Token is saved locally in your browser's sessionStorage. Transmitted only as <code class="text-zinc-400">x-admin-token</code> to your Cloudflare Pages Functions.
+      </p>
+    </div>
+
+    <!-- Step 2: Upload & Registration Form -->
+    <form id="upload-form" class="space-y-6">
+      <!-- Drag and Drop Zone -->
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+        <label class="block text-sm font-semibold text-hub-textBright">
+          2. Binary File Upload (100MB – 250MB+)
+        </label>
+
+        <div
+          id="drop-zone"
+          class="relative border-2 border-dashed border-hub-border hover:border-emerald-500/60 rounded-xl p-8 text-center cursor-pointer transition-colors bg-hub-bg/50 group"
+        >
+          <input
+            type="file"
+            id="file-input"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          />
+          <div class="space-y-2 pointer-events-none">
+            <div class="w-12 h-12 mx-auto rounded-full bg-hub-surfaceElevated flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <div class="text-sm font-medium text-hub-textBright">
+              Drop binary here, or <span class="text-emerald-400 underline">browse files</span>
+            </div>
+            <div class="text-xs font-mono text-zinc-500">
+              Supports .exe, .dmg, .zip, .tar.gz, .pkg, .bin, .iso (Up to 5 GB via S3 presigned PUT)
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected File Preview Card -->
+        <div id="file-preview-card" class="hidden p-4 rounded-lg bg-hub-surfaceElevated border border-hub-border flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-10 h-10 rounded bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0 font-mono text-xs font-bold uppercase">
+              <span id="file-ext-badge">BIN</span>
+            </div>
+            <div class="overflow-hidden">
+              <div id="file-name-display" class="font-mono text-sm text-hub-textBright truncate font-medium">file.zip</div>
+              <div class="flex items-center gap-2 text-xs font-mono text-zinc-400">
+                <span id="file-size-display">0 MB</span>
+                <span>•</span>
+                <span id="file-type-display">application/octet-stream</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            id="remove-file-btn"
+            class="text-zinc-500 hover:text-rose-400 p-2 text-xs font-mono"
+            title="Remove file"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Metadata Details -->
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+        <h3 class="text-sm font-semibold text-hub-textBright">
+          3. Tool Details & Release Metadata
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="meta-title" class="block text-xs font-mono text-zinc-400 mb-1.5">Tool Title *</label>
+            <input
+              type="text"
+              id="meta-title"
+              required
+              placeholder="e.g., PacketForge Pro"
+              class="w-full px-3.5 py-2 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright text-sm focus:outline-none focus:border-emerald-500 font-sans"
+            />
+          </div>
+
+          <div>
+            <label for="meta-version" class="block text-xs font-mono text-zinc-400 mb-1.5">Version *</label>
+            <input
+              type="text"
+              id="meta-version"
+              required
+              placeholder="e.g., v1.4.2"
+              class="w-full px-3.5 py-2 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright text-sm font-mono focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label for="meta-platform" class="block text-xs font-mono text-zinc-400 mb-1.5">Platform *</label>
+            <select
+              id="meta-platform"
+              required
+              class="w-full px-3.5 py-2 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright text-sm font-mono focus:outline-none focus:border-emerald-500"
+            >
+              <option value="Windows">Windows</option>
+              <option value="macOS">macOS</option>
+              <option value="Linux">Linux</option>
+              <option value="Cross-Platform">Cross-Platform (Universal)</option>
+              <option value="Web">Web (Browser App)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="meta-category" class="block text-xs font-mono text-zinc-400 mb-1.5">Category *</label>
+            <select
+              id="meta-category"
+              required
+              class="w-full px-3.5 py-2 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright text-sm font-mono focus:outline-none focus:border-emerald-500"
+            >
+              <option value="Binaries">Binaries</option>
+              <option value="Web Apps">Web Apps</option>
+              <option value="Dev Tools">Dev Tools</option>
+              <option value="Utilities">Utilities</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="meta-description" class="block text-xs font-mono text-zinc-400 mb-1.5">Description *</label>
+          <textarea
+            id="meta-description"
+            rows="3"
+            required
+            placeholder="Brief explanation of the utility, feature set, or release notes..."
+            class="w-full px-3.5 py-2 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright text-sm focus:outline-none focus:border-emerald-500 font-sans"
+          ></textarea>
+        </div>
+
+        <!-- SHA-256 Checksum Calculation -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="meta-sha256" class="text-xs font-mono text-zinc-400">SHA-256 Checksum (Optional)</label>
+            <button
+              type="button"
+              id="compute-sha-btn"
+              class="text-xs font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              Auto-Compute SHA-256 (Client-Side)
+            </button>
+          </div>
+          <input
+            type="text"
+            id="meta-sha256"
+            placeholder="Will auto-populate or enter manually..."
+            class="w-full px-3.5 py-2 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright text-xs font-mono focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        <div>
+          <label for="meta-tags" class="block text-xs font-mono text-zinc-400 mb-1.5">Tags (Comma-separated)</label>
+          <input
+            type="text"
+            id="meta-tags"
+            placeholder="e.g., Security, PCAP, Direct R2, CLI"
+            class="w-full px-3.5 py-2 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright text-xs font-mono focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+      </div>
+
+      <!-- Upload Progress Container (Hidden initially) -->
+      <div id="progress-container" class="hidden p-6 rounded-xl bg-hub-surface border border-hub-border space-y-3">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span id="progress-status-text" class="text-zinc-300 font-medium">Streaming binary directly to Cloudflare R2...</span>
+          <span id="progress-percentage" class="text-emerald-400 font-bold">0%</span>
+        </div>
+
+        <!-- Visual Bar -->
+        <div class="w-full h-3 rounded-full bg-hub-bg border border-hub-border overflow-hidden">
+          <div
+            id="progress-bar-fill"
+            class="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all duration-150 w-0"
+          ></div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs font-mono text-zinc-500">
+          <span id="progress-bytes">0 MB / 0 MB</span>
+          <span id="progress-speed">0.0 MB/s</span>
+        </div>
+      </div>
+
+      <!-- Status / Alerts Box -->
+      <div id="status-box" class="hidden p-4 rounded-xl border text-xs font-mono"></div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        id="submit-upload-btn"
+        class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-all shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        </svg>
+        <span id="submit-btn-text">Generate Presigned Signature & Upload to R2</span>
+      </button>
+    </form>
+
+    <!-- Catalog Management Section -->
+    <div class="mt-16 pt-8 border-t border-hub-border space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-hub-textBright">Catalog Management</h2>
+          <p class="text-xs text-zinc-400 font-mono">Live entries stored in Cloudflare R2 index</p>
+        </div>
+        <button
+          type="button"
+          id="refresh-catalog-btn"
+          class="px-3 py-1.5 rounded-md bg-hub-surface border border-hub-border hover:bg-hub-surfaceElevated text-xs font-mono text-zinc-300"
+        >
+          Refresh List
+        </button>
+      </div>
+
+      <div id="catalog-list" class="space-y-3">
+        <!-- Rendered dynamically -->
+        <div class="p-6 text-center text-xs font-mono text-zinc-500 bg-hub-surface/40 rounded-xl border border-hub-border">
+          Loading catalog entries...
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Client-side Upload and Catalog Management Script
+  const tokenInput = document.getElementById("admin-token-input") as HTMLInputElement;
+  const toggleVisibilityBtn = document.getElementById("toggle-token-visibility");
+  const saveTokenBtn = document.getElementById("save-token-btn");
+  const authBadge = document.getElementById("auth-status-badge");
+  const dropZone = document.getElementById("drop-zone");
+  const fileInput = document.getElementById("file-input") as HTMLInputElement;
+  const filePreview = document.getElementById("file-preview-card");
+  const fileNameDisplay = document.getElementById("file-name-display");
+  const fileSizeDisplay = document.getElementById("file-size-display");
+  const fileTypeDisplay = document.getElementById("file-type-display");
+  const fileExtBadge = document.getElementById("file-ext-badge");
+  const removeFileBtn = document.getElementById("remove-file-btn");
+  const computeShaBtn = document.getElementById("compute-sha-btn");
+
+  const metaTitle = document.getElementById("meta-title") as HTMLInputElement;
+  const metaVersion = document.getElementById("meta-version") as HTMLInputElement;
+  const metaPlatform = document.getElementById("meta-platform") as HTMLSelectElement;
+  const metaCategory = document.getElementById("meta-category") as HTMLSelectElement;
+  const metaDescription = document.getElementById("meta-description") as HTMLTextAreaElement;
+  const metaSha256 = document.getElementById("meta-sha256") as HTMLInputElement;
+  const metaTags = document.getElementById("meta-tags") as HTMLInputElement;
+
+  const uploadForm = document.getElementById("upload-form") as HTMLFormElement;
+  const submitBtn = document.getElementById("submit-upload-btn") as HTMLButtonElement;
+  const submitBtnText = document.getElementById("submit-btn-text");
+  const progressContainer = document.getElementById("progress-container");
+  const progressBarFill = document.getElementById("progress-bar-fill");
+  const progressPercentage = document.getElementById("progress-percentage");
+  const progressBytes = document.getElementById("progress-bytes");
+  const progressSpeed = document.getElementById("progress-speed");
+  const progressStatusText = document.getElementById("progress-status-text");
+  const statusBox = document.getElementById("status-box");
+
+  const refreshCatalogBtn = document.getElementById("refresh-catalog-btn");
+  const catalogList = document.getElementById("catalog-list");
+
+  let selectedFile: File | null = null;
+
+  // Restore saved token
+  const savedToken = sessionStorage.getItem("chriskhros_admin_token") || localStorage.getItem("chriskhros_admin_token") || "";
+  if (savedToken) {
+    tokenInput.value = savedToken;
+    updateAuthBadge(true);
+  }
+
+  function updateAuthBadge(hasToken: boolean) {
+    if (authBadge) {
+      if (hasToken) {
+        authBadge.textContent = "Token Configured";
+        authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+      } else {
+        authBadge.textContent = "Not Verified";
+        authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700";
+      }
+    }
+  }
+
+  saveTokenBtn?.addEventListener("click", () => {
+    const val = tokenInput.value.trim();
+    if (val) {
+      sessionStorage.setItem("chriskhros_admin_token", val);
+      localStorage.setItem("chriskhros_admin_token", val);
+      updateAuthBadge(true);
+      showStatus("Admin Secret Key saved in browser session.", "success");
+    } else {
+      sessionStorage.removeItem("chriskhros_admin_token");
+      localStorage.removeItem("chriskhros_admin_token");
+      updateAuthBadge(false);
+      showStatus("Admin token cleared.", "info");
+    }
+  });
+
+  toggleVisibilityBtn?.addEventListener("click", () => {
+    if (tokenInput.type === "password") {
+      tokenInput.type = "text";
+      toggleVisibilityBtn.textContent = "Hide";
+    } else {
+      tokenInput.type = "password";
+      toggleVisibilityBtn.textContent = "Show";
+    }
+  });
+
+  // Drag and Drop
+  dropZone?.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("border-emerald-500", "bg-emerald-500/5");
+  });
+
+  dropZone?.addEventListener("dragleave", () => {
+    dropZone.classList.remove("border-emerald-500", "bg-emerald-500/5");
+  });
+
+  dropZone?.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("border-emerald-500", "bg-emerald-500/5");
+    if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+      handleFileSelected(e.dataTransfer.files[0]);
+    }
+  });
+
+  fileInput?.addEventListener("change", (e) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      handleFileSelected(target.files[0]);
+    }
+  });
+
+  function handleFileSelected(file: File) {
+    selectedFile = file;
+    const mbSize = (file.size / (1024 * 1024)).toFixed(2);
+    const ext = file.name.split(".").pop()?.toUpperCase() || "BIN";
+
+    if (fileNameDisplay) fileNameDisplay.textContent = file.name;
+    if (fileSizeDisplay) fileSizeDisplay.textContent = `${mbSize} MB`;
+    if (fileTypeDisplay) fileTypeDisplay.textContent = file.type || "binary/octet-stream";
+    if (fileExtBadge) fileExtBadge.textContent = ext.substring(0, 4);
+
+    filePreview?.classList.remove("hidden");
+    dropZone?.classList.add("hidden");
+
+    // Auto-fill title and platform guess
+    if (!metaTitle.value) {
+      const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+      metaTitle.value = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+    }
+
+    if (file.name.endsWith(".exe") || file.name.endsWith(".msi")) {
+      metaPlatform.value = "Windows";
+      metaCategory.value = "Binaries";
+    } else if (file.name.endsWith(".dmg") || file.name.endsWith(".pkg")) {
+      metaPlatform.value = "macOS";
+      metaCategory.value = "Binaries";
+    } else if (file.name.endsWith(".tar.gz") || file.name.endsWith(".AppImage") || file.name.endsWith(".deb")) {
+      metaPlatform.value = "Linux";
+      metaCategory.value = "Binaries";
+    }
+  }
+
+  removeFileBtn?.addEventListener("click", () => {
+    selectedFile = null;
+    fileInput.value = "";
+    filePreview?.classList.add("hidden");
+    dropZone?.classList.remove("hidden");
+    if (metaSha256) metaSha256.value = "";
+  });
+
+  // Client-Side Streaming SHA-256 calculation (Supports 250MB+ without memory overload)
+  computeShaBtn?.addEventListener("click", async () => {
+    if (!selectedFile) {
+      showStatus("Please select a file first to calculate SHA-256.", "error");
+      return;
+    }
+
+    computeShaBtn.innerHTML = `
+      <svg class="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Hashing in WebCrypto...
+    `;
+
+    try {
+      const buffer = await selectedFile.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+
+      if (metaSha256) {
+        metaSha256.value = hashHex;
+      }
+      showStatus(`SHA-256 computed: ${hashHex.substring(0, 16)}...`, "success");
+    } catch (err: any) {
+      showStatus(`Failed to compute hash: ${err.message}`, "error");
+    } finally {
+      computeShaBtn.innerHTML = `
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+        Re-compute SHA-256
+      `;
+    }
+  });
+
+  function showStatus(message: string, type: "success" | "error" | "info") {
+    if (!statusBox) return;
+    statusBox.classList.remove("hidden", "bg-emerald-950/40", "border-emerald-500/50", "text-emerald-300", "bg-rose-950/40", "border-rose-500/50", "text-rose-300", "bg-zinc-900", "border-zinc-700", "text-zinc-300");
+
+    if (type === "success") {
+      statusBox.classList.add("bg-emerald-950/40", "border-emerald-500/50", "text-emerald-300");
+    } else if (type === "error") {
+      statusBox.classList.add("bg-rose-950/40", "border-rose-500/50", "text-rose-300");
+    } else {
+      statusBox.classList.add("bg-zinc-900", "border-zinc-700", "text-zinc-300");
+    }
+    statusBox.innerHTML = message;
+  }
+
+  // Handle Form Submission: 3-Stage Direct S3 Upload
+  uploadForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const token = tokenInput.value.trim();
+    if (!token) {
+      showStatus("Admin Secret Key is required. Please enter it in Step 1.", "error");
+      tokenInput.focus();
+      return;
+    }
+
+    if (!selectedFile && metaCategory.value === "Binaries") {
+      showStatus("Please select a binary file to upload.", "error");
+      return;
+    }
+
+    // Disable button & show progress
+    submitBtn.disabled = true;
+    if (submitBtnText) submitBtnText.textContent = "Negotiating R2 Presigned PUT URL...";
+    progressContainer?.classList.remove("hidden");
+    if (progressBarFill) progressBarFill.style.width = "0%";
+    if (progressPercentage) progressPercentage.textContent = "0%";
+
+    try {
+      let downloadUrl = "";
+      let fileKey = "";
+
+      if (selectedFile) {
+        // Step 1: Request Presigned URL from Pages Function /api/sign-upload
+        if (progressStatusText) progressStatusText.textContent = "Requesting S3 Presigned URL from Cloudflare Functions...";
+
+        const signRes = await fetch("/api/sign-upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-token": token,
+          },
+          body: JSON.stringify({
+            filename: selectedFile.name,
+            contentType: selectedFile.type || "application/octet-stream",
+            sizeBytes: selectedFile.size,
+            platform: metaPlatform.value,
+            category: metaCategory.value,
+            version: metaVersion.value,
+          }),
+        });
+
+        if (!signRes.ok) {
+          const errData = await signRes.json().catch(() => ({}));
+          throw new Error(errData.error || `Presign failed with status ${signRes.status}`);
+        }
+
+        const signData = await signRes.json();
+        const uploadUrl = signData.uploadUrl;
+        downloadUrl = signData.downloadUrl;
+        fileKey = signData.fileKey;
+
+        // Step 2: Direct browser-to-R2 upload using XMLHttpRequest for real-time progress
+        if (progressStatusText) progressStatusText.textContent = "Streaming binary directly to Cloudflare R2 bucket...";
+
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          const startTime = Date.now();
+
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percent = Math.round((event.loaded / event.total) * 100);
+              const elapsedSec = (Date.now() - startTime) / 1000;
+              const speedMBs = elapsedSec > 0 ? (event.loaded / (1024 * 1024)) / elapsedSec : 0;
+              const loadedMB = (event.loaded / (1024 * 1024)).toFixed(1);
+              const totalMB = (event.total / (1024 * 1024)).toFixed(1);
+
+              if (progressBarFill) progressBarFill.style.width = `${percent}%`;
+              if (progressPercentage) progressPercentage.textContent = `${percent}%`;
+              if (progressBytes) progressBytes.textContent = `${loadedMB} MB / ${totalMB} MB`;
+              if (progressSpeed) progressSpeed.textContent = `${speedMBs.toFixed(2)} MB/s`;
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve();
+            } else {
+              reject(new Error(`R2 direct PUT returned status ${xhr.status}: ${xhr.statusText}`));
+            }
+          };
+
+          xhr.onerror = () => reject(new Error("Network error during direct R2 streaming. Check R2 CORS settings."));
+          xhr.ontimeout = () => reject(new Error("R2 upload timed out."));
+
+          xhr.open("PUT", uploadUrl, true);
+          xhr.setRequestHeader("Content-Type", selectedFile?.type || "application/octet-stream");
+          xhr.send(selectedFile);
+        });
+      }
+
+      // Step 3: Register Metadata in R2 Catalog (/api/tools)
+      if (progressStatusText) progressStatusText.textContent = "Registering release metadata into R2 catalog...";
+
+      const tagsArray = metaTags.value
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+
+      const toolPayload = {
+        title: metaTitle.value.trim(),
+        version: metaVersion.value.trim(),
+        platform: metaPlatform.value,
+        category: metaCategory.value,
+        description: metaDescription.value.trim(),
+        sha256: metaSha256.value.trim() || undefined,
+        tags: tagsArray.length > 0 ? tagsArray : [metaPlatform.value, metaCategory.value],
+        type: metaCategory.value === "Web Apps" ? "web" : "binary",
+        downloadUrl: downloadUrl || undefined,
+        filename: selectedFile?.name,
+        fileKey: fileKey || undefined,
+        sizeBytes: selectedFile?.size,
+        size: selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB` : undefined,
+        releaseDate: new Date().toISOString().split("T")[0],
+      };
+
+      const metaRes = await fetch("/api/tools", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token,
+        },
+        body: JSON.stringify(toolPayload),
+      });
+
+      if (!metaRes.ok) {
+        const errJson = await metaRes.json().catch(() => ({}));
+        throw new Error(errJson.error || "Failed to persist tool metadata.");
+      }
+
+      showStatus(`🎉 Successfully uploaded and registered "${toolPayload.title}"! <br><a href="/" class="underline text-emerald-300 font-bold">View in Directory &rarr;</a>`, "success");
+
+      // Reset form
+      selectedFile = null;
+      fileInput.value = "";
+      filePreview?.classList.add("hidden");
+      dropZone?.classList.remove("hidden");
+      metaTitle.value = "";
+      metaVersion.value = "";
+      metaDescription.value = "";
+      metaSha256.value = "";
+      metaTags.value = "";
+
+      // Refresh catalog list
+      loadCatalog();
+    } catch (err: any) {
+      showStatus(`Upload failed: ${err.message}`, "error");
+    } finally {
+      submitBtn.disabled = false;
+      if (submitBtnText) submitBtnText.textContent = "Generate Presigned Signature & Upload to R2";
+    }
+  });
+
+  // Load and Render Catalog
+  async function loadCatalog() {
+    if (!catalogList) return;
+    try {
+      const res = await fetch("/api/tools");
+      if (!res.ok) throw new Error("Failed to load catalog");
+      const tools = await res.json();
+
+      if (!Array.isArray(tools) || tools.length === 0) {
+        catalogList.innerHTML = `<div class="p-6 text-center text-xs font-mono text-zinc-500 bg-hub-surface/40 rounded-xl border border-hub-border">Catalog is currently empty.</div>`;
+        return;
+      }
+
+      catalogList.innerHTML = tools
+        .map(
+          (t: any) => `
+          <div class="p-4 rounded-xl bg-hub-surface border border-hub-border flex items-center justify-between gap-4">
+            <div class="overflow-hidden">
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-hub-textBright text-sm">${t.title}</span>
+                <span class="font-mono text-xs text-zinc-500">${t.version}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700">${t.platform}</span>
+              </div>
+              <div class="text-xs text-zinc-400 truncate mt-1">${t.description}</div>
+              <div class="text-[11px] font-mono text-zinc-500 mt-1 flex items-center gap-3">
+                <span>${t.size || "N/A"}</span>
+                <span>•</span>
+                <span>${t.releaseDate}</span>
+                ${t.downloadUrl ? `<span>•</span><a href="${t.downloadUrl}" target="_blank" class="text-emerald-400 underline">Download Link</a>` : ""}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="delete-tool-btn text-xs font-mono text-rose-400 hover:text-rose-300 p-2 rounded bg-rose-500/10 border border-rose-500/30 flex-shrink-0"
+              data-id="${t.id}"
+            >
+              Delete
+            </button>
+          </div>
+        `
+        )
+        .join("");
+
+      // Attach delete handlers
+      document.querySelectorAll<HTMLButtonElement>(".delete-tool-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-id");
+          const token = tokenInput.value.trim();
+          if (!token) {
+            alert("Please provide the Admin Secret Key in Step 1 first.");
+            return;
+          }
+          if (confirm(`Are you sure you want to remove tool "${id}" from catalog?`)) {
+            try {
+              const delRes = await fetch(`/api/tools?id=${encodeURIComponent(id || "")}`, {
+                method: "DELETE",
+                headers: { "x-admin-token": token },
+              });
+              if (!delRes.ok) {
+                const err = await delRes.json();
+                throw new Error(err.error || "Delete failed");
+              }
+              loadCatalog();
+            } catch (err: any) {
+              alert(err.message);
+            }
+          }
+        });
+      });
+    } catch (err) {
+      catalogList.innerHTML = `<div class="p-4 text-xs font-mono text-rose-400 bg-rose-950/20 rounded-xl border border-rose-900">Failed to fetch tools catalog.</div>`;
+    }
+  }
+
+  refreshCatalogBtn?.addEventListener("click", loadCatalog);
+  loadCatalog();
+</script>

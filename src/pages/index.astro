@@ -1,0 +1,129 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ToolCard from "../components/ToolCard.astro";
+import SearchFilter from "../components/SearchFilter.astro";
+import initialTools from "../data/tools.json";
+
+// High-speed static generation with hydration
+const totalBinaries = initialTools.filter(t => t.type === "binary").length;
+const totalWebApps = initialTools.filter(t => t.type === "web").length;
+---
+
+<Layout title="chriskhros.my // Personal Tools & Binary Distribution Hub">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+    <!-- Hero Section -->
+    <div class="relative mb-12">
+      <!-- Glow accent in background -->
+      <div class="absolute -top-10 left-1/4 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+      <div class="absolute top-0 right-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+      <!-- Domain pill badge -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-hub-surface border border-hub-border text-xs font-mono text-zinc-400 mb-4">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-zinc-200 font-semibold">chriskhros.my</span>
+        <span class="text-zinc-600">•</span>
+        <span>Cloudflare Pages + R2 Free Tier</span>
+      </div>
+
+      <!-- Hero Heading -->
+      <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-hub-textBright font-sans leading-tight">
+        Personal Tools & <br class="hidden sm:inline" />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400">
+          Binary Distribution Hub
+        </span>
+      </h1>
+
+      <p class="mt-4 text-base sm:text-lg text-hub-textMuted max-w-2xl leading-relaxed">
+        High-throughput distribution for compiled desktop binaries (100 MB – 250 MB+) directly from Cloudflare R2, paired with zero-latency browser-native developer utilities.
+      </p>
+
+      <!-- Architecture Badges -->
+      <div class="mt-6 flex flex-wrap gap-2 text-xs font-mono">
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-hub-surface/80 border border-hub-border text-zinc-300">
+          <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          S3 Presigned Streaming
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-hub-surface/80 border border-hub-border text-zinc-300">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          SHA-256 Checksums
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-hub-surface/80 border border-hub-border text-zinc-300">
+          <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7C5 4 4 5 4 7z" />
+          </svg>
+          Zero Worker Proxy Limit
+        </div>
+      </div>
+    </div>
+
+    <!-- Metrics Bar -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+      <div class="p-4 rounded-xl bg-hub-surface/60 border border-hub-border">
+        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Total Catalog</div>
+        <div class="mt-1 text-2xl font-bold font-mono text-hub-textBright" id="metric-total">{initialTools.length}</div>
+      </div>
+      <div class="p-4 rounded-xl bg-hub-surface/60 border border-hub-border">
+        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Binaries (R2)</div>
+        <div class="mt-1 text-2xl font-bold font-mono text-cyan-400">{totalBinaries}</div>
+      </div>
+      <div class="p-4 rounded-xl bg-hub-surface/60 border border-hub-border">
+        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">In-Browser Apps</div>
+        <div class="mt-1 text-2xl font-bold font-mono text-emerald-400">{totalWebApps}</div>
+      </div>
+      <div class="p-4 rounded-xl bg-hub-surface/60 border border-hub-border">
+        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Storage Engine</div>
+        <div class="mt-1 text-2xl font-bold font-mono text-indigo-400">Cloudflare R2</div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <SearchFilter totalTools={initialTools.length} />
+
+    <!-- Tools Grid Container -->
+    <div id="tools-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {initialTools.map((tool) => (
+        <ToolCard {...tool} />
+      ))}
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden text-center py-16 px-4 rounded-2xl border border-dashed border-hub-border bg-hub-surface/30 mt-6">
+      <div class="w-12 h-12 mx-auto rounded-full bg-hub-surfaceElevated flex items-center justify-center text-zinc-500 mb-3">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <h3 class="text-base font-semibold text-hub-textBright">No tools match your criteria</h3>
+      <p class="text-sm text-zinc-400 mt-1 max-w-sm mx-auto">
+        Try adjusting your search keywords, clearing platform filters, or selecting a different category.
+      </p>
+    </div>
+
+    <!-- Direct Upload Banner for Authorized Admin -->
+    <div class="mt-16 p-6 rounded-2xl bg-gradient-to-r from-hub-surface to-hub-surfaceElevated border border-hub-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          Direct S3 Multipart & Presigned Architecture
+        </div>
+        <h4 class="text-lg font-semibold text-hub-textBright">Need to deploy a new binary or tool?</h4>
+        <p class="text-sm text-hub-textMuted max-w-xl">
+          Use the secure upload console to stream files directly into Cloudflare R2 with automatic presigned PUT signatures and SHA-256 verification.
+        </p>
+      </div>
+      <a
+        href="/admin"
+        class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-semibold transition-all shadow-lg shadow-emerald-950/40"
+      >
+        <span>Open Admin Console</span>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</Layout>

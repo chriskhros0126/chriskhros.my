@@ -1,0 +1,134 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "chriskhros.my // Personal Tools & Binary Distribution Hub",
+  description = "Production-ready personal tooling hub, downloadable binaries (100MB-250MB+), and browser-native utilities hosted on Cloudflare Pages and R2.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    
+    <!-- Open Graph / Meta -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts: JetBrains Mono + Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style is:global>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        background-color: #0a0d14;
+        color: #e2e8f0;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      }
+      code, kbd, samp, pre {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      /* Custom sleek scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0a0d14;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1e2638;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #2a354d;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col bg-hub-bg text-hub-textBase selection:bg-emerald-500/30 selection:text-emerald-300">
+    <!-- Background subtle grid pattern -->
+    <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(#1e2638_1px,transparent_1px)] [background-size:24px_24px] opacity-25 z-0"></div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 w-full border-b border-hub-border/80 bg-hub-bg/85 backdrop-blur-md">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <!-- Logo / Domain -->
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 group-hover:border-emerald-500/60 transition-all">
+            <span class="font-mono font-bold text-sm">ck</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-mono font-semibold text-hub-textBright text-sm tracking-tight flex items-center gap-1.5">
+              chriskhros.my
+              <span class="text-[10px] font-mono text-emerald-400 font-normal px-1.5 py-0.2 bg-emerald-500/10 rounded border border-emerald-500/20">edge</span>
+            </span>
+            <span class="text-[11px] text-zinc-500 font-mono">tools & binary hub</span>
+          </div>
+        </a>
+
+        <!-- Header Nav Links -->
+        <nav class="flex items-center gap-1 sm:gap-2">
+          <a
+            href="/"
+            class="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white hover:bg-hub-surface rounded-md transition-colors"
+          >
+            Hub
+          </a>
+          <a
+            href="/tools/demo-tool"
+            class="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white hover:bg-hub-surface rounded-md transition-colors flex items-center gap-1.5"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            DevForge
+          </a>
+          <a
+            href="/admin"
+            class="px-3 py-1.5 text-xs font-mono text-zinc-400 hover:text-amber-400 hover:bg-hub-surface rounded-md transition-colors flex items-center gap-1"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Admin
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Content Slot -->
+    <main class="relative z-10 flex-1">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-hub-border/60 bg-hub-surface/40 py-8 text-xs font-mono text-zinc-500">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>chriskhros.my</span>
+          <span class="text-zinc-700">|</span>
+          <span>Engineered on Cloudflare Pages + R2</span>
+        </div>
+        <div class="flex items-center gap-4 text-zinc-400">
+          <a href="/admin" class="hover:text-emerald-400 transition-colors">Admin Portal</a>
+          <a href="/tools/demo-tool" class="hover:text-emerald-400 transition-colors">Client Tools</a>
+          <span class="text-zinc-600">S3 Presigned Streaming</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,484 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+---
+
+<Layout title="DevForge // Client-Side Crypto & Binary Inspector // chriskhros.my">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+    <!-- Header -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-hub-border">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 mb-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          100% Client-Side • Zero Network Latency • Offline-Ready
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-bold font-sans text-hub-textBright">
+          DevForge: Crypto, Hash & Binary Inspector
+        </h1>
+        <p class="text-xs sm:text-sm text-hub-textMuted mt-1">
+          Verify checksums of binaries downloaded from <code class="text-zinc-300">chriskhros.my</code>, inspect JWTs, and perform cryptographic encoding directly in your browser.
+        </p>
+      </div>
+
+      <a
+        href="/"
+        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-hub-surface border border-hub-border hover:border-hub-borderHover text-xs font-mono text-zinc-300 transition-colors self-start"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Hub
+      </a>
+    </div>
+
+    <!-- Tool Tabs -->
+    <div class="flex flex-wrap gap-2 mb-8 border-b border-hub-border pb-3">
+      <button
+        type="button"
+        class="tool-tab active px-4 py-2 rounded-lg text-xs font-mono transition-all border bg-emerald-500/15 text-emerald-300 border-emerald-500/40 font-medium"
+        data-target="panel-binary-hash"
+      >
+        1. Binary File Checksum Verifier
+      </button>
+      <button
+        type="button"
+        class="tool-tab px-4 py-2 rounded-lg text-xs font-mono transition-all border bg-hub-surface/60 text-zinc-400 border-hub-border hover:text-zinc-200"
+        data-target="panel-text-hash"
+      >
+        2. Text Hashing (SHA-256 / SHA-512)
+      </button>
+      <button
+        type="button"
+        class="tool-tab px-4 py-2 rounded-lg text-xs font-mono transition-all border bg-hub-surface/60 text-zinc-400 border-hub-border hover:text-zinc-200"
+        data-target="panel-encoders"
+      >
+        3. Base64 & Hex Encoder
+      </button>
+      <button
+        type="button"
+        class="tool-tab px-4 py-2 rounded-lg text-xs font-mono transition-all border bg-hub-surface/60 text-zinc-400 border-hub-border hover:text-zinc-200"
+        data-target="panel-jwt"
+      >
+        4. JWT Inspector
+      </button>
+    </div>
+
+    <!-- PANEL 1: Binary File Checksum Verifier -->
+    <div id="panel-binary-hash" class="tab-panel space-y-6">
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+        <div>
+          <h2 class="text-base font-semibold text-hub-textBright flex items-center gap-2">
+            <span>Direct Binary Checksum Verification</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">WebCrypto API</span>
+          </h2>
+          <p class="text-xs text-zinc-400 font-mono mt-1">
+            Drop your downloaded .exe, .dmg, or .zip binary here. Checksums are computed locally using hardware-accelerated WebCrypto—zero bytes are sent over the network.
+          </p>
+        </div>
+
+        <!-- File Drop Area -->
+        <div
+          id="verify-drop-zone"
+          class="border-2 border-dashed border-hub-border hover:border-emerald-500/50 rounded-xl p-8 text-center cursor-pointer bg-hub-bg/50 transition-colors"
+        >
+          <input type="file" id="verify-file-input" class="hidden" />
+          <div class="space-y-2 pointer-events-none">
+            <div class="w-10 h-10 mx-auto rounded-full bg-hub-surfaceElevated flex items-center justify-center text-emerald-400">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <div class="text-sm font-medium text-hub-textBright">
+              Drop binary to verify, or <span class="text-emerald-400 underline">click to select</span>
+            </div>
+            <div id="verify-file-info" class="text-xs font-mono text-zinc-500">
+              Tested with 250MB+ files smoothly
+            </div>
+          </div>
+        </div>
+
+        <!-- Expected Checksum Input -->
+        <div>
+          <label for="expected-hash-input" class="block text-xs font-mono text-zinc-400 mb-1.5">
+            Expected SHA-256 (Paste from Hub catalog card to verify):
+          </label>
+          <input
+            type="text"
+            id="expected-hash-input"
+            placeholder="Paste SHA-256 hash here for automated instant match comparison..."
+            class="w-full px-3.5 py-2.5 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright font-mono text-xs focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        <!-- Verification Results -->
+        <div id="hash-results-card" class="hidden space-y-3 pt-4 border-t border-hub-border">
+          <div id="match-status-banner" class="p-3 rounded-lg text-xs font-mono flex items-center gap-2"></div>
+
+          <div>
+            <div class="text-xs font-mono text-zinc-400 mb-1 flex items-center justify-between">
+              <span>Calculated SHA-256:</span>
+              <button type="button" id="copy-calculated-sha256" class="text-emerald-400 hover:underline">Copy</button>
+            </div>
+            <div id="calc-sha256-output" class="p-3 rounded-lg bg-black/40 border border-hub-border text-emerald-400 font-mono text-xs break-all select-all"></div>
+          </div>
+
+          <div>
+            <div class="text-xs font-mono text-zinc-400 mb-1 flex items-center justify-between">
+              <span>Calculated SHA-512:</span>
+              <button type="button" id="copy-calculated-sha512" class="text-zinc-400 hover:underline">Copy</button>
+            </div>
+            <div id="calc-sha512-output" class="p-3 rounded-lg bg-black/40 border border-hub-border text-zinc-300 font-mono text-xs break-all select-all"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 2: Text Hashing -->
+    <div id="panel-text-hash" class="tab-panel hidden space-y-6">
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+        <h2 class="text-base font-semibold text-hub-textBright">Text Cryptographic Hasher</h2>
+
+        <div>
+          <label for="text-hash-input" class="block text-xs font-mono text-zinc-400 mb-1.5">Input String</label>
+          <textarea
+            id="text-hash-input"
+            rows="3"
+            placeholder="Type or paste any text to hash in real-time..."
+            class="w-full px-3.5 py-2.5 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright font-mono text-sm focus:outline-none focus:border-emerald-500"
+          ></textarea>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <div>
+            <div class="text-xs font-mono text-zinc-400 mb-1">SHA-256:</div>
+            <div id="text-sha256" class="p-3 rounded-lg bg-black/40 border border-hub-border text-emerald-400 font-mono text-xs break-all select-all">
+              e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+            </div>
+          </div>
+          <div>
+            <div class="text-xs font-mono text-zinc-400 mb-1">SHA-512:</div>
+            <div id="text-sha512" class="p-3 rounded-lg bg-black/40 border border-hub-border text-cyan-400 font-mono text-xs break-all select-all">
+              cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
+            </div>
+          </div>
+          <div>
+            <div class="text-xs font-mono text-zinc-400 mb-1">SHA-1:</div>
+            <div id="text-sha1" class="p-3 rounded-lg bg-black/40 border border-hub-border text-zinc-300 font-mono text-xs break-all select-all">
+              da39a3ee5e6b4b0d3255bfef95601890afd80709
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 3: Base64 & Hex Encoder -->
+    <div id="panel-encoders" class="tab-panel hidden space-y-6">
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+        <h2 class="text-base font-semibold text-hub-textBright">Base64 & Hex Transcoder</h2>
+
+        <div>
+          <label for="encoder-plain" class="block text-xs font-mono text-zinc-400 mb-1.5">Plaintext Input</label>
+          <textarea
+            id="encoder-plain"
+            rows="3"
+            placeholder="Enter plaintext to convert..."
+            class="w-full px-3.5 py-2.5 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright font-mono text-sm focus:outline-none focus:border-emerald-500"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-mono text-zinc-400">Base64 Output</span>
+              <button type="button" id="copy-b64-btn" class="text-xs font-mono text-emerald-400 hover:underline">Copy</button>
+            </div>
+            <textarea
+              id="encoder-b64"
+              rows="4"
+              placeholder="Base64 encoded string..."
+              class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-hub-border text-emerald-300 font-mono text-xs focus:outline-none focus:border-emerald-500"
+            ></textarea>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-mono text-zinc-400">Hex (Hexadecimal) Output</span>
+              <button type="button" id="copy-hex-btn" class="text-xs font-mono text-cyan-400 hover:underline">Copy</button>
+            </div>
+            <textarea
+              id="encoder-hex"
+              rows="4"
+              placeholder="Hexadecimal encoded string..."
+              class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-hub-border text-cyan-300 font-mono text-xs focus:outline-none focus:border-cyan-500"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 4: JWT Inspector -->
+    <div id="panel-jwt" class="tab-panel hidden space-y-6">
+      <div class="p-6 rounded-xl bg-hub-surface border border-hub-border space-y-4">
+        <h2 class="text-base font-semibold text-hub-textBright">Client-Side JWT Inspector</h2>
+        <p class="text-xs text-zinc-400 font-mono">
+          Paste a JSON Web Token to inspect its header and claims payload in isolation without exposing it to third-party debugging servers.
+        </p>
+
+        <div>
+          <label for="jwt-input" class="block text-xs font-mono text-zinc-400 mb-1.5">Encoded JWT Token</label>
+          <textarea
+            id="jwt-input"
+            rows="3"
+            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            class="w-full px-3.5 py-2.5 rounded-lg bg-hub-bg border border-hub-border text-hub-textBright font-mono text-xs focus:outline-none focus:border-emerald-500"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <span class="block text-xs font-mono text-pink-400 mb-1.5">Header (Algorithm & Token Type)</span>
+            <pre id="jwt-header-output" class="p-3.5 rounded-lg bg-black/50 border border-hub-border text-pink-300 font-mono text-xs min-h-[140px] overflow-x-auto">// Decoded header will appear here</pre>
+          </div>
+
+          <div>
+            <span class="block text-xs font-mono text-indigo-400 mb-1.5">Payload (Data Claims & Timestamps)</span>
+            <pre id="jwt-payload-output" class="p-3.5 rounded-lg bg-black/50 border border-hub-border text-indigo-300 font-mono text-xs min-h-[140px] overflow-x-auto">// Decoded payload claims will appear here</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Tab Switching Logic
+  const tabs = document.querySelectorAll<HTMLButtonElement>(".tool-tab");
+  const panels = document.querySelectorAll<HTMLElement>(".tab-panel");
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const targetId = tab.getAttribute("data-target");
+
+      tabs.forEach((t) => {
+        t.classList.remove("active", "bg-emerald-500/15", "text-emerald-300", "border-emerald-500/40", "font-medium");
+        t.classList.add("bg-hub-surface/60", "text-zinc-400", "border-hub-border");
+      });
+      tab.classList.remove("bg-hub-surface/60", "text-zinc-400", "border-hub-border");
+      tab.classList.add("active", "bg-emerald-500/15", "text-emerald-300", "border-emerald-500/40", "font-medium");
+
+      panels.forEach((p) => {
+        p.classList.toggle("hidden", p.id !== targetId);
+      });
+    });
+  });
+
+  // Panel 1: File Checksum Logic
+  const verifyDropZone = document.getElementById("verify-drop-zone");
+  const verifyFileInput = document.getElementById("verify-file-input") as HTMLInputElement;
+  const verifyFileInfo = document.getElementById("verify-file-info");
+  const expectedHashInput = document.getElementById("expected-hash-input") as HTMLInputElement;
+  const hashResultsCard = document.getElementById("hash-results-card");
+  const calcSha256Output = document.getElementById("calc-sha256-output");
+  const calcSha512Output = document.getElementById("calc-sha512-output");
+  const matchStatusBanner = document.getElementById("match-status-banner");
+
+  let computedSha256 = "";
+  let computedSha512 = "";
+
+  verifyDropZone?.addEventListener("click", () => verifyFileInput?.click());
+
+  verifyDropZone?.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    verifyDropZone.classList.add("border-emerald-500", "bg-emerald-500/5");
+  });
+
+  verifyDropZone?.addEventListener("dragleave", () => {
+    verifyDropZone.classList.remove("border-emerald-500", "bg-emerald-500/5");
+  });
+
+  verifyDropZone?.addEventListener("drop", (e) => {
+    e.preventDefault();
+    verifyDropZone.classList.remove("border-emerald-500", "bg-emerald-500/5");
+    if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+      processBinaryFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  verifyFileInput?.addEventListener("change", (e) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      processBinaryFile(target.files[0]);
+    }
+  });
+
+  async function processBinaryFile(file: File) {
+    if (verifyFileInfo) {
+      const mb = (file.size / (1024 * 1024)).toFixed(2);
+      verifyFileInfo.textContent = `Computing SHA-256 for "${file.name}" (${mb} MB)...`;
+    }
+
+    try {
+      const buffer = await file.arrayBuffer();
+
+      // Compute SHA-256
+      const hash256Buffer = await crypto.subtle.digest("SHA-256", buffer);
+      computedSha256 = Array.from(new Uint8Array(hash256Buffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      // Compute SHA-512
+      const hash512Buffer = await crypto.subtle.digest("SHA-512", buffer);
+      computedSha512 = Array.from(new Uint8Array(hash512Buffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      if (calcSha256Output) calcSha256Output.textContent = computedSha256;
+      if (calcSha512Output) calcSha512Output.textContent = computedSha512;
+      hashResultsCard?.classList.remove("hidden");
+
+      if (verifyFileInfo) {
+        const mb = (file.size / (1024 * 1024)).toFixed(2);
+        verifyFileInfo.textContent = `Loaded "${file.name}" (${mb} MB)`;
+      }
+
+      checkHashMatch();
+    } catch (err: any) {
+      if (verifyFileInfo) verifyFileInfo.textContent = `Error: ${err.message}`;
+    }
+  }
+
+  function checkHashMatch() {
+    if (!matchStatusBanner || !computedSha256) return;
+    const expected = expectedHashInput.value.trim().toLowerCase();
+
+    if (!expected) {
+      matchStatusBanner.className = "p-3 rounded-lg text-xs font-mono flex items-center gap-2 bg-hub-surfaceElevated text-zinc-400 border border-hub-border";
+      matchStatusBanner.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-zinc-400"></span>
+        Paste an expected checksum above to verify against this binary.
+      `;
+      return;
+    }
+
+    if (computedSha256.toLowerCase() === expected) {
+      matchStatusBanner.className = "p-3 rounded-lg text-xs font-mono flex items-center gap-2 bg-emerald-950/40 text-emerald-300 border border-emerald-500/50";
+      matchStatusBanner.innerHTML = `
+        <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="font-bold">VERIFIED MATCH:</span> Binary checksum is 100% genuine and matches the official release hash!
+      `;
+    } else {
+      matchStatusBanner.className = "p-3 rounded-lg text-xs font-mono flex items-center gap-2 bg-rose-950/40 text-rose-300 border border-rose-500/50";
+      matchStatusBanner.innerHTML = `
+        <svg class="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <span class="font-bold">MISMATCH:</span> The calculated SHA-256 does not match the expected hash. Do not execute untrusted binaries.
+      `;
+    }
+  }
+
+  expectedHashInput?.addEventListener("input", checkHashMatch);
+
+  document.getElementById("copy-calculated-sha256")?.addEventListener("click", () => {
+    if (computedSha256) navigator.clipboard.writeText(computedSha256);
+  });
+  document.getElementById("copy-calculated-sha512")?.addEventListener("click", () => {
+    if (computedSha512) navigator.clipboard.writeText(computedSha512);
+  });
+
+  // Panel 2: Text Hasher
+  const textHashInput = document.getElementById("text-hash-input") as HTMLTextAreaElement;
+  const textSha256 = document.getElementById("text-sha256");
+  const textSha512 = document.getElementById("text-sha512");
+  const textSha1 = document.getElementById("text-sha1");
+
+  async function updateTextHashes() {
+    const text = textHashInput.value;
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+
+    const h256 = await crypto.subtle.digest("SHA-256", data);
+    const h512 = await crypto.subtle.digest("SHA-512", data);
+    const h1 = await crypto.subtle.digest("SHA-1", data);
+
+    const toHex = (buf: ArrayBuffer) =>
+      Array.from(new Uint8Array(buf))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+    if (textSha256) textSha256.textContent = toHex(h256);
+    if (textSha512) textSha512.textContent = toHex(h512);
+    if (textSha1) textSha1.textContent = toHex(h1);
+  }
+
+  textHashInput?.addEventListener("input", updateTextHashes);
+
+  // Panel 3: Base64 & Hex
+  const encoderPlain = document.getElementById("encoder-plain") as HTMLTextAreaElement;
+  const encoderB64 = document.getElementById("encoder-b64") as HTMLTextAreaElement;
+  const encoderHex = document.getElementById("encoder-hex") as HTMLTextAreaElement;
+
+  encoderPlain?.addEventListener("input", () => {
+    const val = encoderPlain.value;
+    try {
+      encoderB64.value = btoa(unescape(encodeURIComponent(val)));
+    } catch {
+      encoderB64.value = "";
+    }
+
+    const hex = Array.from(new TextEncoder().encode(val))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join(" ");
+    encoderHex.value = hex;
+  });
+
+  encoderB64?.addEventListener("input", () => {
+    try {
+      const decoded = decodeURIComponent(escape(atob(encoderB64.value.trim())));
+      encoderPlain.value = decoded;
+      encoderHex.value = Array.from(new TextEncoder().encode(decoded))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join(" ");
+    } catch {}
+  });
+
+  document.getElementById("copy-b64-btn")?.addEventListener("click", () => {
+    if (encoderB64.value) navigator.clipboard.writeText(encoderB64.value);
+  });
+  document.getElementById("copy-hex-btn")?.addEventListener("click", () => {
+    if (encoderHex.value) navigator.clipboard.writeText(encoderHex.value);
+  });
+
+  // Panel 4: JWT Inspector
+  const jwtInput = document.getElementById("jwt-input") as HTMLTextAreaElement;
+  const jwtHeaderOutput = document.getElementById("jwt-header-output");
+  const jwtPayloadOutput = document.getElementById("jwt-payload-output");
+
+  jwtInput?.addEventListener("input", () => {
+    const raw = jwtInput.value.trim();
+    const parts = raw.split(".");
+
+    if (parts.length < 2) {
+      if (jwtHeaderOutput) jwtHeaderOutput.textContent = "// Invalid JWT structure (expected header.payload.signature)";
+      if (jwtPayloadOutput) jwtPayloadOutput.textContent = "";
+      return;
+    }
+
+    try {
+      const b64Decode = (str: string) => {
+        let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
+        while (base64.length % 4) base64 += "=";
+        return decodeURIComponent(escape(atob(base64)));
+      };
+
+      const header = JSON.parse(b64Decode(parts[0]));
+      const payload = JSON.parse(b64Decode(parts[1]));
+
+      if (jwtHeaderOutput) jwtHeaderOutput.textContent = JSON.stringify(header, null, 2);
+      if (jwtPayloadOutput) jwtPayloadOutput.textContent = JSON.stringify(payload, null, 2);
+    } catch (err: any) {
+      if (jwtHeaderOutput) jwtHeaderOutput.textContent = `// Parse error: ${err.message}`;
+    }
+  });
+</script>
