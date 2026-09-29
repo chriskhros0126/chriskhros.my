@@ -136,62 +136,6 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </div>
 
-  <style>
-    /* Osu! Approach Circle Animation */
-    @keyframes osu-approach {
-      0% {
-        transform: scale(2.8);
-        opacity: 0.15;
-      }
-      50% {
-        opacity: 0.9;
-      }
-      100% {
-        transform: scale(1.0);
-        opacity: 1;
-      }
-    }
-
-    .osu-approach-ring {
-      animation: osu-approach 0.75s cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
-    }
-
-    /* Dashed trace line animation */
-    @keyframes osu-dash-draw {
-      from {
-        stroke-dashoffset: 1000;
-      }
-      to {
-        stroke-dashoffset: 0;
-      }
-    }
-
-    .osu-trace-line {
-      stroke-dasharray: 8 6;
-      animation: osu-dash-draw 0.4s ease-out forwards;
-    }
-
-    /* Score popup */
-    @keyframes osu-score-float {
-      0% {
-        transform: scale(0.6) translateY(0);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1.2) translateY(-25px);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1.4) translateY(-50px);
-        opacity: 0;
-      }
-    }
-
-    .osu-score-burst {
-      animation: osu-score-float 0.65s ease-out forwards;
-    }
-  </style>
-
   <script>
     // Elements
     const explorer = document.getElementById("explorer");
@@ -552,12 +496,11 @@ import Layout from "../layouts/Layout.astro";
     interface OsuNode {
       x: number;
       y: number;
-      combo: number;
       element: HTMLElement;
+      line?: SVGLineElement;
     }
 
     const osuNodes: OsuNode[] = [];
-    let comboCounter = 0;
     let audioCtx: AudioContext | null = null;
 
     function playHitSound() {
@@ -567,7 +510,7 @@ import Layout from "../layouts/Layout.astro";
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = "sine";
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.08);
         gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
@@ -582,7 +525,6 @@ import Layout from "../layouts/Layout.astro";
       if (osuTargets) osuTargets.innerHTML = "";
       if (osuSvgLines) osuSvgLines.innerHTML = "";
       osuNodes.length = 0;
-      comboCounter = 0;
     }
 
     closeBtn?.addEventListener("click", (e) => {
@@ -593,9 +535,8 @@ import Layout from "../layouts/Layout.astro";
     function spawnOsuCircle() {
       if (!osuTargets || !osuSvgLines) return;
 
-      comboCounter++;
-      const diameter = 90;
-      const margin = 110;
+      const diameter = 86;
+      const margin = 100;
 
       // Safe viewport coordinate
       const maxX = Math.max(margin, window.innerWidth - margin);
@@ -603,19 +544,21 @@ import Layout from "../layouts/Layout.astro";
       const x = margin + Math.random() * (maxX - margin);
       const y = margin + Math.random() * (maxY - margin);
 
-      // 1. Draw dashed line if previous circle exists
+      let connectingLine: SVGLineElement | undefined;
+
+      // 1. Draw thin white dashed line if previous circle exists
       if (osuNodes.length > 0) {
         const prev = osuNodes[osuNodes.length - 1];
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", String(prev.x));
-        line.setAttribute("y1", String(prev.y));
-        line.setAttribute("x2", String(x));
-        line.setAttribute("y2", String(y));
-        line.setAttribute("stroke", "#38bdf8");
-        line.setAttribute("stroke-width", "3");
-        line.setAttribute("stroke-linecap", "round");
-        line.classList.add("osu-trace-line");
-        osuSvgLines.appendChild(line);
+        connectingLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        connectingLine.setAttribute("x1", String(prev.x));
+        connectingLine.setAttribute("y1", String(prev.y));
+        connectingLine.setAttribute("x2", String(x));
+        connectingLine.setAttribute("y2", String(y));
+        connectingLine.setAttribute("stroke", "#ffffff");
+        connectingLine.setAttribute("stroke-width", "1.5");
+        connectingLine.setAttribute("stroke-dasharray", "5 5");
+        connectingLine.setAttribute("stroke-opacity", "0.9");
+        osuSvgLines.appendChild(connectingLine);
       }
 
       // 2. Create Osu! Hit Object Container
@@ -628,85 +571,93 @@ import Layout from "../layouts/Layout.astro";
       container.style.pointerEvents = "auto";
       container.style.cursor = "pointer";
       container.style.userSelect = "none";
+      container.style.transformOrigin = "center center";
 
-      // 3. Approach Circle (Closing In)
+      // 3. Approach Circle (Rapidly closing in to match the border)
       const approachRing = document.createElement("div");
-      approachRing.classList.add("osu-approach-ring");
       approachRing.style.position = "absolute";
       approachRing.style.inset = "0";
       approachRing.style.borderRadius = "9999px";
-      approachRing.style.border = "3px solid #ffffff";
-      approachRing.style.boxShadow = "0 0 15px rgba(56, 189, 248, 0.9)";
+      approachRing.style.border = "2.5px solid #ffffff";
+      approachRing.style.boxShadow = "0 0 10px rgba(255, 255, 255, 0.9)";
       approachRing.style.pointerEvents = "none";
+      approachRing.style.transformOrigin = "center center";
 
-      // 4. Hit Target (Circular Wong image with white border)
+      // 4. Hit Target (Circular Wong image with white border, NO combo numbers)
       const hitTarget = document.createElement("div");
       hitTarget.style.position = "absolute";
       hitTarget.style.inset = "0";
       hitTarget.style.borderRadius = "9999px";
-      hitTarget.style.border = "4px solid #ffffff";
+      hitTarget.style.border = "3.5px solid #ffffff";
       hitTarget.style.backgroundImage = 'url("/wong.png")';
       hitTarget.style.backgroundSize = "cover";
       hitTarget.style.backgroundPosition = "center";
-      hitTarget.style.boxShadow = "0 0 20px rgba(255, 255, 255, 0.8), 0 8px 32px rgba(0,0,0,0.8)";
+      hitTarget.style.boxShadow = "0 0 16px rgba(255, 255, 255, 0.7), 0 4px 20px rgba(0,0,0,0.6)";
       hitTarget.style.overflow = "hidden";
-      hitTarget.style.transition = "transform 0.1s ease";
-
-      // 5. Combo Badge
-      const comboBadge = document.createElement("div");
-      comboBadge.textContent = String(comboCounter);
-      comboBadge.style.position = "absolute";
-      comboBadge.style.top = "-8px";
-      comboBadge.style.left = "-8px";
-      comboBadge.style.width = "26px";
-      comboBadge.style.height = "26px";
-      comboBadge.style.borderRadius = "9999px";
-      comboBadge.style.backgroundColor = "#0284c7";
-      comboBadge.style.color = "#ffffff";
-      comboBadge.style.border = "2px solid #ffffff";
-      comboBadge.style.display = "flex";
-      comboBadge.style.alignItems = "center";
-      comboBadge.style.justifyContent = "center";
-      comboBadge.style.fontSize = "12px";
-      comboBadge.style.fontWeight = "bold";
-      comboBadge.style.fontFamily = "monospace";
-      comboBadge.style.boxShadow = "0 2px 8px rgba(0,0,0,0.5)";
 
       container.appendChild(approachRing);
       container.appendChild(hitTarget);
-      container.appendChild(comboBadge);
       osuTargets.appendChild(container);
 
-      // Track Node
-      const node: OsuNode = { x, y, combo: comboCounter, element: container };
-      osuNodes.push(node);
+      // Track this node
+      const thisNode: OsuNode = { x, y, element: container, line: connectingLine };
+      osuNodes.push(thisNode);
 
-      // Hit Interaction (Click to pop with "300" score burst)
+      let isCleanedUp = false;
+      function dismissCircle(burst = false) {
+        if (isCleanedUp) return;
+        isCleanedUp = true;
+
+        const fadeDuration = burst ? 100 : 130; // really fast fade
+
+        container.animate([
+          { opacity: 1, transform: burst ? "scale(1.0)" : "scale(1.0)" },
+          { opacity: 0, transform: burst ? "scale(1.3)" : "scale(1.08)" }
+        ], {
+          duration: fadeDuration,
+          easing: "ease-out",
+          fill: "forwards"
+        }).onfinish = () => {
+          container.remove();
+        };
+
+        if (connectingLine) {
+          connectingLine.animate([
+            { opacity: 0.9 },
+            { opacity: 0 }
+          ], {
+            duration: fadeDuration,
+            easing: "ease-out",
+            fill: "forwards"
+          }).onfinish = () => {
+            connectingLine?.remove();
+          };
+        }
+
+        const idx = osuNodes.indexOf(thisNode);
+        if (idx !== -1) osuNodes.splice(idx, 1);
+      }
+
+      // Approach circle animation: rapidly closes in from scale 2.7 to 1.0
+      const approachAnim = approachRing.animate([
+        { transform: "scale(2.7)", opacity: 0.15 },
+        { transform: "scale(1.0)", opacity: 1.0 }
+      ], {
+        duration: 550, // rapid approach
+        easing: "linear",
+        fill: "forwards"
+      });
+
+      // When approach circle reaches the circle, quickly fade away
+      approachAnim.onfinish = () => {
+        dismissCircle(false);
+      };
+
+      // Clicking circle hits it like Osu!
       container.addEventListener("click", (ev) => {
         ev.stopPropagation();
         playHitSound();
-
-        // 300 Score Burst
-        const score = document.createElement("div");
-        score.textContent = "300";
-        score.classList.add("osu-score-burst");
-        score.style.position = "absolute";
-        score.style.left = `${x - 25}px`;
-        score.style.top = `${y - 25}px`;
-        score.style.color = "#38bdf8";
-        score.style.fontSize = "26px";
-        score.style.fontWeight = "900";
-        score.style.fontFamily = "sans-serif";
-        score.style.textShadow = "0 0 10px #0284c7, 0 0 20px #ffffff";
-        score.style.pointerEvents = "none";
-        osuTargets.appendChild(score);
-        setTimeout(() => score.remove(), 700);
-
-        // Burst animation
-        container.style.transition = "transform 0.2s ease, opacity 0.2s ease";
-        container.style.transform = "scale(1.4)";
-        container.style.opacity = "0";
-        setTimeout(() => container.remove(), 200);
+        dismissCircle(true);
       });
     }
 
