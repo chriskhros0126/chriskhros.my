@@ -2,16 +2,25 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="chriskhros.my">
+<Layout title="chriskhros.my // File Explorer">
+  <!-- Floating Scale Slider in Top-Right Corner (Outside Explorer) -->
+  <div class="fixed top-4 right-4 z-50 flex items-center gap-1.5 bg-[#222]/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-[#444] shadow-xl text-xs font-mono text-[#ccc] select-none">
+    <span class="text-[#888] text-[11px]">Zoom:</span>
+    <button type="button" id="zoom-out" class="w-6 h-6 flex items-center justify-center rounded bg-[#333] hover:bg-[#444] text-[#ccc] hover:text-white cursor-pointer select-none text-xs transition-colors" title="Zoom Out">−</button>
+    <input type="range" id="scale-slider" min="70" max="130" value="100" step="5" class="w-20 h-1 accent-[#007acc] cursor-pointer" title="Adjust Scale" />
+    <button type="button" id="zoom-in" class="w-6 h-6 flex items-center justify-center rounded bg-[#333] hover:bg-[#444] text-[#ccc] hover:text-white cursor-pointer select-none text-xs transition-colors" title="Zoom In">+</button>
+    <span id="scale-val" class="w-9 text-right text-white font-medium text-[11px]">100%</span>
+  </div>
+
   <div class="flex items-center justify-center min-h-screen p-4 sm:p-8">
-    <!-- Explorer Window -->
-    <div id="explorer" class="w-full max-w-5xl flex flex-col rounded-lg overflow-hidden border border-[#444] shadow-2xl shadow-black/60 transition-transform origin-top" style="min-height: 620px; max-height: 85vh;">
+    <!-- Explorer Window Container -->
+    <div id="explorer" class="w-full max-w-5xl flex flex-col rounded-lg overflow-hidden border border-[#444] shadow-2xl shadow-black/60 transition-transform origin-top" style="min-height: 600px; max-height: 85vh;">
 
       <!-- Title Bar -->
       <div class="flex items-center justify-between px-3 h-8 bg-[#2d2d2d] border-b border-[#444] select-none flex-shrink-0">
         <div class="flex items-center gap-2 text-xs text-[#ccc]">
           <span>📁</span>
-          <span>chriskhros.my</span>
+          <span id="window-title">chriskhros.my</span>
         </div>
         <div class="flex items-center gap-0.5">
           <span class="w-10 h-7 flex items-center justify-center text-[#888] hover:bg-[#3c3c3c] text-xs cursor-default">─</span>
@@ -20,41 +29,61 @@ import Layout from "../layouts/Layout.astro";
         </div>
       </div>
 
-      <!-- Toolbar -->
-      <div class="flex items-center justify-between px-2 py-1 bg-[#2d2d2d] border-b border-[#3a3a3a] flex-shrink-0 gap-2">
-        <div class="flex items-center gap-0.5" id="filter-group">
-          <button data-filter="all" class="filter-btn active px-3 py-1 text-xs rounded text-white bg-[#3c3c3c]">All</button>
-          <button data-filter="web" class="filter-btn px-3 py-1 text-xs rounded text-[#888] hover:text-[#ccc] hover:bg-[#333]">Web Tools</button>
-          <button data-filter="binary" class="filter-btn px-3 py-1 text-xs rounded text-[#888] hover:text-[#ccc] hover:bg-[#333]">Binaries</button>
+      <!-- Navigation & Address Bar Area -->
+      <div class="flex items-center px-2 py-1.5 bg-[#2d2d2d] border-b border-[#3a3a3a] gap-2 flex-shrink-0">
+        <!-- Back, Forward, Up Navigation Buttons -->
+        <div class="flex items-center gap-0.5 flex-shrink-0">
+          <button
+            type="button"
+            id="nav-back"
+            disabled
+            class="w-7 h-7 flex items-center justify-center rounded text-sm text-[#888] hover:text-white hover:bg-[#3c3c3c] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#888] cursor-pointer disabled:cursor-default transition-colors"
+            title="Back (Alt+Left)"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            id="nav-forward"
+            disabled
+            class="w-7 h-7 flex items-center justify-center rounded text-sm text-[#888] hover:text-white hover:bg-[#3c3c3c] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#888] cursor-pointer disabled:cursor-default transition-colors"
+            title="Forward (Alt+Right)"
+          >
+            →
+          </button>
+          <button
+            type="button"
+            id="nav-up"
+            disabled
+            class="w-7 h-7 flex items-center justify-center rounded text-sm text-[#888] hover:text-white hover:bg-[#3c3c3c] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#888] cursor-pointer disabled:cursor-default transition-colors"
+            title="Up to root (Alt+Up)"
+          >
+            ↑
+          </button>
         </div>
-        <div class="flex items-center gap-2">
-          <!-- Scale Slider -->
-          <div class="hidden sm:flex items-center gap-1 text-[10px] text-[#888] bg-[#222] px-2 py-0.5 rounded border border-[#3a3a3a]">
-            <span class="text-[#666]">Scale</span>
-            <button type="button" id="zoom-out" class="hover:text-white px-0.5 text-xs select-none cursor-pointer">−</button>
-            <input type="range" id="scale-slider" min="70" max="130" value="100" step="5" class="w-16 h-1 accent-[#007acc] cursor-pointer" title="Zoom" />
-            <button type="button" id="zoom-in" class="hover:text-white px-0.5 text-xs select-none cursor-pointer">+</button>
-            <span id="scale-val" class="text-white text-[10px] w-7 text-right">100%</span>
+
+        <!-- Address Bar (Breadcrumb) -->
+        <div class="flex-1 flex items-center justify-between px-2.5 py-1 bg-[#3c3c3c] border border-[#4f4f4f] rounded text-xs min-w-0">
+          <div id="breadcrumb" class="flex items-center gap-1.5 truncate text-[#aaa]">
+            <span>📁 This PC</span>
+            <span class="text-[#666]">›</span>
+            <span class="text-white font-medium">chriskhros.my</span>
           </div>
+          <button type="button" id="refresh-view-btn" class="text-[#888] hover:text-white px-1 ml-2 text-xs flex-shrink-0 cursor-pointer" title="Refresh">
+            ⟳
+          </button>
+        </div>
+
+        <!-- Instant Search Box -->
+        <div class="flex-shrink-0">
           <input
             type="text"
             id="search"
-            placeholder="🔍  Search chriskhros.my"
-            class="w-40 sm:w-56 px-3 py-1 text-xs bg-[#3c3c3c] border border-[#555] rounded text-[#ccc] placeholder-[#666] focus:outline-none focus:border-[#007acc]"
+            placeholder="🔍 Search..."
+            class="w-40 sm:w-52 px-3 py-1 text-xs bg-[#3c3c3c] border border-[#555] rounded text-[#ccc] placeholder-[#777] focus:outline-none focus:border-[#007acc]"
             autocomplete="off"
             spellcheck="false"
           />
-        </div>
-      </div>
-
-      <!-- Address Bar -->
-      <div class="px-2 py-1 flex-shrink-0 bg-[#2d2d2d]">
-        <div class="flex items-center gap-1 px-3 py-1 bg-[#3c3c3c] rounded text-xs text-[#888]">
-          <span>📁 This PC</span>
-          <span class="text-[#555]">›</span>
-          <span>chriskhros.my</span>
-          <span class="text-[#555]">›</span>
-          <span class="text-white font-medium">Tools</span>
         </div>
       </div>
 
@@ -63,48 +92,59 @@ import Layout from "../layouts/Layout.astro";
         <div class="flex-1 min-w-0">Name</div>
         <div class="w-24 text-center hidden sm:block">Type</div>
         <div class="w-20 text-right hidden sm:block">Size</div>
-        <div class="w-24 text-center hidden md:block">Platform</div>
-        <div class="w-24 text-right hidden md:block">Date</div>
+        <div class="w-28 text-center hidden md:block">Platform</div>
+        <div class="w-24 text-right hidden md:block">Date Modified</div>
       </div>
 
-      <!-- File List (dynamically populated) -->
+      <!-- File / Folder Content Area -->
       <div id="file-list" class="flex-1 overflow-y-auto bg-[#1e1e1e]">
-        <div class="flex items-center justify-center h-full text-[#555] text-sm">Loading tools...</div>
+        <div class="flex items-center justify-center h-full text-[#555] text-sm">Loading folder contents...</div>
       </div>
 
       <!-- Empty State -->
-      <div id="empty-state" class="hidden flex-1 flex items-center justify-center bg-[#1e1e1e] text-[#555] text-sm">
-        This folder is empty
+      <div id="empty-state" class="hidden flex-1 flex flex-col items-center justify-center bg-[#1e1e1e] text-[#555] text-sm p-6 text-center">
+        <span class="text-3xl mb-2">📁</span>
+        <span>This folder is empty.</span>
       </div>
 
       <!-- Status Bar -->
       <div class="flex items-center justify-between px-3 py-1 bg-[#2d2d2d] border-t border-[#444] text-[11px] text-[#888] select-none flex-shrink-0">
         <span id="item-count">0 items</span>
-        <span>chriskhros.my · Cloudflare R2</span>
+        <span class="text-[10px] text-[#666]">chriskhros.my · Cloudflare R2</span>
       </div>
 
     </div>
   </div>
 
   <script>
+    // Elements
     const explorer = document.getElementById("explorer");
-    const filterBtns = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
-    const searchInput = document.getElementById("search") as HTMLInputElement;
-    const itemCount = document.getElementById("item-count");
-    const emptyState = document.getElementById("empty-state");
-    const fileList = document.getElementById("file-list");
-
     const scaleSlider = document.getElementById("scale-slider") as HTMLInputElement;
     const scaleVal = document.getElementById("scale-val");
     const zoomOut = document.getElementById("zoom-out");
     const zoomIn = document.getElementById("zoom-in");
 
-    let activeFilter = "all";
-    let query = "";
+    const navBack = document.getElementById("nav-back") as HTMLButtonElement;
+    const navForward = document.getElementById("nav-forward") as HTMLButtonElement;
+    const navUp = document.getElementById("nav-up") as HTMLButtonElement;
+    const breadcrumb = document.getElementById("breadcrumb");
+    const windowTitle = document.getElementById("window-title");
+    const searchInput = document.getElementById("search") as HTMLInputElement;
+    const fileList = document.getElementById("file-list");
+    const emptyState = document.getElementById("empty-state");
+    const itemCount = document.getElementById("item-count");
+    const refreshViewBtn = document.getElementById("refresh-view-btn");
+
+    // State
+    // Folders: 'root' | 'apps' | 'web'
+    let currentFolder: "root" | "apps" | "web" = "root";
+    let history: ("root" | "apps" | "web")[] = ["root"];
+    let historyIndex = 0;
+    let searchQuery = "";
     let selectedRow: HTMLElement | null = null;
     let allTools: any[] = [];
 
-    // --- Scale Slider Logic ---
+    // --- 1. Scale Slider (Outside Explorer Window) ---
     function applyScale(val: number) {
       const pct = Math.max(70, Math.min(130, val));
       if (scaleSlider) scaleSlider.value = String(pct);
@@ -130,8 +170,119 @@ import Layout from "../layouts/Layout.astro";
       applyScale(savedScale);
     }
 
-    // --- Helper formatting ---
-    function getIcon(tool: any): string {
+    // --- 2. Navigation State Machine (Back, Forward, Up) ---
+    function updateNavButtons() {
+      if (navBack) navBack.disabled = historyIndex <= 0;
+      if (navForward) navForward.disabled = historyIndex >= history.length - 1;
+      if (navUp) navUp.disabled = currentFolder === "root";
+    }
+
+    function navigateTo(folder: "root" | "apps" | "web", pushHistory = true) {
+      if (pushHistory) {
+        history = history.slice(0, historyIndex + 1);
+        history.push(folder);
+        historyIndex = history.length - 1;
+      }
+      currentFolder = folder;
+      searchQuery = "";
+      if (searchInput) searchInput.value = "";
+      updateNavButtons();
+      updateBreadcrumb();
+      renderFolder();
+    }
+
+    function goBack() {
+      if (historyIndex > 0) {
+        historyIndex--;
+        currentFolder = history[historyIndex];
+        searchQuery = "";
+        if (searchInput) searchInput.value = "";
+        updateNavButtons();
+        updateBreadcrumb();
+        renderFolder();
+      }
+    }
+
+    function goForward() {
+      if (historyIndex < history.length - 1) {
+        historyIndex++;
+        currentFolder = history[historyIndex];
+        searchQuery = "";
+        if (searchInput) searchInput.value = "";
+        updateNavButtons();
+        updateBreadcrumb();
+        renderFolder();
+      }
+    }
+
+    function goUp() {
+      if (currentFolder !== "root") {
+        navigateTo("root");
+      }
+    }
+
+    navBack?.addEventListener("click", goBack);
+    navForward?.addEventListener("click", goForward);
+    navUp?.addEventListener("click", goUp);
+    refreshViewBtn?.addEventListener("click", () => loadTools());
+
+    // Keyboard navigation: Alt+Left / Alt+Right / Alt+Up
+    window.addEventListener("keydown", (e) => {
+      if (e.altKey && e.key === "ArrowLeft") {
+        e.preventDefault();
+        goBack();
+      } else if (e.altKey && e.key === "ArrowRight") {
+        e.preventDefault();
+        goForward();
+      } else if (e.altKey && e.key === "ArrowUp") {
+        e.preventDefault();
+        goUp();
+      } else if (e.key === "/" && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput?.focus();
+        searchInput?.select();
+      }
+    });
+
+    // --- 3. Breadcrumb & Title Update ---
+    function updateBreadcrumb() {
+      if (!breadcrumb) return;
+
+      if (currentFolder === "root") {
+        breadcrumb.innerHTML = `
+          <span>📁 This PC</span>
+          <span class="text-[#666]">›</span>
+          <span class="text-white font-medium">chriskhros.my</span>
+        `;
+        if (windowTitle) windowTitle.textContent = "chriskhros.my";
+        if (searchInput) searchInput.placeholder = "🔍 Search chriskhros.my...";
+      } else if (currentFolder === "apps") {
+        breadcrumb.innerHTML = `
+          <span>📁 This PC</span>
+          <span class="text-[#666]">›</span>
+          <button type="button" id="crumb-root" class="hover:underline text-[#aaa] cursor-pointer">chriskhros.my</button>
+          <span class="text-[#666]">›</span>
+          <span class="text-white font-medium">Apps</span>
+        `;
+        if (windowTitle) windowTitle.textContent = "Apps - chriskhros.my";
+        if (searchInput) searchInput.placeholder = "🔍 Search in Apps...";
+      } else if (currentFolder === "web") {
+        breadcrumb.innerHTML = `
+          <span>📁 This PC</span>
+          <span class="text-[#666]">›</span>
+          <button type="button" id="crumb-root" class="hover:underline text-[#aaa] cursor-pointer">chriskhros.my</button>
+          <span class="text-[#666]">›</span>
+          <span class="text-white font-medium">Web Tools</span>
+        `;
+        if (windowTitle) windowTitle.textContent = "Web Tools - chriskhros.my";
+        if (searchInput) searchInput.placeholder = "🔍 Search in Web Tools...";
+      }
+
+      document.getElementById("crumb-root")?.addEventListener("click", () => navigateTo("root"));
+    }
+
+    // --- 4. Render Logic ---
+    function getFileIcon(tool: any): string {
       if (tool.type === "web") return "🌐";
       const fn = (tool.filename || "").toLowerCase();
       if (fn.endsWith(".dmg")) return "💿";
@@ -148,51 +299,148 @@ import Layout from "../layouts/Layout.astro";
       return "Binary";
     }
 
-    function renderRows() {
+    function renderFolder() {
       if (!fileList) return;
 
-      const filtered = allTools.filter(tool => {
-        const type = tool.type || "";
-        const title = (tool.title || "").toLowerCase();
-        const tags = (tool.tags || []).join(",").toLowerCase();
+      const binaries = allTools.filter(t => t.type === "binary" || (t.type !== "web" && t.downloadUrl));
+      const webTools = allTools.filter(t => t.type === "web" || !t.downloadUrl);
 
-        const matchFilter = activeFilter === "all" || type === activeFilter;
-        const matchQuery = !query || title.includes(query) || tags.includes(query);
-        return matchFilter && matchQuery;
-      });
+      // Search Mode (global if searching)
+      if (searchQuery) {
+        const matches = allTools.filter(t => {
+          const title = (t.title || "").toLowerCase();
+          const tags = (t.tags || []).join(",").toLowerCase();
+          const fn = (t.filename || "").toLowerCase();
+          return title.includes(searchQuery) || tags.includes(searchQuery) || fn.includes(searchQuery);
+        });
 
-      if (filtered.length === 0) {
-        fileList.classList.add("hidden");
-        emptyState?.classList.remove("hidden");
-      } else {
-        fileList.classList.remove("hidden");
-        emptyState?.classList.add("hidden");
+        if (matches.length === 0) {
+          fileList.classList.add("hidden");
+          emptyState?.classList.remove("hidden");
+        } else {
+          fileList.classList.remove("hidden");
+          emptyState?.classList.add("hidden");
+        }
+
+        fileList.innerHTML = matches.map(renderItemRow).join("");
+        if (itemCount) itemCount.textContent = `${matches.length} search result${matches.length !== 1 ? "s" : ""}`;
+        attachRowListeners();
+        return;
       }
 
-      fileList.innerHTML = filtered.map(tool => {
-        const isWeb = tool.type === "web";
-        const icon = getIcon(tool);
-        const fileType = getFileType(tool);
-        const href = isWeb ? (tool.route || "/tools/demo-tool") : (tool.downloadUrl || "#");
-        const dl = !isWeb ? ` download="${tool.filename || ""}"` : "";
+      // Root View: Show 2 Folders (Apps & Web Tools)
+      if (currentFolder === "root") {
+        fileList.classList.remove("hidden");
+        emptyState?.classList.add("hidden");
 
-        return `<a href="${href}"${dl} class="file-row flex items-center px-3 py-1.5 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] no-underline text-[#ccc] transition-colors duration-75" data-id="${tool.id}">
+        fileList.innerHTML = `
+          <!-- Apps Folder Row -->
+          <div
+            class="folder-row flex items-center px-3 py-2 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] text-[#ccc] transition-colors duration-75 select-none"
+            data-target="apps"
+          >
+            <div class="flex-1 min-w-0 flex items-center gap-2.5 truncate font-medium">
+              <span class="text-base flex-shrink-0">📁</span>
+              <span class="truncate font-mono text-[13px] text-white">Apps</span>
+              <span class="text-[10px] text-[#777] font-mono">(${binaries.length} binaries)</span>
+            </div>
+            <div class="w-24 text-center text-xs text-[#888] hidden sm:block font-mono">File folder</div>
+            <div class="w-20 text-right text-xs text-[#888] hidden sm:block">${binaries.length} item${binaries.length !== 1 ? 's' : ''}</div>
+            <div class="w-28 text-center text-xs text-[#888] hidden md:block">Win / Mac / Linux</div>
+            <div class="w-24 text-right text-xs text-[#666] hidden md:block">—</div>
+          </div>
+
+          <!-- Web Tools Folder Row -->
+          <div
+            class="folder-row flex items-center px-3 py-2 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] text-[#ccc] transition-colors duration-75 select-none"
+            data-target="web"
+          >
+            <div class="flex-1 min-w-0 flex items-center gap-2.5 truncate font-medium">
+              <span class="text-base flex-shrink-0">📁</span>
+              <span class="truncate font-mono text-[13px] text-white">Web Tools</span>
+              <span class="text-[10px] text-[#777] font-mono">(${webTools.length} utilities)</span>
+            </div>
+            <div class="w-24 text-center text-xs text-[#888] hidden sm:block font-mono">File folder</div>
+            <div class="w-20 text-right text-xs text-[#888] hidden sm:block">${webTools.length} item${webTools.length !== 1 ? 's' : ''}</div>
+            <div class="w-28 text-center text-xs text-[#888] hidden md:block">Browser Native</div>
+            <div class="w-24 text-right text-xs text-[#666] hidden md:block">—</div>
+          </div>
+        `;
+
+        if (itemCount) itemCount.textContent = "2 folders";
+
+        // Folder click handlers
+        fileList.querySelectorAll<HTMLElement>(".folder-row").forEach(row => {
+          row.addEventListener("click", () => {
+            const target = row.getAttribute("data-target") as "apps" | "web";
+            if (target) navigateTo(target);
+          });
+        });
+        return;
+      }
+
+      // Apps Folder View
+      if (currentFolder === "apps") {
+        if (binaries.length === 0) {
+          fileList.classList.add("hidden");
+          emptyState?.classList.remove("hidden");
+        } else {
+          fileList.classList.remove("hidden");
+          emptyState?.classList.add("hidden");
+        }
+
+        fileList.innerHTML = binaries.map(renderItemRow).join("");
+        if (itemCount) itemCount.textContent = `${binaries.length} item${binaries.length !== 1 ? "s" : ""}`;
+        attachRowListeners();
+        return;
+      }
+
+      // Web Tools Folder View
+      if (currentFolder === "web") {
+        if (webTools.length === 0) {
+          fileList.classList.add("hidden");
+          emptyState?.classList.remove("hidden");
+        } else {
+          fileList.classList.remove("hidden");
+          emptyState?.classList.add("hidden");
+        }
+
+        fileList.innerHTML = webTools.map(renderItemRow).join("");
+        if (itemCount) itemCount.textContent = `${webTools.length} item${webTools.length !== 1 ? "s" : ""}`;
+        attachRowListeners();
+        return;
+      }
+    }
+
+    function renderItemRow(tool: any): string {
+      const isWeb = tool.type === "web";
+      const icon = getFileIcon(tool);
+      const fileType = getFileType(tool);
+      const href = isWeb ? (tool.route || "/tools/demo-tool") : (tool.downloadUrl || "#");
+      const dl = !isWeb ? ` download="${tool.filename || ""}"` : "";
+
+      return `
+        <a
+          href="${href}"
+          ${dl}
+          class="file-row flex items-center px-3 py-1.5 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] cursor-pointer text-[13px] no-underline text-[#ccc] transition-colors duration-75 select-none"
+          data-id="${tool.id}"
+        >
           <div class="flex-1 min-w-0 flex items-center gap-2 truncate">
             <span class="text-sm flex-shrink-0">${icon}</span>
-            <span class="truncate font-mono text-[13px]">${tool.title || "Untitled"}</span>
-            ${tool.version ? `<span class="text-[10px] text-[#666] flex-shrink-0">${tool.version}</span>` : ""}
+            <span class="truncate font-mono text-[13px] text-neutral-200">${tool.title || "Untitled"}</span>
+            ${tool.version ? `<span class="text-[10px] text-[#666] flex-shrink-0 font-mono">${tool.version}</span>` : ""}
           </div>
           <div class="w-24 text-center text-xs text-[#888] hidden sm:block font-mono">${fileType}</div>
           <div class="w-20 text-right text-xs text-[#888] hidden sm:block">${isWeb ? "—" : (tool.size || "—")}</div>
-          <div class="w-24 text-center text-xs text-[#888] hidden md:block">${tool.platform || "—"}</div>
+          <div class="w-28 text-center text-xs text-[#888] hidden md:block">${tool.platform || "—"}</div>
           <div class="w-24 text-right text-xs text-[#666] hidden md:block">${tool.releaseDate || "—"}</div>
-        </a>`;
-      }).join("");
+        </a>
+      `;
+    }
 
-      if (itemCount) itemCount.textContent = `${filtered.length} item${filtered.length !== 1 ? "s" : ""}`;
-
-      // Row selection visual
-      fileList.querySelectorAll<HTMLElement>(".file-row").forEach(row => {
+    function attachRowListeners() {
+      fileList?.querySelectorAll<HTMLElement>(".file-row").forEach(row => {
         row.addEventListener("mousedown", () => {
           if (selectedRow) selectedRow.style.backgroundColor = "";
           selectedRow = row;
@@ -201,43 +449,20 @@ import Layout from "../layouts/Layout.astro";
       });
     }
 
-    // --- Filter Buttons ---
-    filterBtns.forEach(btn => {
-      btn.addEventListener("click", () => {
-        filterBtns.forEach(b => {
-          b.classList.remove("active", "text-white", "bg-[#3c3c3c]");
-          b.classList.add("text-[#888]");
-        });
-        btn.classList.add("active", "text-white", "bg-[#3c3c3c]");
-        btn.classList.remove("text-[#888]");
-        activeFilter = btn.getAttribute("data-filter") || "all";
-        renderRows();
-      });
-    });
-
-    searchInput?.addEventListener("input", () => {
-      query = searchInput.value.trim().toLowerCase();
-      renderRows();
-    });
-
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
-      if (!target.closest(".file-row") && selectedRow) {
+      if (!target.closest(".file-row") && !target.closest(".folder-row") && selectedRow) {
         selectedRow.style.backgroundColor = "";
         selectedRow = null;
       }
     });
 
-    // Keyboard shortcut: / focuses search
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "/" && document.activeElement !== searchInput) {
-        e.preventDefault();
-        searchInput?.focus();
-        searchInput?.select();
-      }
+    searchInput?.addEventListener("input", () => {
+      searchQuery = searchInput.value.trim().toLowerCase();
+      renderFolder();
     });
 
-    // --- Dynamic API Fetching ---
+    // --- 5. Dynamic Data Fetch from R2 ---
     async function loadTools() {
       try {
         const res = await fetch("/api/tools");
@@ -245,17 +470,20 @@ import Layout from "../layouts/Layout.astro";
           const data = await res.json();
           if (Array.isArray(data)) {
             allTools = data;
-            renderRows();
+            renderFolder();
             return;
           }
         }
       } catch (err) {
-        console.warn("Failed to load tools from API:", err);
+        console.warn("Failed to load catalog from API:", err);
       }
       allTools = [];
-      renderRows();
+      renderFolder();
     }
 
+    // Initialize
+    updateNavButtons();
+    updateBreadcrumb();
     loadTools();
   </script>
 </Layout>
