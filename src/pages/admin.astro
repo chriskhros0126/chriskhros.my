@@ -63,6 +63,13 @@ import Layout from "../layouts/Layout.astro";
         </div>
         <button
           type="button"
+          id="test-token-btn"
+          class="px-4 py-2.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-xs font-mono font-medium text-emerald-300 transition-colors"
+        >
+          Test Key
+        </button>
+        <button
+          type="button"
           id="save-token-btn"
           class="px-4 py-2.5 rounded-lg bg-hub-surfaceElevated hover:bg-zinc-700 border border-hub-border text-xs font-mono font-medium text-zinc-200 transition-colors"
         >
@@ -347,38 +354,80 @@ import Layout from "../layouts/Layout.astro";
   const refreshCatalogBtn = document.getElementById("refresh-catalog-btn");
   const catalogList = document.getElementById("catalog-list");
 
+  const testTokenBtn = document.getElementById("test-token-btn");
   let selectedFile: File | null = null;
+
+  async function testToken(showNotification = true) {
+    const val = tokenInput.value.trim();
+    if (!val) {
+      if (authBadge) {
+        authBadge.textContent = "No Key Entered";
+        authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700";
+      }
+      if (showNotification) showStatus("Please enter an Admin Secret Key first.", "error");
+      return false;
+    }
+
+    if (authBadge) {
+      authBadge.textContent = "Verifying...";
+      authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30";
+    }
+
+    try {
+      const res = await fetch("/api/tools?verify=true", {
+        headers: { "x-admin-token": val },
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success) {
+        if (authBadge) {
+          authBadge.textContent = "Verified Active";
+          authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-bold";
+        }
+        if (showNotification) showStatus("Your Admin Secret Key is verified and matches Cloudflare Pages!", "success");
+        return true;
+      } else {
+        if (authBadge) {
+          authBadge.textContent = "Auth Failed";
+          authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/50 font-bold";
+        }
+        if (showNotification) {
+          showStatus(`<strong>Authentication Failed:</strong> ${data.error || "Secret key does not match."}`, "error");
+        }
+        return false;
+      }
+    } catch (err: any) {
+      if (authBadge) {
+        authBadge.textContent = "Network Error";
+        authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30";
+      }
+      if (showNotification) showStatus(`Network error checking key: ${err.message}`, "error");
+      return false;
+    }
+  }
+
+  testTokenBtn?.addEventListener("click", () => testToken(true));
 
   // Restore saved token
   const savedToken = sessionStorage.getItem("chriskhros_admin_token") || localStorage.getItem("chriskhros_admin_token") || "";
   if (savedToken) {
     tokenInput.value = savedToken;
-    updateAuthBadge(true);
+    testToken(false);
   }
 
-  function updateAuthBadge(hasToken: boolean) {
-    if (authBadge) {
-      if (hasToken) {
-        authBadge.textContent = "Token Configured";
-        authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
-      } else {
-        authBadge.textContent = "Not Verified";
-        authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700";
-      }
-    }
-  }
-
-  saveTokenBtn?.addEventListener("click", () => {
+  saveTokenBtn?.addEventListener("click", async () => {
     const val = tokenInput.value.trim();
     if (val) {
       sessionStorage.setItem("chriskhros_admin_token", val);
       localStorage.setItem("chriskhros_admin_token", val);
-      updateAuthBadge(true);
-      showStatus("Admin Secret Key saved in browser session.", "success");
+      await testToken(true);
     } else {
       sessionStorage.removeItem("chriskhros_admin_token");
       localStorage.removeItem("chriskhros_admin_token");
-      updateAuthBadge(false);
+      if (authBadge) {
+        authBadge.textContent = "Not Verified";
+        authBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700";
+      }
       showStatus("Admin token cleared.", "info");
     }
   });

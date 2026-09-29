@@ -41,6 +41,58 @@ const corsHeaders = {
 // Built-in seed tools fallback (empty by default)
 const SEED_TOOLS: ToolItem[] = [];
 
+// Helper: validate admin secret key with clear diagnostic errors
+function validateAdminAuth(request: Request, env: Env): { authorized: boolean; errorResponse?: Response } {
+  const authHeader = (
+    request.headers.get("x-admin-token") ||
+    request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ||
+    ""
+  ).trim();
+
+  const configuredSecret = (env.ADMIN_SECRET_KEY || "").trim();
+
+  if (!configuredSecret) {
+    return {
+      authorized: false,
+      errorResponse: new Response(
+        JSON.stringify({
+          error: "Cloudflare Configuration Error: ADMIN_SECRET_KEY is not defined in Cloudflare Pages environment variables. Please add ADMIN_SECRET_KEY in Cloudflare Pages (Settings -> Environment variables) and trigger a redeploy.",
+          code: "MISSING_ENV_SECRET",
+        }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      ),
+    };
+  }
+
+  if (!authHeader) {
+    return {
+      authorized: false,
+      errorResponse: new Response(
+        JSON.stringify({
+          error: "Unauthorized: No Admin Secret Key provided. Please enter your secret key in Step 1.",
+          code: "NO_SECRET_PROVIDED",
+        }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      ),
+    };
+  }
+
+  if (authHeader !== configuredSecret) {
+    return {
+      authorized: false,
+      errorResponse: new Response(
+        JSON.stringify({
+          error: "Unauthorized: The entered key does not match the ADMIN_SECRET_KEY configured in Cloudflare Pages. Please check for typos or copy-paste whitespace.",
+          code: "INVALID_SECRET",
+        }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      ),
+    };
+  }
+
+  return { authorized: true };
+}
+
 // Helper: load tools index from R2 or fallback
 async function loadToolsFromStorage(env: Env): Promise<ToolItem[]> {
   // Option A: Direct Cloudflare R2 bucket binding
@@ -51,7 +103,6 @@ async function loadToolsFromStorage(env: Env): Promise<ToolItem[]> {
         const text = await obj.text();
         const stored: ToolItem[] = JSON.parse(text);
         if (Array.isArray(stored)) {
-          // Once an index is established in R2, it is the authoritative source of truth
           return stored;
         }
       }
@@ -81,12 +132,11 @@ async function loadToolsFromStorage(env: Env): Promise<ToolItem[]> {
         const text = await res.Body.transformToString();
         const stored: ToolItem[] = JSON.parse(text);
         if (Array.isArray(stored)) {
-          // Once an index is established in R2, it is the authoritative source of truth
           return stored;
         }
       }
     } catch {
-      // Index object might not exist yet, fallback to seed tools
+      // Index object does not exist yet
     }
   }
 
@@ -123,23 +173,37 @@ async function saveToolsToStorage(env: Env, tools: ToolItem[]): Promise<void> {
     return;
   }
 
-  throw new Error("Neither R2_BUCKET binding nor R2 S3 credentials are configured for persistent write.");
+  throw new Error("Neither R2_BUCKET binding nor R2 S3 credentials are configured for storage persistence.");
 }
 
 export const onRequestOptions = async () => {
   return new Response(null, { status: 204, headers: corsHeaders });
 };
 
-// GET: Fetch list of all tools & downloadable binaries
+// GET: Fetch catalog or test authorization
 export const onRequestGet: PagesFunction<Env> = async (context) => {
-  const { env } = context;
+  const { request, env } = context;
+  const url = new URL(request.url);
+
+  // Endpoint to test token validity from frontend
+  if (url.searchParams.get("verify") === "true") {
+    const auth = validateAdminAuth(request, env);
+    if (!auth.authorized) {
+      return auth.errorResponse!;
+    }
+    return new Response(
+      JSON.stringify({ success: true, message: "Admin Secret Key verified successfully." }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+
   try {
     const tools = await loadToolsFromStorage(env);
     return new Response(JSON.stringify(tools), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
         ...corsHeaders,
       },
     });
@@ -155,14 +219,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
-  const authHeader = request.headers.get("x-admin-token") ||
-                     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-
-  if (!env.ADMIN_SECRET_KEY || authHeader !== env.ADMIN_SECRET_KEY) {
-    return new Response(JSON.stringify({ error: "Unauthorized: Invalid admin secret." }), {
-      status: 401,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
+  const auth = validateAdminAuth(request, env);
+  if (!auth.authorized) {
+    return auth.errorResponse!;
   }
 
   let body: Partial<ToolItem>;
@@ -206,7 +265,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   try {
     const currentTools = await loadToolsFromStorage(env);
-    // Replace if exists, else prepend
     const existingIndex = currentTools.findIndex(t => t.id === newTool.id);
     if (existingIndex >= 0) {
       currentTools[existingIndex] = newTool;
@@ -232,14 +290,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 export const onRequestDelete: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
-  const authHeader = request.headers.get("x-admin-token") ||
-                     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-
-  if (!env.ADMIN_SECRET_KEY || authHeader !== env.ADMIN_SECRET_KEY) {
-    return new Response(JSON.stringify({ error: "Unauthorized: Invalid admin secret." }), {
-      status: 401,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
+  const auth = validateAdminAuth(request, env);
+  if (!auth.authorized) {
+    return auth.errorResponse!;
   }
 
   const url = new URL(request.url);

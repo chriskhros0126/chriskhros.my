@@ -38,21 +38,26 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
   // 1. Authenticate Request via Admin Secret
-  const authHeader = request.headers.get("x-admin-token") || 
-                     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  const authHeader = (
+    request.headers.get("x-admin-token") || 
+    request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ||
+    ""
+  ).trim();
 
-  if (!env.ADMIN_SECRET_KEY) {
+  const configuredSecret = (env.ADMIN_SECRET_KEY || "").trim();
+
+  if (!configuredSecret) {
     return new Response(
       JSON.stringify({
-        error: "Server configuration error: ADMIN_SECRET_KEY is not defined in Cloudflare Pages environment variables.",
+        error: "Server configuration error: ADMIN_SECRET_KEY is not defined in Cloudflare Pages environment variables. Please add ADMIN_SECRET_KEY under Settings -> Environment variables.",
       }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 
-  if (!authHeader || authHeader !== env.ADMIN_SECRET_KEY) {
+  if (authHeader !== configuredSecret) {
     return new Response(
-      JSON.stringify({ error: "Unauthorized: Invalid or missing admin secret token." }),
+      JSON.stringify({ error: "Unauthorized: Invalid or missing admin secret token. The key does not match ADMIN_SECRET_KEY on Cloudflare Pages." }),
       { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
