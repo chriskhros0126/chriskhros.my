@@ -20,13 +20,13 @@ const platforms = [
 ];
 ---
 
-<div class="space-y-4 mb-8">
+<div class="space-y-5 mb-10">
   <!-- Search Input and Platform Dropdown Bar -->
   <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3">
     <!-- Instant Search Input -->
     <div class="relative flex-1">
-      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-text-dark/40">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
@@ -35,19 +35,19 @@ const platforms = [
         type="text"
         id="search-input"
         placeholder="Search tools, platforms, file types, or keywords (Press '/' to focus)..."
-        class="w-full pl-10 pr-20 py-2.5 rounded-lg bg-hub-surface border border-hub-border text-hub-textBright placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-sans text-sm transition-all"
+        class="w-full pl-12 pr-20 py-3.5 rounded-full bg-white/90 border border-black/10 text-text-dark placeholder-text-dark/40 focus:outline-none focus:border-brand-vibrant-purple focus:ring-2 focus:ring-brand-vibrant-purple/20 font-secondary text-sm transition-all shadow-sm"
         autocomplete="off"
         spellcheck="false"
       />
 
-      <div class="absolute inset-y-0 right-0 pr-3 flex items-center gap-1.5 pointer-events-none">
-        <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-hub-surfaceElevated border border-hub-border rounded">
+      <div class="absolute inset-y-0 right-0 pr-4 flex items-center gap-2 pointer-events-none">
+        <kbd class="hidden sm:inline-block px-2 py-0.5 text-[11px] font-mono font-medium text-text-dark/60 bg-black/5 border border-black/10 rounded-full">
           /
         </kbd>
         <button
           type="button"
           id="clear-search"
-          class="hidden pointer-events-auto text-zinc-500 hover:text-zinc-300 p-0.5"
+          class="hidden pointer-events-auto text-text-dark/40 hover:text-text-dark p-0.5"
           title="Clear search"
         >
           <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
@@ -59,16 +59,16 @@ const platforms = [
 
     <!-- Platform Selector -->
     <div class="flex items-center gap-2">
-      <div class="relative w-full md:w-44">
+      <div class="relative w-full md:w-52">
         <select
           id="platform-select"
-          class="w-full appearance-none px-3.5 py-2.5 rounded-lg bg-hub-surface border border-hub-border text-zinc-200 text-sm font-sans focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+          class="w-full appearance-none px-5 py-3.5 rounded-full bg-white/90 border border-black/10 text-text-dark text-sm font-secondary font-medium focus:outline-none focus:border-brand-vibrant-purple transition-colors cursor-pointer shadow-sm"
         >
           {platforms.map((p) => (
             <option value={p.id}>{p.label}</option>
           ))}
         </select>
-        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-zinc-500">
+        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-text-dark/50">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
@@ -78,16 +78,16 @@ const platforms = [
   </div>
 
   <!-- Category Pills and Results Count -->
-  <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-    <div class="flex flex-wrap items-center gap-1.5" id="category-filter-group">
+  <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
+    <div class="flex flex-wrap items-center gap-2" id="category-filter-group">
       {categories.map((cat, idx) => (
         <button
           type="button"
           data-category-target={cat.id}
-          class={`category-tab px-3.5 py-1.5 rounded-md text-xs font-mono transition-all duration-150 border ${
+          class={`category-tab px-5 py-2 rounded-full text-xs font-secondary font-medium transition-all duration-200 border ${
             idx === 0
-              ? "active bg-emerald-500/15 text-emerald-300 border-emerald-500/40 font-medium"
-              : "bg-hub-surface/60 text-zinc-400 border-hub-border hover:text-zinc-200 hover:bg-hub-surfaceElevated"
+              ? "active bg-text-dark text-white border-text-dark shadow-md font-semibold"
+              : "bg-white/70 text-text-dark/70 border-black/10 hover:text-text-dark hover:bg-white"
           }`}
         >
           {cat.label}
@@ -96,8 +96,8 @@ const platforms = [
     </div>
 
     <!-- Live Counter -->
-    <div class="text-xs font-mono text-zinc-400 flex items-center gap-2">
-      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+    <div class="text-xs font-mono font-medium text-text-dark/70 flex items-center gap-2 bg-white/80 px-3.5 py-1.5 rounded-full border border-black/5 shadow-sm">
+      <span class="inline-block w-2 h-2 rounded-full bg-brand-vibrant-teal animate-pulse"></span>
       <span id="results-count">Showing {totalTools} tools</span>
     </div>
   </div>
@@ -202,11 +202,11 @@ const platforms = [
     categoryTabs.forEach((tab) => {
       tab.addEventListener("click", () => {
         categoryTabs.forEach((t) => {
-          t.classList.remove("active", "bg-emerald-500/15", "text-emerald-300", "border-emerald-500/40", "font-medium");
-          t.classList.add("bg-hub-surface/60", "text-zinc-400", "border-hub-border");
+          t.classList.remove("active", "bg-text-dark", "text-white", "border-text-dark", "shadow-md", "font-semibold");
+          t.classList.add("bg-white/70", "text-text-dark/70", "border-black/10");
         });
-        tab.classList.remove("bg-hub-surface/60", "text-zinc-400", "border-hub-border");
-        tab.classList.add("active", "bg-emerald-500/15", "text-emerald-300", "border-emerald-500/40", "font-medium");
+        tab.classList.remove("bg-white/70", "text-text-dark/70", "border-black/10");
+        tab.classList.add("active", "bg-text-dark", "text-white", "border-text-dark", "shadow-md", "font-semibold");
 
         currentCategory = tab.getAttribute("data-category-target") || "all";
         filterTools();
@@ -227,7 +227,7 @@ const platforms = [
         if (url) {
           await navigator.clipboard.writeText(url);
           const original = btn.innerHTML;
-          btn.innerHTML = `<svg class="w-4 h-4 text-emerald-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>`;
+          btn.innerHTML = `<svg class="w-4 h-4 text-teal-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>`;
           setTimeout(() => (btn.innerHTML = original), 2000);
         }
       });
@@ -240,14 +240,13 @@ const platforms = [
         if (sha) {
           await navigator.clipboard.writeText(sha);
           const original = btn.innerHTML;
-          btn.innerHTML = `<span class="text-[10px] text-emerald-400">Copied!</span>`;
+          btn.innerHTML = `<span class="text-[10px] text-purple-600 font-bold">Copied!</span>`;
           setTimeout(() => (btn.innerHTML = original), 1500);
         }
       });
     });
   }
 
-  // Run on page load and view transitions
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", setupSearchFilter);
   } else {

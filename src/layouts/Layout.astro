@@ -5,13 +5,13 @@ export interface Props {
 }
 
 const {
-  title = "chriskhros.my // Personal Tools & Binary Distribution Hub",
-  description = "Production-ready personal tooling hub, downloadable binaries (100MB-250MB+), and browser-native utilities hosted on Cloudflare Pages and R2.",
+  title = "CHRISKHROS.MY // Personal Tools & Binary Distribution",
+  description = "High-throughput binary distribution and browser-native developer utilities on Cloudflare Pages and R2.",
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,85 +20,98 @@ const {
     <title>{title}</title>
     <meta name="description" content={description} />
     
-    <!-- Open Graph / Meta -->
+    <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- Google Fonts: JetBrains Mono + Inter -->
+    <!-- Google Fonts: Syne (Bold Display) + Inter (Clean Text) + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
     <style is:global>
-      :root {
-        color-scheme: dark;
+      .animate-on-scroll-hidden {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
       }
-      body {
-        background-color: #0a0d14;
-        color: #e2e8f0;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      .animate-on-scroll-visible {
+        opacity: 1;
+        transform: translateY(0);
       }
-      code, kbd, samp, pre {
-        font-family: 'JetBrains Mono', monospace;
+      
+      @keyframes blob-float {
+        0% { transform: translate(0px, 0px) rotate(0deg) scale(1); }
+        33% { transform: translate(80px, -120px) rotate(120deg) scale(1.15); }
+        66% { transform: translate(-80px, 80px) rotate(240deg) scale(0.85); }
+        100% { transform: translate(0px, 0px) rotate(360deg) scale(1); }
       }
-      /* Custom sleek scrollbar */
+      .animate-blob {
+        animation: blob-float 22s linear infinite;
+      }
+      .animation-delay-2000 { animation-delay: 2s; }
+      .animation-delay-4000 { animation-delay: 4s; }
+
+      /* SVG text mask sizing fallback */
+      svg text {
+        user-select: none;
+      }
+
+      /* Custom scrollbar */
       ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 10px;
       }
       ::-webkit-scrollbar-track {
-        background: #0a0d14;
+        background: #fcffd7;
       }
       ::-webkit-scrollbar-thumb {
-        background: #1e2638;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #2a354d;
+        background: #1a1a1a;
+        border-radius: 5px;
+        border: 2px solid #fcffd7;
       }
     </style>
   </head>
-  <body class="min-h-screen flex flex-col bg-hub-bg text-hub-textBase selection:bg-emerald-500/30 selection:text-emerald-300">
-    <!-- Background subtle grid pattern -->
-    <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(#1e2638_1px,transparent_1px)] [background-size:24px_24px] opacity-25 z-0"></div>
-
-    <!-- Navigation Header -->
-    <header class="sticky top-0 z-50 w-full border-b border-hub-border/80 bg-hub-bg/85 backdrop-blur-md">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <!-- Logo / Domain -->
+  <body class="font-secondary bg-neutral-background text-text-dark min-h-screen flex flex-col antialiased selection:bg-brand-vibrant-purple selection:text-white">
+    
+    <!-- Floating Header -->
+    <header class="sticky top-4 z-50 px-4 md:px-10 max-w-[1440px] mx-auto w-full pointer-events-none">
+      <div class="pointer-events-auto bg-text-dark/95 text-white backdrop-blur-xl border border-white/10 rounded-full px-6 py-3.5 flex items-center justify-between shadow-2xl transition-all">
+        <!-- Logo -->
         <a href="/" class="flex items-center gap-3 group">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 group-hover:border-emerald-500/60 transition-all">
-            <span class="font-mono font-bold text-sm">ck</span>
+          <div class="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-brand-primary group-hover:scale-110 transition-transform">
+            <svg class="w-4 h-4 text-brand-vibrant-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
           </div>
-          <div class="flex flex-col">
-            <span class="font-mono font-semibold text-hub-textBright text-sm tracking-tight flex items-center gap-1.5">
-              chriskhros.my
-              <span class="text-[10px] font-mono text-emerald-400 font-normal px-1.5 py-0.2 bg-emerald-500/10 rounded border border-emerald-500/20">edge</span>
+          <div class="flex items-center gap-2">
+            <span class="font-primary font-bold text-sm tracking-tight text-white group-hover:text-brand-primary transition-colors">
+              CHRISKHROS.MY
             </span>
-            <span class="text-[11px] text-zinc-500 font-mono">tools & binary hub</span>
+            <span class="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded-full bg-brand-vibrant-teal/20 text-brand-vibrant-teal border border-brand-vibrant-teal/30">
+              R2 Edge
+            </span>
           </div>
         </a>
 
-        <!-- Header Nav Links -->
-        <nav class="flex items-center gap-1 sm:gap-2">
+        <!-- Navigation Links -->
+        <nav class="flex items-center gap-2">
           <a
             href="/"
-            class="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white hover:bg-hub-surface rounded-md transition-colors"
+            class="px-4 py-1.5 rounded-full text-xs font-secondary font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all"
           >
             Hub
           </a>
           <a
             href="/tools/demo-tool"
-            class="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white hover:bg-hub-surface rounded-md transition-colors flex items-center gap-1.5"
+            class="px-4 py-1.5 rounded-full text-xs font-secondary font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
           >
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-vibrant-teal animate-pulse"></span>
             DevForge
           </a>
           <a
             href="/admin"
-            class="px-3 py-1.5 text-xs font-mono text-zinc-400 hover:text-amber-400 hover:bg-hub-surface rounded-md transition-colors flex items-center gap-1"
+            class="px-4 py-1.5 rounded-full text-xs font-secondary font-semibold bg-white text-text-dark hover:bg-brand-primary hover:scale-105 transition-all shadow-md shadow-black/20 flex items-center gap-1.5"
           >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -109,26 +122,45 @@ const {
       </div>
     </header>
 
-    <!-- Main Content Slot -->
-    <main class="relative z-10 flex-1">
+    <!-- Main Content -->
+    <main class="flex-grow">
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer class="relative z-10 border-t border-hub-border/60 bg-hub-surface/40 py-8 text-xs font-mono text-zinc-500">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>chriskhros.my</span>
-          <span class="text-zinc-700">|</span>
-          <span>Engineered on Cloudflare Pages + R2</span>
+    <footer class="w-full bg-neutral-background py-12 px-4 md:px-10 border-t border-black/10 mt-20">
+      <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <span class="font-primary font-bold text-lg text-text-dark">CHRISKHROS.MY</span>
+          <span class="text-black/30">•</span>
+          <span class="text-xs text-black/60 font-secondary">Cloudflare Pages + R2 Distribution Hub</span>
         </div>
-        <div class="flex items-center gap-4 text-zinc-400">
-          <a href="/admin" class="hover:text-emerald-400 transition-colors">Admin Portal</a>
-          <a href="/tools/demo-tool" class="hover:text-emerald-400 transition-colors">Client Tools</a>
-          <span class="text-zinc-600">S3 Presigned Streaming</span>
+        <div class="flex items-center gap-6 text-xs font-secondary font-medium text-black/70">
+          <a href="/" class="hover:text-text-dark transition-colors">Directory</a>
+          <a href="/tools/demo-tool" class="hover:text-text-dark transition-colors">DevForge Utility</a>
+          <a href="/admin" class="hover:text-text-dark transition-colors">Admin Console</a>
+          <span class="text-black/40">S3 Direct Streaming</span>
         </div>
       </div>
     </footer>
+
+    <!-- Scroll Animation Observer -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("animate-on-scroll-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll("[data-animation-on-scroll]").forEach(el => {
+          el.classList.add("animate-on-scroll-hidden");
+          observer.observe(el);
+        });
+      });
+    </script>
   </body>
 </html>

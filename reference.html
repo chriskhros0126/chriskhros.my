@@ -1,0 +1,172 @@
+ <!DOCTYPE html><html lang="en"><head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Data-Driven Marketing</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&amp;family=Inter:wght@300;400;500&amp;display=swap" rel="stylesheet">
+  
+  <style>
+    .animate-on-scroll-hidden { opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+    .animate-on-scroll-visible { opacity: 1; transform: translateY(0); }
+    
+    @keyframes blob-float {
+      0% { transform: translate(0px, 0px) rotate(0deg) scale(1); }
+      33% { transform: translate(100px, -150px) rotate(120deg) scale(1.2); }
+      66% { transform: translate(-100px, 100px) rotate(240deg) scale(0.8); }
+      100% { transform: translate(0px, 0px) rotate(360deg) scale(1); }
+    }
+    .animate-blob {
+      animation: blob-float 20s linear infinite;
+    }
+    .animation-delay-2000 { animation-delay: 2s; }
+    .animation-delay-4000 { animation-delay: 4s; }
+  </style>
+<style type="text/tailwindcss">@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+.video-text-mask {
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}</style><script src="https://cdn.tailwindcss.com"></script><script>tailwind.config = {
+  important: '#app-root',
+  theme: {
+    extend: {
+      colors: {
+        'brand-primary': 'rgb(252, 255, 215)',
+        'brand-accent': 'rgb(196, 198, 168)',
+        'brand-vibrant-purple': '#a855f7',
+        'brand-vibrant-blue': '#3b82f6',
+        'brand-vibrant-teal': '#2dd4bf',
+        'brand-vibrant-pink': '#ec4899',
+        'neutral-background': 'rgb(252, 255, 215)',
+        'text-dark': 'rgb(26, 26, 26)',
+      },
+      fontFamily: {
+        'primary': ['Syne', 'sans-serif'],
+        'secondary': ['Inter', 'sans-serif'],
+      },
+      borderRadius: {
+        'xl': '30px',
+        '2xl': '50px',
+      },
+    }
+  }
+}</script></head>
+<body id="app-root">
+  <div class="font-secondary bg-neutral-background text-text-dark min-h-screen flex flex-col w-full relative">
+    <main class="flex-grow"><section class="w-full bg-neutral-background py-10 px-4 md:px-10 overflow-hidden">
+  <div class="max-w-[1440px] mx-auto">
+    <!-- Masked Text Section -->
+    <div class="relative w-full h-[120px] md:h-[180px] mb-4 overflow-hidden flex items-end">
+      <!-- Using SVG for reliable animation masking across browsers -->
+      <svg class="w-full h-full" viewBox="0 0 1600 150" preserveAspectRatio="xMinYMid meet">
+        <defs>
+          <mask id="textMask">
+            <text x="0" y="120" font-family="'Syne', sans-serif" font-size="118" font-weight="800" fill="white" style="text-transform: uppercase; letter-spacing: -2px;">DIGITAL TREND</text>
+          </mask>
+        </defs>
+        <foreignObject mask="url(#textMask)" width="100%" height="100%">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full relative">
+            <!-- Masked Heading Background: Deep dark iridescent fluid -->
+            <img src="https://images.unsplash.com/photo-1652982261193-8160514e985b?ixid=M3w4NjU0NDF8MHwxfHNlYXJjaHwxfHxEZWVwJTIwYmxhY2slMjBhbmQlMjBkYXJrJTIwYmx1ZSUyMGlyaWRlc2NlbnQlMjBmbHVpZCUyMHdhdmVzJTIwd2l0aCUyMHN1YnRsZSUyMG1ldGFsbGljJTIwaGlnaGxpZ2h0cyUyMGFuZCUyMGxpcXVpZCUyMHRleHR1cmV8ZW58MHwwfHx8MTc3MjAyMDgzN3ww&amp;ixlib=rb-4.1.0&amp;w=1474&amp;fit=crop&amp;fm=jpg&amp;q=80" alt="Deep dark iridescent fluid abstract" class="w-full h-full object-cover">
+          </div>
+        </foreignObject>
+      </svg>
+    </div>
+
+    <!-- Main Content Box -->
+    <div class="relative w-full min-h-[600px] rounded-2xl md:rounded-[50px] overflow-hidden border border-white/10 shadow-2xl">
+      <!-- Main Background: Full opacity with a readability gradient -->
+      <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1766340118459-2af615146bcd?ixid=M3w4NjU0NDF8MHwxfHNlYXJjaHwxfHxEYXJrJTIwaXJpZGVzY2VudCUyMGZsdWlkJTIwYWJzdHJhY3QlMjByaXBwbGVzJTIwbGlxdWlkJTIwd2F2ZXMlMjBwdXJwbGUlMjBibHVlJTIwYmxhY2slMjBtZXRhbGxpYyUyMGdsb3NzeXxlbnwwfDB8fHwxNzcyMDIxNzk5fDA&amp;ixlib=rb-4.1.0&amp;w=1474&amp;fit=crop&amp;fm=jpg&amp;q=80" alt="Iridescent fluid abstract ripples" class="w-full h-full object-cover opacity-100">
+        
+        <!-- Gradient Overlay: Black from top disappearing as it goes down -->
+        <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-transparent"></div>
+        
+        <!-- Subtle noise overlay for texture -->
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/stardust.png');"></div>
+      </div>
+
+      <!-- Content Overlay -->
+      <div class="relative z-10 w-full h-full grid grid-cols-1 lg:grid-cols-[350px_1fr] p-8 md:p-14 min-h-[600px]">
+        
+        <!-- Left Column -->
+        <div class="flex flex-col justify-between relative z-20">
+          <div>
+            <!-- Interactive Glassmorphic Badge -->
+            <div class="relative w-20 h-20 mb-8 group">
+              <div class="absolute inset-0 bg-brand-vibrant-teal/20 rounded-full blur-2xl group-hover:bg-brand-vibrant-purple/30 transition-all duration-700"></div>
+              <div class="relative w-full h-full bg-white/10 border border-white/20 backdrop-blur-xl rounded-[24px] flex items-center justify-center overflow-hidden shadow-2xl transform group-hover:rotate-6 transition-transform duration-500">
+                <div class="absolute -inset-2 bg-gradient-to-br from-brand-vibrant-purple/20 via-transparent to-brand-vibrant-teal/20 animate-pulse"></div>
+                <svg class="w-8 h-8 text-white group-hover:text-brand-vibrant-purple transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+            </div>
+            <p class="text-lg md:text-xl font-secondary text-white/90 tracking-tight">
+              Digital mixing trends</p>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="flex flex-col justify-between items-start lg:items-end lg:pr-10 mt-10 lg:mt-0 relative z-20">
+          <div class="max-w-md lg:text-left">
+            <p class="text-lg md:text-xl font-secondary text-white leading-relaxed mb-10">
+              Digital color mixings according to the trends of the season, paraffin and toxins free.&nbsp;<br>creating a better colorful world.</p>
+            
+            <a href="#" class="inline-flex items-center justify-center px-10 py-3 bg-white text-text-dark hover:bg-brand-primary font-secondary text-lg font-semibold rounded-full hover:scale-105 transition-all duration-300 shadow-xl shadow-white/10">
+              Book Online
+            </a>
+          </div>
+
+          <!-- Bottom Right Arrow Button -->
+          <div class="mt-auto self-end lg:self-end">
+             <div class="w-24 h-24 rounded-full bg-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300 group shadow-lg shadow-white/10">
+                <svg viewBox="19.588 20.146 159.561 159.541" class="w-10 h-10 text-text-dark group-hover:translate-x-1 group-hover:translate-y-1 transition-transform">
+                  <path fill="currentColor" d="M170.281 20.146v144.371L25.892 20.16l-6.27 6.268 144.421 144.393H19.588v8.866h159.561V20.146h-8.868z"></path>
+                </svg>
+             </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Fallback for the SVG text mask sizing on some engines */
+  svg text {
+    user-select: none;
+  }
+</style></main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-on-scroll-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('[data-animation-on-scroll]').forEach(el => {
+        el.classList.add('animate-on-scroll-hidden');
+        observer.observe(el);
+      });
+    });
+  </script>
+
+</body></html>
