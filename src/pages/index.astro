@@ -555,9 +555,9 @@ import Layout from "../layouts/Layout.astro";
         connectingLine.setAttribute("x2", String(x));
         connectingLine.setAttribute("y2", String(y));
         connectingLine.setAttribute("stroke", "#ffffff");
-        connectingLine.setAttribute("stroke-width", "1.5");
-        connectingLine.setAttribute("stroke-dasharray", "5 5");
-        connectingLine.setAttribute("stroke-opacity", "0.9");
+        connectingLine.setAttribute("stroke-width", "1");
+        connectingLine.setAttribute("stroke-dasharray", "12 10");
+        connectingLine.setAttribute("stroke-opacity", "0.4");
         osuSvgLines.appendChild(connectingLine);
       }
 
@@ -623,7 +623,7 @@ import Layout from "../layouts/Layout.astro";
 
         if (connectingLine) {
           connectingLine.animate([
-            { opacity: 0.9 },
+            { opacity: 0.4 },
             { opacity: 0 }
           ], {
             duration: fadeDuration,
